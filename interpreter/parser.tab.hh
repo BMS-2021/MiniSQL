@@ -49,11 +49,13 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NUMBER = 258,
-    TOKHEAT = 259,
-    STATE = 260,
-    TOKTARGET = 261,
-    TOKTEMPERATURE = 262
+    T_STRING = 258,
+    K_DATABASE = 259,
+    K_TABLE = 260,
+    K_CREATE = 261,
+    K_SELECT = 262,
+    K_UPDATE = 263,
+    K_DROP = 264
   };
 #endif
 

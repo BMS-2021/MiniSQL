@@ -71,7 +71,9 @@
 #include <iostream>
 
 #include "interpreter.h"
-#include "proto.h"
+#include "model.h"
+
+extern query::base *query_object_ptr;
 
 int yywrap()
 {
@@ -84,7 +86,7 @@ int yyerror()
 }
 
 
-#line 88 "parser.tab.cc"
+#line 90 "parser.tab.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -132,11 +134,13 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NUMBER = 258,
-    TOKHEAT = 259,
-    STATE = 260,
-    TOKTARGET = 261,
-    TOKTEMPERATURE = 262
+    T_STRING = 258,
+    K_DATABASE = 259,
+    K_TABLE = 260,
+    K_CREATE = 261,
+    K_SELECT = 262,
+    K_UPDATE = 263,
+    K_DROP = 264
   };
 #endif
 
@@ -456,21 +460,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  2
+#define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   6
+#define YYLAST   3
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  8
+#define YYNTOKENS  10
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  5
+#define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  7
+#define YYNRULES  4
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  11
+#define YYNSTATES  8
 
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   262
+#define YYMAXUTOK   264
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -508,14 +512,14 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7
+       5,     6,     7,     8,     9
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    23,    23,    24,    27,    28,    32,    40
+       0,    28,    28,    34,    37
 };
 #endif
 
@@ -524,9 +528,9 @@ static const yytype_int8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "NUMBER", "TOKHEAT", "STATE",
-  "TOKTARGET", "TOKTEMPERATURE", "$accept", "commands", "command",
-  "heat_switch", "target_set", YY_NULLPTR
+  "$end", "error", "$undefined", "T_STRING", "K_DATABASE", "K_TABLE",
+  "K_CREATE", "K_SELECT", "K_UPDATE", "K_DROP", "$accept", "top_input",
+  "top_stmt", "drop_table", YY_NULLPTR
 };
 #endif
 
@@ -535,11 +539,11 @@ static const char *const yytname[] =
    (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_int16 yytoknum[] =
 {
-       0,   256,   257,   258,   259,   260,   261,   262
+       0,   256,   257,   258,   259,   260,   261,   262,   263,   264
 };
 # endif
 
-#define YYPACT_NINF (-6)
+#define YYPACT_NINF (-10)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -553,8 +557,7 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -6,     0,    -6,    -4,    -5,    -6,    -6,    -6,    -6,     2,
-      -6
+      -9,    -4,     2,   -10,   -10,     0,   -10,   -10
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -562,20 +565,19 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       2,     0,     1,     0,     0,     3,     4,     5,     6,     0,
-       7
+       0,     0,     0,     2,     3,     0,     1,     4
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -6,    -6,    -6,    -6,    -6
+     -10,   -10,   -10,   -10
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,     5,     6,     7
+      -1,     2,     3,     4
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -583,32 +585,31 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       2,     8,     9,     0,     3,    10,     4
+       1,     5,     6,     7
 };
 
 static const yytype_int8 yycheck[] =
 {
-       0,     5,     7,    -1,     4,     3,     6
+       9,     5,     0,     3
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     9,     0,     4,     6,    10,    11,    12,     5,     7,
-       3
+       0,     9,    11,    12,    13,     5,     0,     3
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,     8,     9,     9,    10,    10,    11,    12
+       0,    10,    11,    12,    13
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0,     2,     1,     1,     2,     3
+       0,     2,     1,     1,     3
 };
 
 
@@ -1303,25 +1304,27 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 6:
-#line 33 "parser.y"
+  case 2:
+#line 29 "parser.y"
     {
-        std::cout << test(1) << std::endl;
-        std::cout << "Heat turned on or off";
+        YYACCEPT;
     }
 #line 1313 "parser.tab.cc"
     break;
 
-  case 7:
-#line 41 "parser.y"
+  case 4:
+#line 38 "parser.y"
     {
-        std::cout << "Temperature set";
+        auto drop_table = new query::drop_table();
+        drop_table->table_name = yyvsp[0];
+
+        query_object_ptr = drop_table;
     }
-#line 1321 "parser.tab.cc"
+#line 1324 "parser.tab.cc"
     break;
 
 
-#line 1325 "parser.tab.cc"
+#line 1328 "parser.tab.cc"
 
       default: break;
     }

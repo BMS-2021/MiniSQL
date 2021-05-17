@@ -2,7 +2,9 @@
 #include <iostream>
 
 #include "interpreter.h"
-#include "proto.h"
+#include "model.h"
+
+extern query::base *query_object_ptr;
 
 int yywrap()
 {
@@ -16,32 +18,30 @@ int yyerror()
 
 %}
 
-%token  NUMBER TOKHEAT STATE TOKTARGET TOKTEMPERATURE
+%token
+T_STRING
+K_DATABASE K_TABLE
+K_CREATE K_SELECT K_UPDATE K_DROP
 
 %%
 
-commands: /* empty */
-    | commands command
-;
-
-command: heat_switch
-    | target_set
-;
-
-heat_switch:
-    TOKHEAT STATE
+top_input: top_stmt
     {
-        std::cout << test(1) << std::endl;
-        std::cout << "Heat turned on or off";
+        YYACCEPT;
     }
-;
+    ;
 
-target_set:
-    TOKTARGET TOKTEMPERATURE NUMBER
+top_stmt: drop_table
+    ;
+
+drop_table: K_DROP K_TABLE T_STRING
     {
-        std::cout << "Temperature set";
+        auto drop_table = new query::drop_table();
+        drop_table->table_name = $3;
+
+        query_object_ptr = drop_table;
     }
-;
+    ;
 
 %%
 
