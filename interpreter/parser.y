@@ -19,9 +19,10 @@ int yyerror()
 %}
 
 %token
-T_STRING
 K_DATABASE K_TABLE
 K_CREATE K_SELECT K_UPDATE K_DROP
+
+%token <str> T_STRING
 
 %%
 

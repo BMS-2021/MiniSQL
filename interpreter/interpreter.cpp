@@ -3,14 +3,16 @@
 #include "model.h"
 #include "interpreter.h"
 
+bool sig_exit = false;
 query::base *query_object_ptr = nullptr;
 
 void interpret_entrance() {
-    while (true) {
+    while (!sig_exit) {
         yyparse();
-        auto test = dynamic_cast<query::drop_table *>(query_object_ptr);
+        auto test = dynamic_cast<query::drop_table*>(query_object_ptr);
         if (test != nullptr) {
-            std::cout << "Yes" << std::endl;
+            std::cout << "Table to drop: " << test->table_name << std::endl;
+            std::cout << "Interpreter Yes!!!" << std::endl;
         }
     }
 

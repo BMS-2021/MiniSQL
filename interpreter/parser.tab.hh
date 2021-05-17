@@ -49,22 +49,17 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    T_STRING = 258,
-    K_DATABASE = 259,
-    K_TABLE = 260,
-    K_CREATE = 261,
-    K_SELECT = 262,
-    K_UPDATE = 263,
-    K_DROP = 264
+    K_DATABASE = 258,
+    K_TABLE = 259,
+    K_CREATE = 260,
+    K_SELECT = 261,
+    K_UPDATE = 262,
+    K_DROP = 263,
+    T_STRING = 264
   };
 #endif
 
 /* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
 
 
 extern YYSTYPE yylval;

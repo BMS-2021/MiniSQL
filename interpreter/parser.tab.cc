@@ -134,22 +134,17 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    T_STRING = 258,
-    K_DATABASE = 259,
-    K_TABLE = 260,
-    K_CREATE = 261,
-    K_SELECT = 262,
-    K_UPDATE = 263,
-    K_DROP = 264
+    K_DATABASE = 258,
+    K_TABLE = 259,
+    K_CREATE = 260,
+    K_SELECT = 261,
+    K_UPDATE = 262,
+    K_DROP = 263,
+    T_STRING = 264
   };
 #endif
 
 /* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
 
 
 extern YYSTYPE yylval;
@@ -519,7 +514,7 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    28,    28,    34,    37
+       0,    29,    29,    35,    38
 };
 #endif
 
@@ -528,8 +523,8 @@ static const yytype_int8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "T_STRING", "K_DATABASE", "K_TABLE",
-  "K_CREATE", "K_SELECT", "K_UPDATE", "K_DROP", "$accept", "top_input",
+  "$end", "error", "$undefined", "K_DATABASE", "K_TABLE", "K_CREATE",
+  "K_SELECT", "K_UPDATE", "K_DROP", "T_STRING", "$accept", "top_input",
   "top_stmt", "drop_table", YY_NULLPTR
 };
 #endif
@@ -543,7 +538,7 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF (-10)
+#define YYPACT_NINF (-9)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -557,7 +552,7 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -9,    -4,     2,   -10,   -10,     0,   -10,   -10
+      -8,    -3,     2,    -9,    -9,    -6,    -9,    -9
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -571,7 +566,7 @@ static const yytype_int8 yydefact[] =
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -10,   -10,   -10,   -10
+      -9,    -9,    -9,    -9
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
@@ -590,14 +585,14 @@ static const yytype_int8 yytable[] =
 
 static const yytype_int8 yycheck[] =
 {
-       9,     5,     0,     3
+       8,     4,     0,     9
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     9,    11,    12,    13,     5,     0,     3
+       0,     8,    11,    12,    13,     4,     0,     9
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -1305,26 +1300,26 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 29 "parser.y"
+#line 30 "parser.y"
     {
         YYACCEPT;
     }
-#line 1313 "parser.tab.cc"
+#line 1308 "parser.tab.cc"
     break;
 
   case 4:
-#line 38 "parser.y"
+#line 39 "parser.y"
     {
         auto drop_table = new query::drop_table();
-        drop_table->table_name = yyvsp[0];
+        drop_table->table_name = (yyvsp[0].str);
 
         query_object_ptr = drop_table;
     }
-#line 1324 "parser.tab.cc"
+#line 1319 "parser.tab.cc"
     break;
 
 
-#line 1328 "parser.tab.cc"
+#line 1323 "parser.tab.cc"
 
       default: break;
     }
@@ -1556,7 +1551,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 46 "parser.y"
+#line 47 "parser.y"
 
 
 bool bFlag; /* no meanings. */
