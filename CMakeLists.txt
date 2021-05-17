@@ -3,4 +3,13 @@ project(MiniSQL)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(MiniSQL main.cpp)
+set(INTERPRETER main.cpp
+        interpreter/interpreter.h
+        interpreter/proto.h
+        interpreter/proto.cpp
+        interpreter/lex.yy.cc
+        interpreter/parser.tab.hh
+        interpreter/parser.tab.cc
+)
+
+add_executable(MiniSQL main.cpp ${INTERPRETER})
