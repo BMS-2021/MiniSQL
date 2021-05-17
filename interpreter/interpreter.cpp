@@ -15,5 +15,4 @@ void interpret_entrance() {
             std::cout << "Interpreter Yes!!!" << std::endl;
         }
     }
-
 }

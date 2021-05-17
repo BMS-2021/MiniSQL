@@ -15,11 +15,11 @@ namespace query {
         std::string table_name;
     };
 
-    struct create_table : create {
+    struct create_table final : create {
         std::vector<std::tuple<std::string, value_type>> schema;
     };
 
-    struct create_index : create {
+    struct create_index final : create {
         std::string index_name;
         std::string element_name;
     };
