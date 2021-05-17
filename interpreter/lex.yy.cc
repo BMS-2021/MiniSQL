@@ -726,7 +726,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 14 "tokenizer.l"
-{ return get_token(std::string(yytext)); }
+{ return get_token(yylval.str = std::string(yytext)); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP

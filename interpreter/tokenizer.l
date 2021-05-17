@@ -11,6 +11,6 @@ s_num       [+\-]?{num}
 
 %%
 
-[A-Za-z]([A-Za-z0-9]|_)*  { return get_token(std::string(yytext)); }
+[A-Za-z]([A-Za-z0-9]|_)*  { return get_token(yylval.str = std::string(yytext)); }
 
 %%
