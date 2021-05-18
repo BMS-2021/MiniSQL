@@ -10,6 +10,13 @@
 namespace query {
     struct base {
         virtual void exec(){};
+
+        /*
+         * If expression evaluates to a pointer to a base class subobject
+         * of the object that was allocated with new, the destructor of
+         * the base class must be virtual, otherwise the behavior is undefined.
+         */
+        virtual ~base() = default;
     };
 
     struct create : base {
