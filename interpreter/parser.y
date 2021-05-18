@@ -11,9 +11,16 @@ int yywrap()
     return  1;
 }
 
-int yyerror()
+bool bFlag; /* no meanings. */
+
+extern int yylineno;
+extern char *yytext;
+inline int yyerror(const char *s)
 {
-    return  1;
+    std::cerr << s << std::endl;
+    std::cerr << "line: " << yylineno << " on token " << yytext << std::endl;
+    yywrap();
+    return 1;
 }
 
 %}
@@ -45,14 +52,3 @@ drop_table: K_DROP K_TABLE T_STRING
     ;
 
 %%
-
-bool bFlag; /* no meanings. */
-
-inline int yyerror(const char *s)
-{
-    //std::cerr << "error: ";
-    std::cerr << s << std::endl;
-    //std::cerr << "line: " << yylineno << " on token " << yytext << std::endl;
-    yywrap();
-    return 1;
-}

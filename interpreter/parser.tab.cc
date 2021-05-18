@@ -80,13 +80,20 @@ int yywrap()
     return  1;
 }
 
-int yyerror()
+bool bFlag; /* no meanings. */
+
+extern int yylineno;
+extern char *yytext;
+inline int yyerror(const char *s)
 {
-    return  1;
+    std::cerr << s << std::endl;
+    std::cerr << "line: " << yylineno << " on token " << yytext << std::endl;
+    yywrap();
+    return 1;
 }
 
 
-#line 90 "parser.tab.cc"
+#line 97 "parser.tab.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -457,16 +464,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   4
+#define YYLAST   3
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  11
+#define YYNTOKENS  10
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  4
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  9
+#define YYNSTATES  8
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   264
@@ -486,7 +493,7 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    10,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -514,7 +521,7 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    29,    29,    35,    38
+       0,    36,    36,    42,    45
 };
 #endif
 
@@ -524,8 +531,8 @@ static const yytype_int8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "K_DATABASE", "K_TABLE", "K_CREATE",
-  "K_SELECT", "K_UPDATE", "K_DROP", "T_STRING", "';'", "$accept",
-  "top_input", "top_stmt", "drop_table", YY_NULLPTR
+  "K_SELECT", "K_UPDATE", "K_DROP", "T_STRING", "$accept", "top_input",
+  "top_stmt", "drop_table", YY_NULLPTR
 };
 #endif
 
@@ -534,8 +541,7 @@ static const char *const yytname[] =
    (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_int16 yytoknum[] =
 {
-       0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-      59
+       0,   256,   257,   258,   259,   260,   261,   262,   263,   264
 };
 # endif
 
@@ -553,7 +559,7 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -8,    -3,     2,    -7,    -9,    -5,    -9,    -9,    -9
+      -8,    -3,     2,    -9,    -9,    -6,    -9,    -9
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -561,7 +567,7 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     0,     3,     0,     1,     2,     4
+       0,     0,     0,     2,     3,     0,     1,     4
 };
 
   /* YYPGOTO[NTERM-NUM].  */
@@ -581,31 +587,31 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     5,     6,     7,     8
+       1,     5,     6,     7
 };
 
 static const yytype_int8 yycheck[] =
 {
-       8,     4,     0,    10,     9
+       8,     4,     0,     9
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     8,    12,    13,    14,     4,     0,    10,     9
+       0,     8,    11,    12,    13,     4,     0,     9
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    11,    12,    13,    14
+       0,    10,    11,    12,    13
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     2,     1,     3
+       0,     2,     1,     1,     3
 };
 
 
@@ -1301,26 +1307,26 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 30 "parser.y"
+#line 37 "parser.y"
     {
         YYACCEPT;
     }
-#line 1309 "parser.tab.cc"
+#line 1315 "parser.tab.cc"
     break;
 
   case 4:
-#line 39 "parser.y"
+#line 46 "parser.y"
     {
         auto drop_table = new query::drop_table();
         drop_table->table_name = (yyvsp[0].str);
 
         query_object_ptr = drop_table;
     }
-#line 1320 "parser.tab.cc"
+#line 1326 "parser.tab.cc"
     break;
 
 
-#line 1324 "parser.tab.cc"
+#line 1330 "parser.tab.cc"
 
       default: break;
     }
@@ -1552,16 +1558,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 47 "parser.y"
+#line 54 "parser.y"
 
-
-bool bFlag; /* no meanings. */
-
-inline int yyerror(const char *s)
-{
-    //std::cerr << "error: ";
-    std::cerr << s << std::endl;
-    //std::cerr << "line: " << yylineno << " on token " << yytext << std::endl;
-    yywrap();
-    return 1;
-}

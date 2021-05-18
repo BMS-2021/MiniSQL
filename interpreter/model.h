@@ -3,12 +3,13 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "../macro.h"
 
 namespace query {
     struct base {
-        virtual void placeholder(){};
+        virtual void exec(){};
     };
 
     struct create : base {
@@ -26,6 +27,10 @@ namespace query {
 
     struct drop_table final : base {
         std::string table_name;
+        inline void exec() override {
+            std::cout << "Table to drop: " << table_name << std::endl;
+            std::cout << "Interpreter Yes!!!" << std::endl;
+        }
     };
 }
 
