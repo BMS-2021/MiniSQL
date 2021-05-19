@@ -44,8 +44,7 @@ top_stmt: drop_table
 
 drop_table: K_DROP K_TABLE T_STRING
     {
-        auto drop_table = new query::drop_table();
-        drop_table->table_name = $3;
+        auto drop_table = new query::drop_table($3);
 
         query_object_ptr = drop_table;
     }

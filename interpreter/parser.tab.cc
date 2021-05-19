@@ -1317,16 +1317,15 @@ yyreduce:
   case 4:
 #line 46 "parser.y"
     {
-        auto drop_table = new query::drop_table();
-        drop_table->table_name = (yyvsp[0].str);
+        auto drop_table = new query::drop_table((yyvsp[0].str));
 
         query_object_ptr = drop_table;
     }
-#line 1326 "parser.tab.cc"
+#line 1325 "parser.tab.cc"
     break;
 
 
-#line 1330 "parser.tab.cc"
+#line 1329 "parser.tab.cc"
 
       default: break;
     }
@@ -1558,5 +1557,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 54 "parser.y"
+#line 53 "parser.y"
 
