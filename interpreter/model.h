@@ -21,7 +21,7 @@ namespace query {
 
     class create_table final : public base {
         std::string table_name;
-        std::vector<std::tuple<std::string, value_type>> schema;
+        std::vector<std::pair<std::string, value_type>> schema_list;
 
         inline void exec() override {
             std::cout << "Interpreter Yes!!!" << std::endl;

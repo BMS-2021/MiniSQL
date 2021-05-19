@@ -5,13 +5,19 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_CXX_FLAGS "-fstandalone-debug" )
 
-set(INTERPRETER main.cpp
+set(INTERPRETER
         interpreter/interpreter.h
         interpreter/lex.yy.cc
         interpreter/parser.tab.hh
         interpreter/parser.tab.cc
         interpreter/model.cpp
         interpreter/model.h
-        interpreter/interpreter.cpp interpreter/utils.cpp interpreter/utils.h)
+        interpreter/interpreter.cpp interpreter/utils.cpp interpreter/utils.h
+)
 
-add_executable(MiniSQL macro.h main.cpp ${INTERPRETER})
+set(API
+        api/api.h
+        api/api.cpp
+)
+
+add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API})
