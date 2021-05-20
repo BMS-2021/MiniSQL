@@ -3,8 +3,6 @@ project(MiniSQL)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_CXX_FLAGS "-fstandalone-debug" )
-
 set(INTERPRETER
         interpreter/interpreter.h
         interpreter/lex.yy.cc
