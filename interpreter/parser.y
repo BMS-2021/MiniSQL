@@ -6,11 +6,6 @@
 
 extern query::base *query_object_ptr;
 
-int yywrap()
-{
-    return  1;
-}
-
 bool bFlag; /* no meanings. */
 
 extern int yylineno;
@@ -28,24 +23,24 @@ inline int yyerror(const char *s)
 %token
 K_DATABASE K_TABLE
 K_CREATE K_SELECT K_UPDATE K_DROP
+S_SEMICOLON
 
 %token <str> T_STRING
 
 %%
 
-top_input: top_stmt
+C_TOP_INPUT: C_TOP_STMT S_SEMICOLON
     {
         YYACCEPT;
     }
     ;
 
-top_stmt: drop_table
+C_TOP_STMT: E_DROP_TABLE
     ;
 
-drop_table: K_DROP K_TABLE T_STRING
+E_DROP_TABLE: K_DROP K_TABLE T_STRING
     {
         auto drop_table = new query::drop_table($3);
-
         query_object_ptr = drop_table;
     }
     ;

@@ -55,7 +55,8 @@ extern int yydebug;
     K_SELECT = 261,
     K_UPDATE = 262,
     K_DROP = 263,
-    T_STRING = 264
+    S_SEMICOLON = 264,
+    T_STRING = 265
   };
 #endif
 
