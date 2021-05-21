@@ -5,11 +5,10 @@
 #include "parser.tab.hh"
 %}
 
-num         {digit}+
-s_digit     [+\-]?{digit}
-s_num       [+\-]?{num}
 
 %%
+
+[ \t\n]		;
 
 ";"         return S_SEMICOLON;
 "("         return S_L_BRACKETS;

@@ -21,7 +21,7 @@ namespace query {
 
     class create_table final : public base {
         std::string table_name;
-        std::vector<std::pair<std::string, sql_value_type>> schema_list;
+        std::vector<schema> schema_list;
         std::string primary_key;
 
         inline void exec() override {
@@ -30,7 +30,7 @@ namespace query {
 
     public:
         create_table(std::string& table_name,
-                     std::vector<std::pair<std::string, sql_value_type>>& schema_list,
+                     std::vector<schema>& schema_list,
                      std::string& primary_key) :
                      table_name(table_name), schema_list(schema_list), primary_key(primary_key) {}
     };

@@ -16,6 +16,15 @@ struct sql_value_type {
     sql_value_type(uint8_t length) : type(value_type::CHAR), length(length) {}
 };
 
+struct schema {
+    std::string name;
+    sql_value_type type;
+    bool unique;
+
+    schema() = default;
+    schema(std::string& name, sql_value_type& type, bool unique) : name(name), type(type), unique(unique) {}
+};
+
 enum class attribute_operator {
     EQUAL,
     NOT_EQUAL,

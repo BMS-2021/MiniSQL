@@ -17,9 +17,10 @@ int yyparse();
 int yyerror(const char *s);
 
 typedef struct yystype {
+    bool b;
     std::string str;
-    std::vector<std::pair<std::string, sql_value_type>> schema_list;
-    std::pair<std::string, sql_value_type> schema;
+    std::vector<schema> schema_list;
+    schema schema_item;
     sql_value_type type;
 
 } YYSTYPE;

@@ -14,8 +14,7 @@ extern int yylineno;
 extern char *yytext;
 inline int yyerror(const char *s)
 {
-    std::cerr << s << std::endl;
-    std::cerr << "line: " << yylineno << " on token " << yytext << std::endl;
+    std::cerr << s << " on token " << yytext << std::endl;
     yywrap();
     return 1;
 }
@@ -25,13 +24,14 @@ inline int yyerror(const char *s)
 %token
 K_DATABASE K_TABLE
 K_CREATE K_SELECT K_UPDATE K_DROP
-K_USE K_EXIT K_PRIMARY K_KEY
+K_USE K_EXIT K_PRIMARY K_KEY K_UNIQUE
 T_INT T_FLOAT T_CHAR
 S_SEMICOLON S_L_BRACKETS S_R_BRACKETS S_COMMA
 
 %token <str> V_STRING
+%type <b> E_UNIQUE
 %type <schema_list> E_SCHEMA_LIST
-%type <schema> E_SCHEMA
+%type <schema_item> E_SCHEMA
 %type <type> E_TYPE
 %type <str> E_PRIMARY_KEY
 
@@ -90,14 +90,14 @@ E_SCHEMA_LIST: E_SCHEMA_LIST S_COMMA E_SCHEMA
     }
     | E_SCHEMA
     {
-        $$ = std::vector<std::pair<std::string, sql_value_type>>();
+        $$ = std::vector<schema>();
         $$.push_back($1);
     }
     ;
 
-E_SCHEMA: V_STRING E_TYPE
+E_SCHEMA: V_STRING E_TYPE E_UNIQUE
     {
-        $$ = std::make_pair($1, $2);
+        $$ = schema($1, $2, $3);
     }
     ;
 
@@ -122,6 +122,16 @@ E_PRIMARY_KEY: S_COMMA K_PRIMARY K_KEY S_L_BRACKETS V_STRING S_R_BRACKETS
     | E_VACANT
     {
         $$ = "";
+    }
+    ;
+
+E_UNIQUE: K_UNIQUE
+    {
+        $$ = true;
+    }
+    | E_VACANT
+    {
+        $$ = false;
     }
     ;
 

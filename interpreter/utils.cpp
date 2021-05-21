@@ -7,7 +7,7 @@
 std::unordered_map<std::string, int> token_map = {
         {"database", K_DATABASE}, {"table", K_TABLE},
         {"create", K_CREATE}, {"select", K_SELECT}, {"update", K_UPDATE}, {"drop", K_DROP},
-        {"use", K_USE}, {"exit", K_EXIT}, {"primary", K_PRIMARY}, {"key", K_KEY},
+        {"use", K_USE}, {"exit", K_EXIT}, {"primary", K_PRIMARY}, {"key", K_KEY}, {"unique", K_UNIQUE},
         {"int", T_INT}, {"float", T_FLOAT}, {"char", T_CHAR},
 };
 
