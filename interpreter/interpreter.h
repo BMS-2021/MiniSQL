@@ -2,6 +2,9 @@
 #define MINISQL_INTERPRETER_H
 
 #include <string>
+#include <vector>
+
+#include "../macro.h"
 
 void interpret_entrance();
 
@@ -14,10 +17,11 @@ int yyparse();
 int yyerror(const char *s);
 
 typedef struct yystype {
-    int i;
-    double r;
     std::string str;
-    bool b;
+    std::vector<std::pair<std::string, sql_value_type>> schema_list;
+    std::pair<std::string, sql_value_type> schema;
+    sql_value_type type;
+
 } YYSTYPE;
 
 #endif //MINISQL_INTERPRETER_H

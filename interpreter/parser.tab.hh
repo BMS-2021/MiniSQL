@@ -55,8 +55,18 @@ extern int yydebug;
     K_SELECT = 261,
     K_UPDATE = 262,
     K_DROP = 263,
-    S_SEMICOLON = 264,
-    T_STRING = 265
+    K_USE = 264,
+    K_EXIT = 265,
+    K_PRIMARY = 266,
+    K_KEY = 267,
+    T_INT = 268,
+    T_FLOAT = 269,
+    T_CHAR = 270,
+    S_SEMICOLON = 271,
+    S_L_BRACKETS = 272,
+    S_R_BRACKETS = 273,
+    S_COMMA = 274,
+    V_STRING = 275
   };
 #endif
 

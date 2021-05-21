@@ -11,7 +11,10 @@ s_num       [+\-]?{num}
 
 %%
 
-";"  return S_SEMICOLON;
+";"         return S_SEMICOLON;
+"("         return S_L_BRACKETS;
+")"         return S_R_BRACKETS;
+","         return S_COMMA;
 
 ([A-Za-z0-9]|_)*  { return get_token(yylval.str = std::string(yytext)); }
 

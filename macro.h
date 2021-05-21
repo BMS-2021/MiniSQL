@@ -7,6 +7,15 @@ enum class value_type {
     FLOAT,
 };
 
+struct sql_value_type {
+    value_type type;
+    uint8_t length = 0;
+
+    sql_value_type() = default;
+    sql_value_type(value_type type) : type(type) {}
+    sql_value_type(uint8_t length) : type(value_type::CHAR), length(length) {}
+};
+
 enum class attribute_operator {
     EQUAL,
     NOT_EQUAL,

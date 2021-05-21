@@ -7,10 +7,12 @@
 std::unordered_map<std::string, int> token_map = {
         {"database", K_DATABASE}, {"table", K_TABLE},
         {"create", K_CREATE}, {"select", K_SELECT}, {"update", K_UPDATE}, {"drop", K_DROP},
+        {"use", K_USE}, {"exit", K_EXIT}, {"primary", K_PRIMARY}, {"key", K_KEY},
+        {"int", T_INT}, {"float", T_FLOAT}, {"char", T_CHAR},
 };
 
 int get_token(const std::string& str) {
-    int token = T_STRING;
+    int token = V_STRING;
 
     std::string lower_str = str;
     std::for_each(lower_str.begin(), lower_str.end(), [](char & c) {
