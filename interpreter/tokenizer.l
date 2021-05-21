@@ -20,7 +20,7 @@ s_num       [+\-]?{num}
 
 %%
 
-inline int yywrap()
+int yywrap()
 {
     yy_flush_buffer(YY_CURRENT_BUFFER);
     { BEGIN INITIAL; }

@@ -1764,7 +1764,7 @@ void yyfree (void * ptr )
 #line 21 "tokenizer.l"
 
 
-inline int yywrap()
+int yywrap()
 {
     yy_flush_buffer(YY_CURRENT_BUFFER);
     { BEGIN INITIAL; }

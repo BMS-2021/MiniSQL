@@ -9,7 +9,10 @@ query::base *query_object_ptr = nullptr;
 void interpret_entrance() {
     while (!sig_exit) {
         yyparse();
-        query_object_ptr->exec();
+        if (query_object_ptr != nullptr) {
+            query_object_ptr->exec();
+        }
+
 
         /*
          * If expression evaluates to a null pointer value,

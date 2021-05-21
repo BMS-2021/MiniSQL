@@ -528,11 +528,11 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
        0,    40,    40,    46,    47,    48,    51,    52,    55,    62,
-      69,    76,    85,    90,    97,   103,   107,   111,   117,   121,
-     127
+      69,    77,    86,    91,    98,   104,   108,   112,   118,   122,
+     128
 };
 #endif
 
@@ -1377,87 +1377,88 @@ yyreduce:
 #line 70 "parser.y"
     {
         auto operation = new query::create_table((yyvsp[-4].str), (yyvsp[-2].schema_list), (yyvsp[-1].str));
+        query_object_ptr = operation;
     }
-#line 1382 "parser.tab.cc"
+#line 1383 "parser.tab.cc"
     break;
 
   case 11:
-#line 77 "parser.y"
+#line 78 "parser.y"
     {
         auto operation = new query::drop_table((yyvsp[0].str));
         query_object_ptr = operation;
     }
-#line 1391 "parser.tab.cc"
+#line 1392 "parser.tab.cc"
     break;
 
   case 12:
-#line 86 "parser.y"
+#line 87 "parser.y"
     {
         (yyval.schema_list) = (yyvsp[-2].schema_list);
         (yyval.schema_list).push_back((yyvsp[0].schema));
     }
-#line 1400 "parser.tab.cc"
+#line 1401 "parser.tab.cc"
     break;
 
   case 13:
-#line 91 "parser.y"
+#line 92 "parser.y"
     {
         (yyval.schema_list) = std::vector<std::pair<std::string, sql_value_type>>();
         (yyval.schema_list).push_back((yyvsp[0].schema));
     }
-#line 1409 "parser.tab.cc"
+#line 1410 "parser.tab.cc"
     break;
 
   case 14:
-#line 98 "parser.y"
+#line 99 "parser.y"
     {
         (yyval.schema) = std::make_pair((yyvsp[-1].str), (yyvsp[0].type));
     }
-#line 1417 "parser.tab.cc"
+#line 1418 "parser.tab.cc"
     break;
 
   case 15:
-#line 104 "parser.y"
+#line 105 "parser.y"
     {
         (yyval.type) = sql_value_type(value_type::INT);
     }
-#line 1425 "parser.tab.cc"
+#line 1426 "parser.tab.cc"
     break;
 
   case 16:
-#line 108 "parser.y"
+#line 109 "parser.y"
     {
         (yyval.type) = sql_value_type(value_type::FLOAT);
     }
-#line 1433 "parser.tab.cc"
+#line 1434 "parser.tab.cc"
     break;
 
   case 17:
-#line 112 "parser.y"
+#line 113 "parser.y"
     {
-        (yyval.type) = sql_value_type(std::stoi((yyvsp[-1].str)));
+        (yyval.type) = sql_value_type(std::stoi((yyvsp[-1].str)));  // FIXME: exception
     }
-#line 1441 "parser.tab.cc"
+#line 1442 "parser.tab.cc"
     break;
 
   case 18:
-#line 118 "parser.y"
+#line 119 "parser.y"
     {
         (yyval.str) = (yyvsp[-1].str);
     }
-#line 1449 "parser.tab.cc"
+#line 1450 "parser.tab.cc"
     break;
 
   case 19:
-#line 122 "parser.y"
+#line 123 "parser.y"
     {
         (yyval.str) = "";
     }
-#line 1457 "parser.tab.cc"
+#line 1458 "parser.tab.cc"
     break;
 
 
-#line 1461 "parser.tab.cc"
+#line 1462 "parser.tab.cc"
 
       default: break;
     }
@@ -1689,5 +1690,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 130 "parser.y"
+#line 131 "parser.y"
 

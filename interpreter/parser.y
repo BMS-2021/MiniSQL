@@ -69,6 +69,7 @@ I_USE_DATABASE: K_USE K_DATABASE V_STRING
 I_CREATE_TABLE: K_CREATE K_TABLE V_STRING S_L_BRACKETS E_SCHEMA_LIST E_PRIMARY_KEY S_R_BRACKETS
     {
         auto operation = new query::create_table($3, $5, $6);
+        query_object_ptr = operation;
     }
     ;
 
@@ -110,7 +111,7 @@ E_TYPE: T_INT
     }
     | T_CHAR S_L_BRACKETS V_STRING S_R_BRACKETS
     {
-        $$ = sql_value_type(std::stoi($3));
+        $$ = sql_value_type(std::stoi($3));  // FIXME: exception
     }
     ;
 
