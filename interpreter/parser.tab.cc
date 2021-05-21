@@ -139,23 +139,30 @@ extern int yydebug;
   {
     K_DATABASE = 258,
     K_TABLE = 259,
-    K_CREATE = 260,
-    K_SELECT = 261,
-    K_UPDATE = 262,
-    K_DROP = 263,
-    K_USE = 264,
-    K_EXIT = 265,
-    K_PRIMARY = 266,
-    K_KEY = 267,
-    K_UNIQUE = 268,
-    T_INT = 269,
-    T_FLOAT = 270,
-    T_CHAR = 271,
-    S_SEMICOLON = 272,
-    S_L_BRACKETS = 273,
-    S_R_BRACKETS = 274,
-    S_COMMA = 275,
-    V_STRING = 276
+    K_INDEX = 260,
+    K_VALUES = 261,
+    K_FROM = 262,
+    K_WHERE = 263,
+    K_ON = 264,
+    K_INTO = 265,
+    K_CREATE = 266,
+    K_SELECT = 267,
+    K_INSERT = 268,
+    K_DROP = 269,
+    K_USE = 270,
+    K_EXIT = 271,
+    K_PRIMARY = 272,
+    K_KEY = 273,
+    K_UNIQUE = 274,
+    T_INT = 275,
+    T_FLOAT = 276,
+    T_CHAR = 277,
+    S_APOSTROPGE = 278,
+    S_SEMICOLON = 279,
+    S_L_BRACKETS = 280,
+    S_R_BRACKETS = 281,
+    S_COMMA = 282,
+    V_STRING = 283
   };
 #endif
 
@@ -470,21 +477,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  15
+#define YYFINAL  23
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   43
+#define YYLAST   55
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  22
+#define YYNTOKENS  29
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  14
+#define YYNNTS  20
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  22
+#define YYNRULES  33
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  44
+#define YYNSTATES  71
 
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   276
+#define YYMAXUTOK   283
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -523,16 +530,18 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    40,    40,    46,    47,    48,    51,    52,    55,    62,
-      69,    77,    86,    91,    98,   104,   108,   112,   118,   122,
-     128,   132,   138
+       0,    43,    43,    49,    50,    51,    52,    55,    56,    57,
+      58,    61,    64,    71,    78,    86,    93,   100,   107,   116,
+     121,   128,   134,   138,   142,   148,   152,   158,   162,   168,
+     173,   180,   184,   198
 };
 #endif
 
@@ -541,13 +550,15 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "K_DATABASE", "K_TABLE", "K_CREATE",
-  "K_SELECT", "K_UPDATE", "K_DROP", "K_USE", "K_EXIT", "K_PRIMARY",
-  "K_KEY", "K_UNIQUE", "T_INT", "T_FLOAT", "T_CHAR", "S_SEMICOLON",
-  "S_L_BRACKETS", "S_R_BRACKETS", "S_COMMA", "V_STRING", "$accept",
-  "C_TOP_INPUT", "C_TOP_STMT", "C_DDL", "I_EXIT", "I_USE_DATABASE",
-  "I_CREATE_TABLE", "I_DROP_TABLE", "E_SCHEMA_LIST", "E_SCHEMA", "E_TYPE",
-  "E_PRIMARY_KEY", "E_UNIQUE", "E_VACANT", YY_NULLPTR
+  "$end", "error", "$undefined", "K_DATABASE", "K_TABLE", "K_INDEX",
+  "K_VALUES", "K_FROM", "K_WHERE", "K_ON", "K_INTO", "K_CREATE",
+  "K_SELECT", "K_INSERT", "K_DROP", "K_USE", "K_EXIT", "K_PRIMARY",
+  "K_KEY", "K_UNIQUE", "T_INT", "T_FLOAT", "T_CHAR", "S_APOSTROPGE",
+  "S_SEMICOLON", "S_L_BRACKETS", "S_R_BRACKETS", "S_COMMA", "V_STRING",
+  "$accept", "C_TOP_INPUT", "C_TOP_STMT", "C_DDL", "C_DML", "I_EXIT",
+  "I_USE_DATABASE", "I_CREATE_TABLE", "I_DROP_TABLE", "I_CREATE_INDEX",
+  "I_DROP_INDEX", "I_INSERT_TABLE", "E_SCHEMA_LIST", "E_SCHEMA", "E_TYPE",
+  "E_PRIMARY_KEY", "E_UNIQUE", "E_INSERT_LIST", "V_INSERT", "E_VACANT", YY_NULLPTR
 };
 #endif
 
@@ -558,11 +569,11 @@ static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276
+     275,   276,   277,   278,   279,   280,   281,   282,   283
 };
 # endif
 
-#define YYPACT_NINF (-12)
+#define YYPACT_NINF (-22)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -576,11 +587,14 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -4,    -2,    -1,     8,   -12,    12,    -3,   -12,   -12,   -12,
-     -12,   -12,    -8,    -6,    -5,   -12,   -12,     0,   -12,   -12,
-       1,    -7,     3,   -12,   -12,   -12,     2,     4,   -11,     5,
-     -12,     6,   -12,   -12,   -12,     7,   -12,   -12,     9,    11,
-     -12,    10,    13,   -12
+     -10,     8,     6,    10,    16,   -22,    20,    -3,   -22,   -22,
+     -22,   -22,   -22,   -22,   -22,   -22,   -22,    -6,    -5,    -4,
+      -2,    -1,     0,   -22,   -22,     4,    21,    19,   -22,   -22,
+     -22,     3,     5,     7,   -12,     9,   -22,    12,   -21,   -22,
+     -22,    13,    15,   -17,    14,   -22,    11,    17,   -22,    -9,
+     -22,    18,   -22,   -22,   -22,    23,   -22,   -22,    22,    24,
+     -22,   -21,    25,    27,   -22,   -22,   -22,   -22,    26,    29,
+     -22
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -588,25 +602,28 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     0,     8,     0,     0,     3,     4,     5,
-       6,     7,     0,     0,     0,     1,     2,     0,    11,     9,
-       0,     0,    22,    13,    15,    16,     0,    22,     0,     0,
-      19,     0,    20,    14,    21,     0,    12,    10,     0,     0,
-      17,     0,     0,    18
+       0,     0,     0,     0,     0,    12,     0,     0,     3,     4,
+       5,     6,     7,     8,     9,    10,    11,     0,     0,     0,
+       0,     0,     0,     1,     2,     0,     0,     0,    15,    17,
+      13,     0,     0,     0,     0,    33,    20,     0,     0,    22,
+      23,     0,    33,     0,     0,    26,     0,     0,    32,     0,
+      30,     0,    27,    21,    28,     0,    19,    14,     0,     0,
+      18,     0,     0,     0,    16,    31,    29,    24,     0,     0,
+      25
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -12,   -12,   -12,   -12,   -12,   -12,   -12,   -12,   -12,    14,
-     -12,   -12,   -12,    16
+     -22,   -22,   -22,   -22,   -22,   -22,   -22,   -22,   -22,   -22,
+     -22,   -22,   -22,    -8,   -22,   -22,   -22,   -22,   -19,     1
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     5,     6,     7,     8,     9,    10,    11,    22,    23,
-      27,    29,    33,    30
+      -1,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    35,    36,    42,    44,    53,    49,    50,    45
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -614,47 +631,54 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      35,     1,    12,    13,     2,     3,     4,    24,    25,    26,
-      21,    14,    15,    17,    16,    18,    19,    32,    20,    39,
-      31,     0,    21,    28,    37,     0,     0,    38,    40,    41,
-       0,    42,    43,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    36,    34
+      55,     1,    47,     2,     3,     4,     5,    48,    39,    40,
+      41,    34,    17,    18,    20,    21,    19,    60,    61,    22,
+      23,    24,    25,    26,    27,    33,    28,    29,    30,    31,
+      32,    34,    38,    37,    52,    56,    43,    46,    51,    58,
+      57,    63,    66,    54,     0,    59,    62,    65,    64,     0,
+       0,    67,    68,     0,    69,    70
 };
 
 static const yytype_int8 yycheck[] =
 {
-      11,     5,     4,     4,     8,     9,    10,    14,    15,    16,
-      21,     3,     0,    21,    17,    21,    21,    13,    18,    12,
-      18,    -1,    21,    20,    19,    -1,    -1,    21,    19,    18,
-      -1,    21,    19,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    28,    27
+      17,    11,    23,    13,    14,    15,    16,    28,    20,    21,
+      22,    28,     4,     5,     4,     5,    10,    26,    27,     3,
+       0,    24,    28,    28,    28,     6,    28,    28,    28,    25,
+       9,    28,    25,    28,    19,    43,    27,    25,    25,    28,
+      26,    18,    61,    42,    -1,    28,    28,    23,    26,    -1,
+      -1,    26,    25,    -1,    28,    26
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     5,     8,     9,    10,    23,    24,    25,    26,    27,
-      28,    29,     4,     4,     3,     0,    17,    21,    21,    21,
-      18,    21,    30,    31,    14,    15,    16,    32,    20,    33,
-      35,    18,    13,    34,    35,    11,    31,    19,    21,    12,
-      19,    18,    21,    19
+       0,    11,    13,    14,    15,    16,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,     4,     5,    10,
+       4,     5,     3,     0,    24,    28,    28,    28,    28,    28,
+      28,    25,     9,     6,    28,    41,    42,    28,    25,    20,
+      21,    22,    43,    27,    44,    48,    25,    23,    28,    46,
+      47,    25,    19,    45,    48,    17,    42,    26,    28,    28,
+      26,    27,    28,    18,    26,    23,    47,    26,    25,    28,
+      26
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    22,    23,    24,    24,    24,    25,    25,    26,    27,
-      28,    29,    30,    30,    31,    32,    32,    32,    33,    33,
-      34,    34,    35
+       0,    29,    30,    31,    31,    31,    31,    32,    32,    32,
+      32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
+      41,    42,    43,    43,    43,    44,    44,    45,    45,    46,
+      46,    47,    47,    48
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     2,     1,     1,     1,     1,     1,     1,     3,
-       7,     3,     3,     1,     3,     1,     1,     4,     6,     1,
-       1,     1,     0
+       0,     2,     2,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     3,     7,     3,     8,     3,     7,     3,
+       1,     3,     1,     1,     4,     6,     1,     1,     1,     3,
+       1,     3,     1,     0
 };
 
 
@@ -1350,133 +1374,202 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 41 "parser.y"
+#line 44 "parser.y"
     {
         YYACCEPT;
     }
-#line 1358 "parser.tab.cc"
+#line 1382 "parser.tab.cc"
     break;
 
-  case 8:
-#line 56 "parser.y"
+  case 12:
+#line 65 "parser.y"
     {
         auto operation = new query::exit();
         query_object_ptr = operation;
     }
-#line 1367 "parser.tab.cc"
+#line 1391 "parser.tab.cc"
     break;
 
-  case 9:
-#line 63 "parser.y"
+  case 13:
+#line 72 "parser.y"
     {
         auto operation = new query::use_database((yyvsp[0].str));
         query_object_ptr = operation;
     }
-#line 1376 "parser.tab.cc"
+#line 1400 "parser.tab.cc"
     break;
 
-  case 10:
-#line 70 "parser.y"
+  case 14:
+#line 79 "parser.y"
     {
         auto operation = new query::create_table((yyvsp[-4].str), (yyvsp[-2].schema_list), (yyvsp[-1].str));
         query_object_ptr = operation;
     }
-#line 1385 "parser.tab.cc"
+#line 1409 "parser.tab.cc"
     break;
 
-  case 11:
-#line 78 "parser.y"
+  case 15:
+#line 87 "parser.y"
     {
         auto operation = new query::drop_table((yyvsp[0].str));
         query_object_ptr = operation;
     }
-#line 1394 "parser.tab.cc"
-    break;
-
-  case 12:
-#line 87 "parser.y"
-    {
-        (yyval.schema_list) = (yyvsp[-2].schema_list);
-        (yyval.schema_list).push_back((yyvsp[0].schema_item));
-    }
-#line 1403 "parser.tab.cc"
-    break;
-
-  case 13:
-#line 92 "parser.y"
-    {
-        (yyval.schema_list) = std::vector<schema>();
-        (yyval.schema_list).push_back((yyvsp[0].schema_item));
-    }
-#line 1412 "parser.tab.cc"
-    break;
-
-  case 14:
-#line 99 "parser.y"
-    {
-        (yyval.schema_item) = schema((yyvsp[-2].str), (yyvsp[-1].type), (yyvsp[0].b));
-    }
-#line 1420 "parser.tab.cc"
-    break;
-
-  case 15:
-#line 105 "parser.y"
-    {
-        (yyval.type) = sql_value_type(value_type::INT);
-    }
-#line 1428 "parser.tab.cc"
+#line 1418 "parser.tab.cc"
     break;
 
   case 16:
-#line 109 "parser.y"
+#line 94 "parser.y"
     {
-        (yyval.type) = sql_value_type(value_type::FLOAT);
+        auto operation = new query::create_index((yyvsp[-5].str), (yyvsp[-3].str), (yyvsp[-1].str));
+        query_object_ptr = operation;
+    }
+#line 1427 "parser.tab.cc"
+    break;
+
+  case 17:
+#line 101 "parser.y"
+    {
+        auto operation = new query::drop_index((yyvsp[0].str));
+        query_object_ptr = operation;
     }
 #line 1436 "parser.tab.cc"
     break;
 
-  case 17:
-#line 113 "parser.y"
-    {
-        (yyval.type) = sql_value_type(std::stoi((yyvsp[-1].str)));  // FIXME: exception
-    }
-#line 1444 "parser.tab.cc"
-    break;
-
   case 18:
-#line 119 "parser.y"
+#line 108 "parser.y"
     {
-        (yyval.str) = (yyvsp[-1].str);
+        auto operation = new query::insert_table((yyvsp[-4].str), (yyvsp[-1].insert_list));
+        query_object_ptr = operation;
     }
-#line 1452 "parser.tab.cc"
+#line 1445 "parser.tab.cc"
     break;
 
   case 19:
-#line 123 "parser.y"
+#line 117 "parser.y"
     {
-        (yyval.str) = "";
+        (yyval.schema_list) = (yyvsp[-2].schema_list);
+        (yyval.schema_list).push_back((yyvsp[0].schema_item));
     }
-#line 1460 "parser.tab.cc"
+#line 1454 "parser.tab.cc"
     break;
 
   case 20:
-#line 129 "parser.y"
+#line 122 "parser.y"
     {
-        (yyval.b) = true;
+        (yyval.schema_list) = std::vector<schema>();
+        (yyval.schema_list).push_back((yyvsp[0].schema_item));
     }
-#line 1468 "parser.tab.cc"
+#line 1463 "parser.tab.cc"
     break;
 
   case 21:
-#line 133 "parser.y"
+#line 129 "parser.y"
+    {
+        (yyval.schema_item) = schema((yyvsp[-2].str), (yyvsp[-1].type), (yyvsp[0].b));
+    }
+#line 1471 "parser.tab.cc"
+    break;
+
+  case 22:
+#line 135 "parser.y"
+    {
+        (yyval.type) = sql_value_type(value_type::INT);
+    }
+#line 1479 "parser.tab.cc"
+    break;
+
+  case 23:
+#line 139 "parser.y"
+    {
+        (yyval.type) = sql_value_type(value_type::FLOAT);
+    }
+#line 1487 "parser.tab.cc"
+    break;
+
+  case 24:
+#line 143 "parser.y"
+    {
+        (yyval.type) = sql_value_type(std::stoi((yyvsp[-1].str)));  // FIXME: exception
+    }
+#line 1495 "parser.tab.cc"
+    break;
+
+  case 25:
+#line 149 "parser.y"
+    {
+        (yyval.str) = (yyvsp[-1].str);
+    }
+#line 1503 "parser.tab.cc"
+    break;
+
+  case 26:
+#line 153 "parser.y"
+    {
+        (yyval.str) = "";
+    }
+#line 1511 "parser.tab.cc"
+    break;
+
+  case 27:
+#line 159 "parser.y"
+    {
+        (yyval.b) = true;
+    }
+#line 1519 "parser.tab.cc"
+    break;
+
+  case 28:
+#line 163 "parser.y"
     {
         (yyval.b) = false;
     }
-#line 1476 "parser.tab.cc"
+#line 1527 "parser.tab.cc"
+    break;
+
+  case 29:
+#line 169 "parser.y"
+    {
+        (yyval.insert_list) = (yyvsp[-2].insert_list);
+        (yyval.insert_list).push_back((yyvsp[0].v));
+    }
+#line 1536 "parser.tab.cc"
+    break;
+
+  case 30:
+#line 174 "parser.y"
+    {
+        (yyval.insert_list) = std::vector<std::variant<int, float, std::string>>();
+        (yyval.insert_list).push_back((yyvsp[0].v));
+    }
+#line 1545 "parser.tab.cc"
+    break;
+
+  case 31:
+#line 181 "parser.y"
+    {
+        (yyval.v) = (yyvsp[-1].str);
+    }
+#line 1553 "parser.tab.cc"
+    break;
+
+  case 32:
+#line 185 "parser.y"
+    {
+        try {
+            (yyval.v) = std::stoi((yyvsp[0].str));
+        } catch (std::exception) {
+            try {
+                (yyval.v) = std::stof((yyvsp[0].str));
+            } catch (std::exception) {
+                (yyval.v) = (yyvsp[0].str);
+            }
+        }
+    }
+#line 1569 "parser.tab.cc"
     break;
 
 
-#line 1480 "parser.tab.cc"
+#line 1573 "parser.tab.cc"
 
       default: break;
     }
@@ -1708,5 +1801,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 141 "parser.y"
+#line 201 "parser.y"
 

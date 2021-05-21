@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <variant>
 
 #include "../macro.h"
 
@@ -19,9 +20,11 @@ int yyerror(const char *s);
 typedef struct yystype {
     bool b;
     std::string str;
+    std::vector<std::variant<int, float, std::string>> insert_list;
     std::vector<schema> schema_list;
     schema schema_item;
     sql_value_type type;
+    std::variant<int, float, std::string> v;
 
 } YYSTYPE;
 

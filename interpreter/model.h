@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <variant>
 #include <iostream>
 
 #include "../macro.h"
@@ -37,11 +38,18 @@ namespace query {
 
     class create_index final : public base {
         std::string index_name;
-        std::string element_name;
+        std::string table_name;
+        std::string attribute_name;
 
         inline void exec() override {
             std::cout << "Interpreter Yes!!!" << std::endl;
         }
+
+    public:
+        create_index(std::string& index_name, 
+                     std::string& table_name, 
+                     std::string& attribute_name) : 
+                     index_name(index_name), table_name(table_name), attribute_name(attribute_name) {}
     };
 
     class drop_table final : public base {
@@ -54,6 +62,32 @@ namespace query {
 
     public:
         explicit drop_table(std::string &table_name) : table_name(table_name) {}
+    };
+
+    class drop_index final : public base {
+        std::string index_name;
+
+        inline void exec() override {
+            std::cout << "Interpreter Yes!!!" << std::endl;
+        }
+
+    public:
+        explicit drop_index(std::string &index_name) : index_name(index_name) {}
+    };
+
+    class insert_table final : public base {
+        std::string table_name;
+        std::vector<std::variant<int, float, std::string>> insert_list;
+
+
+        inline void exec() override {
+            std::cout << "Interpreter Yes!!!" << std::endl;
+        }
+
+    public:
+        insert_table(std::string& table_name,
+                     std::vector<std::variant<int, float, std::string>>& insert_list) :
+                     table_name(table_name), insert_list(insert_list) {}
     };
 
     class use_database final : public base {
