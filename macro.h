@@ -1,6 +1,8 @@
 #ifndef MINISQL_MACRO_H
 #define MINISQL_MACRO_H
 
+#include <variant>
+
 enum class value_type {
     INT,
     CHAR,  //string
@@ -32,6 +34,18 @@ enum class attribute_operator {
     GREATER_EQUAL,
     LESS,
     LESS_EQUAL,
+};
+
+struct condition {
+    std::string attribute_name;
+    attribute_operator op;
+    std::variant<int, float, std::string> value;
+
+    condition() = default;
+    condition(std::string& attribute_name, attribute_operator op, std::variant<int, float, std::string>& value) :
+    attribute_name(attribute_name),
+    op(op),
+    value(value) {}
 };
 
 #endif //MINISQL_MACRO_H

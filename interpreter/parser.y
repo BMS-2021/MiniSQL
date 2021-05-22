@@ -23,15 +23,21 @@ inline int yyerror(const char *s)
 
 %token
 K_DATABASE K_TABLE K_INDEX K_VALUES
-K_FROM K_WHERE K_ON K_INTO
+K_FROM K_WHERE K_ON K_INTO K_AND
 K_CREATE K_SELECT K_INSERT K_DROP
 K_USE K_EXIT K_PRIMARY K_KEY K_UNIQUE
 T_INT T_FLOAT T_CHAR
-S_APOSTROPGE S_SEMICOLON S_L_BRACKETS S_R_BRACKETS S_COMMA
+S_APOSTROPGE S_SEMICOLON S_L_BRACKETS S_R_BRACKETS S_COMMA S_STAR
+S_EQUAL S_NOT_EQUAL S_GREATER S_GREATER_EQUAL S_LESS S_LESS_EQUAL
 
 %token <str> V_STRING
 %type <v> V_INSERT
 %type <b> E_UNIQUE
+%type <attribute_list> E_ATTRIBUTE_LIST
+%type <condition_list> E_WHERE
+%type <condition_list> E_CONDITION_LIST
+%type <condition_item> E_CONDITION
+%type <op> E_OPERATOR
 %type <insert_list> E_INSERT_LIST
 %type <schema_list> E_SCHEMA_LIST
 %type <schema_item> E_SCHEMA
@@ -59,6 +65,7 @@ C_DDL: I_CREATE_TABLE
     ;
 
 C_DML: I_INSERT_TABLE
+    | I_SELECT_TABLE
     ;
 
 I_EXIT: K_EXIT
@@ -107,6 +114,13 @@ I_DROP_INDEX: K_DROP K_INDEX V_STRING
 I_INSERT_TABLE: K_INSERT K_INTO V_STRING K_VALUES S_L_BRACKETS E_INSERT_LIST S_R_BRACKETS
     {
         auto operation = new query::insert_table($3, $6);
+        query_object_ptr = operation;
+    }
+    ;
+
+I_SELECT_TABLE: K_SELECT E_ATTRIBUTE_LIST K_FROM V_STRING E_WHERE
+    {
+        auto operation = new query::select_table($2, $4, $5);
         query_object_ptr = operation;
     }
     ;
@@ -176,6 +190,59 @@ E_INSERT_LIST: E_INSERT_LIST S_COMMA V_INSERT
         $$.push_back($1);
     }
     ;
+
+E_ATTRIBUTE_LIST: S_STAR
+    {
+        $$ = std::vector<std::string>();
+    }
+    | E_ATTRIBUTE_LIST S_COMMA V_STRING
+    {
+        $$.push_back($3);
+    }
+    | V_STRING
+    {
+        $$ = std::vector<std::string>();
+        $$.push_back($1);
+    }
+    ;
+
+E_WHERE: K_WHERE E_CONDITION_LIST
+    {
+        $$ = $2;
+    }
+    | E_VACANT
+    {
+        $$ = std::vector<condition>();
+    }
+    ;
+
+E_CONDITION_LIST: E_CONDITION_LIST K_AND E_CONDITION
+    {
+        $$ = $1;
+        $$.push_back($3);
+    }
+    | E_CONDITION
+    {
+        $$ = std::vector<condition>();
+        $$.push_back($1);
+    }
+    ;
+
+E_CONDITION: V_STRING E_OPERATOR V_INSERT
+    {
+        $$.attribute_name = $1;
+        $$.op = $2;
+        $$.value = $3;
+    }
+
+E_OPERATOR: 
+      S_EQUAL {$$ = attribute_operator::EQUAL;}
+    | S_NOT_EQUAL {$$ = attribute_operator::NOT_EQUAL;}
+    | S_GREATER {$$ = attribute_operator::GREATER;}
+    | S_GREATER_EQUAL {$$ = attribute_operator::GREATER_EQUAL;}
+    | S_LESS {$$ = attribute_operator::LESS;}
+    | S_LESS_EQUAL {$$ = attribute_operator::LESS_EQUAL;}
+
 
 V_INSERT: S_APOSTROPGE V_STRING S_APOSTROPGE
     {

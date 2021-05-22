@@ -90,6 +90,23 @@ namespace query {
                      table_name(table_name), insert_list(insert_list) {}
     };
 
+    class select_table final : public base {
+        std::vector<std::string> attribute_list;
+        std::string table_name;
+        std::vector<condition> condition_list;
+
+
+        inline void exec() override {
+            std::cout << "Interpreter Yes!!!" << std::endl;
+        }
+
+    public:
+        select_table(std::vector<std::string>& attribute_list,
+                     std::string& table_name,
+                     std::vector<condition>& condition_list) :
+                attribute_list(attribute_list), table_name(table_name), condition_list(condition_list) {}
+    };
+
     class use_database final : public base {
         std::string database_name;
 

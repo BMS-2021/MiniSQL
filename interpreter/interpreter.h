@@ -21,6 +21,10 @@ typedef struct yystype {
     bool b;
     std::string str;
     std::vector<std::variant<int, float, std::string>> insert_list;
+    std::vector<std::string> attribute_list;
+    std::vector<condition> condition_list;
+    condition condition_item;
+    attribute_operator op;
     std::vector<schema> schema_list;
     schema schema_item;
     sql_value_type type;

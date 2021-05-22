@@ -10,11 +10,19 @@
 
 [ \t\n]		;
 
+"*"         return S_STAR;
 "'"         return S_APOSTROPGE;
 ";"         return S_SEMICOLON;
 "("         return S_L_BRACKETS;
 ")"         return S_R_BRACKETS;
 ","         return S_COMMA;
+
+"="         return S_EQUAL;
+"<>"        return S_NOT_EQUAL;
+">"         return S_GREATER;
+">="        return S_GREATER_EQUAL;
+"<"         return S_LESS;
+"<="        return S_LESS_EQUAL;
 
 [A-Za-z0-9_.]*  { return get_token(yylval.str = std::string(yytext)); }
 
