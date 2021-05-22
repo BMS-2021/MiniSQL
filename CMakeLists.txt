@@ -3,6 +3,9 @@ project(MiniSQL)
 
 set(CMAKE_CXX_STANDARD 20)
 
+
+find_library(READLINE "readline")
+
 set(INTERPRETER
         interpreter/interpreter.h
         interpreter/lex.yy.cc
@@ -19,3 +22,9 @@ set(API
 )
 
 add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API})
+if(READLINE)
+    message(WARNING "Library \"readline\" not found. Install this library for better experience.")
+    target_link_libraries(MiniSQL ${READLINE})
+else()
+    message(NOTICE "Library \"readline\" not found. Install this library for better experience.")
+endif()

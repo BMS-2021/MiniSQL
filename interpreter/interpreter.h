@@ -2,10 +2,13 @@
 #define MINISQL_INTERPRETER_H
 
 #include <string>
+#include <cstring>
 #include <vector>
 #include <variant>
 
 #include "../macro.h"
+
+const int SQL_QUERY_LENGTH = 200;
 
 void interpret_entrance();
 
@@ -15,7 +18,9 @@ int yylex();
 
 int yyparse();
 
-int yyerror(const char *s);
+int yyerror(const char *);
+
+int parse(const char *);
 
 typedef struct yystype {
     bool b;
@@ -31,5 +36,21 @@ typedef struct yystype {
     std::variant<int, float, std::string> v;
 
 } YYSTYPE;
+
+class interpreter {
+    char *str = nullptr;
+public:
+    inline interpreter() {
+        str = reinterpret_cast<char*>(std::malloc(SQL_QUERY_LENGTH));
+    }
+    inline ~interpreter() {
+        if (str != nullptr) {
+            std::free(str);
+        }
+        str = nullptr;
+    }
+
+    const char* read();
+};
 
 #endif //MINISQL_INTERPRETER_H

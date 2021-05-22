@@ -1,5 +1,5 @@
-#include <iostream>
-
+#include <readline/readline.h>
+#include <memory>
 #include "model.h"
 #include "interpreter.h"
 
@@ -8,7 +8,10 @@ query::base *query_object_ptr = nullptr;
 
 void interpret_entrance() {
     while (!sig_exit) {
-        yyparse();
+        interpreter inter;
+
+        parse(inter.read());
+
         if (query_object_ptr != nullptr) {
             query_object_ptr->exec();
         }
@@ -24,4 +27,27 @@ void interpret_entrance() {
         delete query_object_ptr;
         query_object_ptr = nullptr;
     }
+}
+
+const char* interpreter::read() {
+    bool first_loop = true;
+    while (true) {
+        char *src = nullptr;
+        if (first_loop) {
+            src = readline("MiniSQL> ");
+        } else {
+            src = readline("      -> ");
+        }
+        if (!first_loop) {
+            std::strncat(this->str, "\n", SQL_QUERY_LENGTH);
+        }
+        std::strncat(this->str, src, SQL_QUERY_LENGTH);
+        if (std::strlen(src) >= 1 && src[std::strlen(src) - 1] == ';') {
+            std::free(src);
+            break;
+        }
+        std::free(src);
+        first_loop = false;
+    }
+    return this->str;
 }
