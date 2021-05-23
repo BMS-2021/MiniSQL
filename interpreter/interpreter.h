@@ -38,7 +38,17 @@ typedef struct yystype {
 } YYSTYPE;
 
 class interpreter {
+    bool first_loop = true;
     char *str = nullptr;
+
+    char* start_text() const {
+        if (first_loop) {
+            return const_cast<char *>("MiniSQL> ");
+        } else {
+            return const_cast<char *>("      -> ");
+        }
+    }
+
 public:
     inline interpreter() {
         str = reinterpret_cast<char*>(std::malloc(SQL_QUERY_LENGTH));

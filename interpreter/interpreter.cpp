@@ -1,5 +1,7 @@
+#ifdef READLINE_FOUND
 #include <readline/readline.h>
-#include <memory>
+#endif
+
 #include "model.h"
 #include "interpreter.h"
 
@@ -16,7 +18,6 @@ void interpret_entrance() {
             query_object_ptr->exec();
         }
 
-
         /*
          * If expression evaluates to a null pointer value,
          * no destructors are called, and the deallocation
@@ -30,14 +31,9 @@ void interpret_entrance() {
 }
 
 const char* interpreter::read() {
-    bool first_loop = true;
     while (true) {
-        char *src = nullptr;
-        if (first_loop) {
-            src = readline("MiniSQL> ");
-        } else {
-            src = readline("      -> ");
-        }
+#ifdef READLINE_FOUND
+        char *src = readline(this->start_text());
         if (!first_loop) {
             std::strncat(this->str, "\n", SQL_QUERY_LENGTH);
         }
@@ -47,6 +43,18 @@ const char* interpreter::read() {
             break;
         }
         std::free(src);
+#else
+        std::string src;
+        std::cout << this->start_text();
+        std::getline(std::cin, src);
+        if (!first_loop) {
+            std::strncat(this->str, "\n", SQL_QUERY_LENGTH);
+        }
+        std::strncat(this->str, src.c_str(), SQL_QUERY_LENGTH);
+        if (src.length() >= 1 && *src.rbegin() == ';') {
+            break;
+        }
+#endif
         first_loop = false;
     }
     return this->str;
