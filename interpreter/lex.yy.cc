@@ -450,11 +450,12 @@ char *yytext;
 #line 1 "tokenizer.l"
 #line 2 "tokenizer.l"
 #include <string>
+#include <iostream>
 #include "utils.h"
 #include "interpreter.h"
 #include "parser.tab.hh"
-#line 457 "lex.yy.cc"
 #line 458 "lex.yy.cc"
+#line 459 "lex.yy.cc"
 
 #define INITIAL 0
 
@@ -671,10 +672,10 @@ YY_DECL
 		}
 
 	{
-#line 9 "tokenizer.l"
+#line 10 "tokenizer.l"
 
 
-#line 678 "lex.yy.cc"
+#line 679 "lex.yy.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -734,80 +735,80 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 11 "tokenizer.l"
+#line 12 "tokenizer.l"
 ;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 13 "tokenizer.l"
+#line 14 "tokenizer.l"
 return S_STAR;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 14 "tokenizer.l"
+#line 15 "tokenizer.l"
 return S_APOSTROPGE;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 15 "tokenizer.l"
+#line 16 "tokenizer.l"
 return S_SEMICOLON;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 16 "tokenizer.l"
+#line 17 "tokenizer.l"
 return S_L_BRACKETS;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 17 "tokenizer.l"
+#line 18 "tokenizer.l"
 return S_R_BRACKETS;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 18 "tokenizer.l"
+#line 19 "tokenizer.l"
 return S_COMMA;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 20 "tokenizer.l"
+#line 21 "tokenizer.l"
 return S_EQUAL;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 21 "tokenizer.l"
+#line 22 "tokenizer.l"
 return S_NOT_EQUAL;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 22 "tokenizer.l"
+#line 23 "tokenizer.l"
 return S_GREATER;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 23 "tokenizer.l"
+#line 24 "tokenizer.l"
 return S_GREATER_EQUAL;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 24 "tokenizer.l"
+#line 25 "tokenizer.l"
 return S_LESS;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 25 "tokenizer.l"
+#line 26 "tokenizer.l"
 return S_LESS_EQUAL;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 27 "tokenizer.l"
+#line 28 "tokenizer.l"
 { return get_token(yylval.str = std::string(yytext)); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 29 "tokenizer.l"
+#line 30 "tokenizer.l"
 ECHO;
 	YY_BREAK
-#line 811 "lex.yy.cc"
+#line 812 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1812,7 +1813,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 29 "tokenizer.l"
+#line 30 "tokenizer.l"
 
 
 int yywrap()
@@ -1820,5 +1821,18 @@ int yywrap()
     yy_flush_buffer(YY_CURRENT_BUFFER);
     { BEGIN INITIAL; }
     return 1;
+}
+
+int parse(const char *input) {
+    YY_BUFFER_STATE bp = yy_scan_string(input);
+    if (bp == nullptr) {
+    	std::cerr << "error on creating YY_BUFFER_STATE" << std::endl;
+    	return -1;
+    }
+    yy_switch_to_buffer(bp);
+    yyparse();
+    yy_delete_buffer(bp);
+    yylex_destroy();
+    return 0;
 }
 
