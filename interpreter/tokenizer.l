@@ -9,7 +9,7 @@
 
 %%
 
-[ \t\n]		;
+[ \t\r\n]		;
 
 "*"         return S_STAR;
 "'"         return S_APOSTROPGE;

@@ -52,6 +52,7 @@ class interpreter {
 public:
     inline interpreter() {
         str = reinterpret_cast<char*>(std::malloc(SQL_QUERY_LENGTH));
+        str[0] = '\0';
     }
     inline ~interpreter() {
         if (str != nullptr) {
