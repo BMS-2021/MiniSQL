@@ -1,6 +1,0 @@
-#ifndef MINISQL_MODEL_H
-#define MINISQL_MODEL_H
-
-
-
-#endif //MINISQL_MODEL_H

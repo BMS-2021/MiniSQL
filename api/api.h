@@ -13,7 +13,7 @@
 
 #include "../macro.h"
 
-namespace query {
+namespace api {
     struct base {
         /*
          * If expression evaluates to a pointer to a base class subobject

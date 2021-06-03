@@ -6,7 +6,7 @@
 #include "interpreter.h"
 
 bool sig_exit = false;
-query::base *query_object_ptr = nullptr;
+api::base *query_object_ptr = nullptr;
 
 void interpret_entrance() {
     while (!sig_exit) {
