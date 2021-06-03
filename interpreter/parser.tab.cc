@@ -73,9 +73,9 @@
 #include <vector>
 
 #include "interpreter.h"
-#include "model.h"
+#include "../api/api.h"
 
-extern query::base *query_object_ptr;
+extern api::base *query_object_ptr;
 
 bool bFlag; /* no meanings. */
 
@@ -1414,7 +1414,7 @@ yyreduce:
   case 13:
 #line 72 "parser.y"
     {
-        auto operation = new query::exit();
+        auto operation = new api::exit();
         query_object_ptr = operation;
     }
 #line 1421 "parser.tab.cc"
@@ -1423,7 +1423,7 @@ yyreduce:
   case 14:
 #line 79 "parser.y"
     {
-        auto operation = new query::use_database((yyvsp[0].str));
+        auto operation = new api::use_database((yyvsp[0].str));
         query_object_ptr = operation;
     }
 #line 1430 "parser.tab.cc"
@@ -1432,7 +1432,7 @@ yyreduce:
   case 15:
 #line 86 "parser.y"
     {
-        auto operation = new query::create_table((yyvsp[-4].str), (yyvsp[-2].schema_list), (yyvsp[-1].str));
+        auto operation = new api::create_table((yyvsp[-4].str), (yyvsp[-2].schema_list), (yyvsp[-1].str));
         query_object_ptr = operation;
     }
 #line 1439 "parser.tab.cc"
@@ -1441,7 +1441,7 @@ yyreduce:
   case 16:
 #line 94 "parser.y"
     {
-        auto operation = new query::drop_table((yyvsp[0].str));
+        auto operation = new api::drop_table((yyvsp[0].str));
         query_object_ptr = operation;
     }
 #line 1448 "parser.tab.cc"
@@ -1450,7 +1450,7 @@ yyreduce:
   case 17:
 #line 101 "parser.y"
     {
-        auto operation = new query::create_index((yyvsp[-5].str), (yyvsp[-3].str), (yyvsp[-1].str));
+        auto operation = new api::create_index((yyvsp[-5].str), (yyvsp[-3].str), (yyvsp[-1].str));
         query_object_ptr = operation;
     }
 #line 1457 "parser.tab.cc"
@@ -1459,7 +1459,7 @@ yyreduce:
   case 18:
 #line 108 "parser.y"
     {
-        auto operation = new query::drop_index((yyvsp[0].str));
+        auto operation = new api::drop_index((yyvsp[0].str));
         query_object_ptr = operation;
     }
 #line 1466 "parser.tab.cc"
@@ -1468,7 +1468,7 @@ yyreduce:
   case 19:
 #line 115 "parser.y"
     {
-        auto operation = new query::insert_table((yyvsp[-4].str), (yyvsp[-1].insert_list));
+        auto operation = new api::insert_table((yyvsp[-4].str), (yyvsp[-1].insert_list));
         query_object_ptr = operation;
     }
 #line 1475 "parser.tab.cc"
@@ -1477,7 +1477,7 @@ yyreduce:
   case 20:
 #line 122 "parser.y"
     {
-        auto operation = new query::select_table((yyvsp[-3].attribute_list), (yyvsp[-1].str), (yyvsp[0].condition_list));
+        auto operation = new api::select_table((yyvsp[-3].attribute_list), (yyvsp[-1].str), (yyvsp[0].condition_list));
         query_object_ptr = operation;
     }
 #line 1484 "parser.tab.cc"

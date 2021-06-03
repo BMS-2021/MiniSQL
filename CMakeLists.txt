@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(INTERPRETER
         interpreter/interpreter.h
-        interpreter/model.cpp
-        interpreter/model.h
         interpreter/interpreter.cpp
         interpreter/utils.cpp
         interpreter/utils.h
