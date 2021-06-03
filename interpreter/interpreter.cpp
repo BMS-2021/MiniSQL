@@ -2,7 +2,7 @@
 #include <readline/readline.h>
 #endif
 
-#include "model.h"
+#include "../api/api.h"
 #include "interpreter.h"
 
 bool sig_exit = false;

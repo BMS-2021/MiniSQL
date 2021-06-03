@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "interpreter.h"
-#include "model.h"
+#include "../api/api.h"
 
 extern query::base *query_object_ptr;
 
