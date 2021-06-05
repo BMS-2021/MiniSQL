@@ -17,7 +17,7 @@ namespace MINISQL_BASE {
 
     inline std::string tableFile(const std::string &tableName) { return tableName + ".tb"; }
 
-    inline std::string indexFile(const std::string &tableName const std::string &index) {
+    inline std::string indexFile(const std::string &tableName, const std::string &index) {
         return tableName + "_" + index + ".ind";
     }
 }

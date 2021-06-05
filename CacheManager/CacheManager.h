@@ -30,12 +30,12 @@ struct Page {
     }
 
     void reset() {
-        vaild = dirty = false;
+        valid = dirty = false;
         memset(content, 0, PageSize);
     }
 
     void assign(string filename, int pageID) {
-        this->fileName = filename;
+        this->filename = filename;
         this->pageID = pageID;
     }
 
@@ -75,7 +75,7 @@ public:
 
 
 private:
-    typedef map<pair<string, unsigned int>, Block &> PageMap;
+    typedef map<pair<string, unsigned int>, Page &> PageMap;
 
     PageMap pageMap;
 

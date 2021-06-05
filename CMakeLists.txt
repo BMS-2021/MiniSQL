@@ -21,7 +21,13 @@ set(DEPRECATED_INTERPRETER
         interpreter/lex.yy.cc
         interpreter/parser.tab.hh
         interpreter/parser.tab.cc
-        BufferManager/BufferManager.cpp BufferManager/BufferManager.h Base/Base.h CacheManager/CacheManager.cpp CacheManager/CacheManager.h)
+)
+
+set(CACHE_MANAGER
+        Base/Base.h
+        CacheManager/CacheManager.cpp
+        CacheManager/CacheManager.h
+)
 
 find_package(BISON)
 find_package(FLEX)
@@ -31,11 +37,11 @@ find_package(FLEX)
 #    FLEX_TARGET(MyScanner interpreter/tokenizer.l ${CMAKE_CURRENT_BINARY_DIR}/interpreter/lex.yy.cc)
 #    ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 #    include_directories("interpreter")
-#    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS})
+#    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS} ${CACHE_MANAGER})
 #else()
     message(WARNING "GNU Bison or Flex not found. \
                      This program will use pre-generated files instead... (deprecated)")
-    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${DEPRECATED_INTERPRETER})
+    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${DEPRECATED_INTERPRETER} ${CACHE_MANAGER})
 #endif()
 
 find_library(LIB_READLINE "readline")

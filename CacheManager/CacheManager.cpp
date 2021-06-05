@@ -19,9 +19,10 @@ CacheManager::CacheManager() {
 int CacheManager::getPageTail(string filename) {
     struct stat st;
     if (stat(filename.c_str(), &st) == 0) {
-        return (st.st_size / BlockSize - 1);
+        return (st.st_size / PageSize - 1);
     }
     cerr << "Failed to get file tail" << endl;
+    return 0;
 }
 
 void CacheManager::setDirty(const string &filename, unsigned int pageID) {
@@ -52,7 +53,7 @@ Page& CacheManager::getLRU() {
 
 void CacheManager::removeFile(string filename) {
     for(auto &page: pages) {
-        if(page.filename == filename) page.reset()
+        if(page.filename == filename) page.reset();
     }
 
     if(remove(filename.c_str())) {
@@ -66,7 +67,7 @@ void CacheManager::createFile(string in) {
 
 Page& CacheManager::getFreePage() {
     for (auto &page: pages) {
-        if (!page.dirty && !page.vaild) {
+        if (!page.dirty && !page.valid) {
             page.reset();
             setValid(page.id);
             return page;
@@ -108,9 +109,9 @@ char* CacheManager::getPage(string filename, unsigned int pageID, bool allocate)
 
     Page &page = getFreePage();
     page.assign(filename, pageID);
-    pageMap.insert(BlockMap::value_type(make_pair(filename, pageID), page));
+    pageMap.insert(PageMap::value_type(make_pair(filename, pageID), page));
 
-    fp.seekg(offset * PageSize, ios::beg);
+    fp.seekg(pageID * PageSize, ios::beg);
     fp.read(page.content, PageSize);
     fp.close();
     setValid(page.id);
@@ -125,7 +126,7 @@ void CacheManager::setFree(string filename, unsigned int pageID) {
 }
 
 Page& CacheManager::findPagePair(string filename, unsigned int pageID) const {
-    auto parent = blockMap.find(make_pair(filename, pageID));
+    auto parent = pageMap.find(make_pair(filename, pageID));
     if (parent == pageMap.end()) {
         cerr << "Element not found!";
     }
