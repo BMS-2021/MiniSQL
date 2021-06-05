@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "interpreter.h"
-#include "model.h"
+#include "../api/api.h"
 
-extern query::base *query_object_ptr;
+extern api::base *query_object_ptr;
 
 bool bFlag; /* no meanings. */
 
@@ -70,21 +70,21 @@ C_DML: I_INSERT_TABLE
 
 I_EXIT: K_EXIT
     {
-        auto operation = new query::exit();
+        auto operation = new api::exit();
         query_object_ptr = operation;
     }
     ;
 
 I_USE_DATABASE: K_USE K_DATABASE V_STRING
     {
-        auto operation = new query::use_database($3);
+        auto operation = new api::use_database($3);
         query_object_ptr = operation;
     }
     ;
 
 I_CREATE_TABLE: K_CREATE K_TABLE V_STRING S_L_BRACKETS E_SCHEMA_LIST E_PRIMARY_KEY S_R_BRACKETS
     {
-        auto operation = new query::create_table($3, $5, $6);
+        auto operation = new api::create_table($3, $5, $6);
         query_object_ptr = operation;
     }
     ;
@@ -92,35 +92,35 @@ I_CREATE_TABLE: K_CREATE K_TABLE V_STRING S_L_BRACKETS E_SCHEMA_LIST E_PRIMARY_K
 
 I_DROP_TABLE: K_DROP K_TABLE V_STRING
     {
-        auto operation = new query::drop_table($3);
+        auto operation = new api::drop_table($3);
         query_object_ptr = operation;
     }
     ;
 
 I_CREATE_INDEX: K_CREATE K_INDEX V_STRING K_ON V_STRING S_L_BRACKETS V_STRING S_R_BRACKETS
     {
-        auto operation = new query::create_index($3, $5, $7);
+        auto operation = new api::create_index($3, $5, $7);
         query_object_ptr = operation;
     }
     ;
 
 I_DROP_INDEX: K_DROP K_INDEX V_STRING
     {
-        auto operation = new query::drop_index($3);
+        auto operation = new api::drop_index($3);
         query_object_ptr = operation;
     }
     ;
 
 I_INSERT_TABLE: K_INSERT K_INTO V_STRING K_VALUES S_L_BRACKETS E_INSERT_LIST S_R_BRACKETS
     {
-        auto operation = new query::insert_table($3, $6);
+        auto operation = new api::insert_table($3, $6);
         query_object_ptr = operation;
     }
     ;
 
 I_SELECT_TABLE: K_SELECT E_ATTRIBUTE_LIST K_FROM V_STRING E_WHERE
     {
-        auto operation = new query::select_table($2, $4, $5);
+        auto operation = new api::select_table($2, $4, $5);
         query_object_ptr = operation;
     }
     ;

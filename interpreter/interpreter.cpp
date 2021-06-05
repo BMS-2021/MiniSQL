@@ -2,11 +2,11 @@
 #include <readline/readline.h>
 #endif
 
-#include "model.h"
+#include "../api/api.h"
 #include "interpreter.h"
 
 bool sig_exit = false;
-query::base *query_object_ptr = nullptr;
+api::base *query_object_ptr = nullptr;
 
 void interpret_entrance() {
     while (!sig_exit) {
@@ -35,9 +35,10 @@ const char* interpreter::read() {
 #ifdef READLINE_FOUND
         char *src = readline(this->start_text());
         if (!first_loop) {
-            std::strncat(this->str, "\n", SQL_QUERY_LENGTH);
+            std::strcat(this->str, "\n");
         }
-        std::strncat(this->str, src, SQL_QUERY_LENGTH);
+        // FIXME: Buffer overflow
+        std::strcat(this->str, src);
         if (std::strlen(src) >= 1 && src[std::strlen(src) - 1] == ';') {
             std::free(src);
             break;
@@ -48,9 +49,10 @@ const char* interpreter::read() {
         std::cout << this->start_text();
         std::getline(std::cin, src);
         if (!first_loop) {
-            std::strncat(this->str, "\n", SQL_QUERY_LENGTH);
+            std::strcat(this->str, "\n");
         }
-        std::strncat(this->str, src.c_str(), SQL_QUERY_LENGTH);
+        // FIXME: Buffer overflow
+        std::strcat(this->str, src.c_str());
         if (src.length() >= 1 && *src.rbegin() == ';') {
             break;
         }

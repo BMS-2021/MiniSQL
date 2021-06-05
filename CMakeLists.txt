@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(INTERPRETER
         interpreter/interpreter.h
-        interpreter/model.cpp
-        interpreter/model.h
         interpreter/interpreter.cpp
         interpreter/utils.cpp
         interpreter/utils.h
@@ -17,10 +15,16 @@ set(API
         api/api.cpp
 )
 
+set(EXCEPTION
+        utils/exception.cpp
+        utils/exception.h
+)
+
 set(DEPRECATED_INTERPRETER
         interpreter/lex.yy.cc
         interpreter/parser.tab.hh
         interpreter/parser.tab.cc
+        utils/exception.cpp utils/exception.h
 )
 
 set(CACHE_MANAGER
@@ -31,18 +35,20 @@ set(CACHE_MANAGER
 
 find_package(BISON)
 find_package(FLEX)
-#if(${BISON_FOUND} AND ${FLEX_FOUND})
-#    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/interpreter)
-#    BISON_TARGET(MyParser interpreter/parser.y ${CMAKE_CURRENT_BINARY_DIR}/interpreter/parser.tab.cc)
-#    FLEX_TARGET(MyScanner interpreter/tokenizer.l ${CMAKE_CURRENT_BINARY_DIR}/interpreter/lex.yy.cc)
-#    ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
-#    include_directories("interpreter")
-#    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS} ${CACHE_MANAGER})
-#else()
+#[[
+if(BISON_FOUND AND FLEX_FOUND)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/interpreter)
+    BISON_TARGET(MyParser interpreter/parser.y ${CMAKE_CURRENT_BINARY_DIR}/interpreter/parser.tab.cc)
+    FLEX_TARGET(MyScanner interpreter/tokenizer.l ${CMAKE_CURRENT_BINARY_DIR}/interpreter/lex.yy.cc)
+    ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
+    include_directories("interpreter")
+    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS} ${CACHE_MANAGER})
+else()
     message(WARNING "GNU Bison or Flex not found. \
                      This program will use pre-generated files instead... (deprecated)")
-    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${DEPRECATED_INTERPRETER} ${CACHE_MANAGER})
-#endif()
+                     ]]
+    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${CACHE_MANAGER})
+# endif()
 
 find_library(LIB_READLINE "readline")
 if(LIB_READLINE)
