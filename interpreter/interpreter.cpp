@@ -4,6 +4,7 @@
 
 #include "../api/api.h"
 #include "interpreter.h"
+#include "../utils/utils.h"
 
 bool sig_exit = false;
 api::base *query_object_ptr = nullptr;
@@ -35,10 +36,9 @@ const char* interpreter::read() {
 #ifdef READLINE_FOUND
         char *src = readline(this->start_text());
         if (!first_loop) {
-            std::strcat(this->str, "\n");
+            strcat_s(this->str, "\n", SQL_QUERY_LENGTH);
         }
-        // FIXME: Buffer overflow
-        std::strcat(this->str, src);
+        strcat_s(this->str, src, SQL_QUERY_LENGTH);
         if (std::strlen(src) >= 1 && src[std::strlen(src) - 1] == ';') {
             std::free(src);
             break;
@@ -49,10 +49,9 @@ const char* interpreter::read() {
         std::cout << this->start_text();
         std::getline(std::cin, src);
         if (!first_loop) {
-            std::strcat(this->str, "\n");
+            strcat_s(this->str, "\n", SQL_QUERY_LENGTH);
         }
-        // FIXME: Buffer overflow
-        std::strcat(this->str, src.c_str());
+        strcat_s(this->str, src, SQL_QUERY_LENGTH);
         if (src.length() >= 1 && *src.rbegin() == ';') {
             break;
         }
