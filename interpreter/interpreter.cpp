@@ -2,12 +2,13 @@
 #include <readline/readline.h>
 #endif
 
+#include <memory>
 #include "../api/api.h"
 #include "interpreter.h"
 #include "../utils/utils.h"
 
 bool sig_exit = false;
-api::base *query_object_ptr = nullptr;
+std::unique_ptr<api::base> query_object_ptr = nullptr;
 
 void interpret_entrance() {
     while (!sig_exit) {
@@ -18,16 +19,6 @@ void interpret_entrance() {
         if (query_object_ptr != nullptr) {
             query_object_ptr->exec();
         }
-
-        /*
-         * If expression evaluates to a null pointer value,
-         * no destructors are called, and the deallocation
-         * function may or may not be called (it's unspecified),
-         * but the default deallocation functions are guaranteed
-         * to do nothing when passed a null pointer.
-         */
-        delete query_object_ptr;
-        query_object_ptr = nullptr;
     }
 }
 
