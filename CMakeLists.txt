@@ -33,6 +33,11 @@ set(CACHE_MANAGER
         CacheManager/CacheManager.h
 )
 
+set(CATALOG_MANAGER
+        CatalogManager/CatalogManager.cpp
+        CatalogManager/CatalogManager.h
+)
+
 find_package(BISON)
 find_package(FLEX)
 #[[
