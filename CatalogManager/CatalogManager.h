@@ -17,7 +17,7 @@
 
 //using namespace MINISQL_BASE;
 
-class CatalogManager final
+class CatalogManager
 {
 public:
     void CreateTable(const std::string &table_name,
