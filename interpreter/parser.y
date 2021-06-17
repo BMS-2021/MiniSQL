@@ -2,11 +2,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "interpreter.h"
 #include "../api/api.h"
 
-extern api::base *query_object_ptr;
+extern std::unique_ptr<api::base> query_object_ptr;
 
 bool bFlag; /* no meanings. */
 
@@ -70,58 +71,54 @@ C_DML: I_INSERT_TABLE
 
 I_EXIT: K_EXIT
     {
-        auto operation = new api::exit();
-        query_object_ptr = operation;
+        query_object_ptr = std::make_unique<api::exit>();
+        // query_object_ptr = operation;
     }
     ;
 
 I_USE_DATABASE: K_USE K_DATABASE V_STRING
     {
-        auto operation = new api::use_database($3);
-        query_object_ptr = operation;
+        query_object_ptr = std::make_unique<api::use_database>($3);
+        // query_object_ptr = operation;
     }
     ;
 
 I_CREATE_TABLE: K_CREATE K_TABLE V_STRING S_L_BRACKETS E_SCHEMA_LIST E_PRIMARY_KEY S_R_BRACKETS
     {
-        auto operation = new api::create_table($3, $5, $6);
-        query_object_ptr = operation;
+        query_object_ptr = std::make_unique<api::create_table>($3, $5, $6);
+        // query_object_ptr = operation;
     }
     ;
 
 
 I_DROP_TABLE: K_DROP K_TABLE V_STRING
     {
-        auto operation = new api::drop_table($3);
-        query_object_ptr = operation;
+        query_object_ptr = std::make_unique<api::drop_table>($3);
+        // query_object_ptr = operation;
     }
     ;
 
 I_CREATE_INDEX: K_CREATE K_INDEX V_STRING K_ON V_STRING S_L_BRACKETS V_STRING S_R_BRACKETS
     {
-        auto operation = new api::create_index($3, $5, $7);
-        query_object_ptr = operation;
+        query_object_ptr = std::make_unique<api::create_index>($3, $5, $7);
     }
     ;
 
 I_DROP_INDEX: K_DROP K_INDEX V_STRING
     {
-        auto operation = new api::drop_index($3);
-        query_object_ptr = operation;
+        query_object_ptr = std::make_unique<api::drop_index>($3);
     }
     ;
 
 I_INSERT_TABLE: K_INSERT K_INTO V_STRING K_VALUES S_L_BRACKETS E_INSERT_LIST S_R_BRACKETS
     {
-        auto operation = new api::insert_table($3, $6);
-        query_object_ptr = operation;
+        query_object_ptr = std::make_unique<api::insert_table>($3, $6);
     }
     ;
 
 I_SELECT_TABLE: K_SELECT E_ATTRIBUTE_LIST K_FROM V_STRING E_WHERE
     {
-        auto operation = new api::select_table($2, $4, $5);
-        query_object_ptr = operation;
+        query_object_ptr = std::make_unique<api::select_table>($2, $4, $5);
     }
     ;
 
