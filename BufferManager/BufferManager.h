@@ -49,6 +49,8 @@ public:
 
     void createFile(string in);
 
+    void removeFile(string filename);
+
     int getBlockTail(string filename);
 
 private:

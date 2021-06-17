@@ -81,7 +81,7 @@ struct row {
 };
 
 struct result {
-    std::vector<row> row;
+    std::vector<struct row> row;
 };
 
 struct sql_tuple {

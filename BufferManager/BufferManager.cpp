@@ -137,7 +137,7 @@ Block &BufferManager::getBlock(string filename, int blockID) {
     if(!curBlock) { //block not found
         return readBlock(filename, blockID);
     }
-    return curBlock->blockContent;
+    return *curBlock;
 }
 
 Block &BufferManager::findBlock(string filename, int blockID) const {
@@ -165,10 +165,21 @@ void BufferManager::createFile(string in) {
     ofstream f1(in);
 }
 
+void BufferManager::removeFile(string filename) {
+    File *curFile = fileHandle;
+    while(curFile && curFile->filename != filename) {
+        curFile = curFile->next;
+    }
+    if(curFile) closeFile(curFile);
+    if (remove(filename.c_str())) {
+        cerr << "Fail to remove file: " << filename << endl;
+    }
+}
+
 int BufferManager::getBlockTail(string filename) {
     struct stat st;
     if (stat(filename.c_str(), &st) == 0) {
-        return (st.st_size / BlockSize - 1);
+        return (st.st_size / macro::BlockSize - 1);
     }
     cerr << "Failed to get file tail" << endl;
 }
