@@ -52,7 +52,7 @@ else()
     message(WARNING "GNU Bison or Flex not found. \
                      This program will use pre-generated files instead... (deprecated)")
                      ]]
-    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${CACHE_MANAGER} utils/utils.cpp utils/utils.h)
+    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${CATALOG_MANAGER} ${CACHE_MANAGER} utils/utils.cpp utils/utils.h)
 # endif()
 
 find_library(LIB_READLINE "readline")
