@@ -72,12 +72,11 @@ void CatalogManager::Flush() const
         ofs << tb.record_cnt << std::endl;
         ofs << kv[tb.name] << std::endl;
         std::ofstream otbfs(tb.name + ".catalog");
-        uint16_t i{0};
+        uint16_t i;
 
         otbfs << tb.attribute_names.size() << std::endl;
-        for (const auto &attr_name: tb.attribute_names)
-        {
-            otbfs << attr_name << std::endl;
+        for(i = 0; i < tb.attribute_names.size(); ++i){
+            otbfs << tb.attribute_names[i] << std::endl;
             const auto &attr = tb.attribute_type[i];
             switch (attr.type)
             {
@@ -91,27 +90,27 @@ void CatalogManager::Flush() const
                     otbfs << "char" << std::endl;
                     break;
             }
-            if (attr.type == value_type::CHAR)
-            {
+            if (attr.type == value_type::CHAR){
                 otbfs << attr.length << std::endl;
-            } else
-            {
+            }
+            else{
                 otbfs << 0 << std::endl;
             }
 
-            auto ind = std::find_if(tb.index.begin(), tb.index.end(),
-                                    [&attr_name](const std::pair<std::string, std::string> &p)
-                                    {
-                                        return p.first == attr_name;
-                                    });
-            if (ind != tb.index.end())
-            {
+            std::vector<std::pair<std::string, std::string>>::iterator ind;
+            for(ind = tb.index.begin(); ind != tb.index.end(); ++ind){
+                if(ind->first == tb.attribute_names[i]){
+                    break;
+                }
+            }
+
+            if (ind != tb.index.end()){
                 otbfs << 1 << std::endl << ind->second << std::endl;
-            } else
-            {
+            }
+            else{
                 otbfs << 0 << std::endl << "-" << std::endl;
             }
-            ++i;
+//            ++i;
         }
         otbfs.close();
     }
