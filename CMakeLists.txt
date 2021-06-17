@@ -27,10 +27,14 @@ set(DEPRECATED_INTERPRETER
         utils/exception.cpp utils/exception.h
 )
 
-set(CACHE_MANAGER
-        Base/Base.h
-        CacheManager/CacheManager.cpp
-        CacheManager/CacheManager.h
+set(BUFFER_MANAGER
+        BufferManager/BufferManager.h
+        BufferManager/BufferManager.cpp
+)
+
+set(RECORD_MANAGER
+        RecordManager/RecordManager.h
+        RecordManager/RecordManager.cpp
 )
 
 find_package(BISON)
@@ -47,7 +51,7 @@ else()
     message(WARNING "GNU Bison or Flex not found. \
                      This program will use pre-generated files instead... (deprecated)")
                      ]]
-    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${CACHE_MANAGER} utils/utils.cpp utils/utils.h)
+    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${BUFFER_MANAGER} ${RECORD_MANAGER} utils/utils.cpp utils/utils.h)
 # endif()
 
 find_library(LIB_READLINE "readline")
