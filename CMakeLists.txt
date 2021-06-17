@@ -54,6 +54,7 @@ else()
     add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${BUFFER_MANAGER} ${RECORD_MANAGER} utils/utils.cpp utils/utils.h)
 # endif()
 
+#[[
 find_library(LIB_READLINE "readline")
 if(LIB_READLINE)
     message(STATUS "Found READLINE: ${LIB_READLINE}")
@@ -63,3 +64,4 @@ else()
     message(WARNING "Library \"readline\" not found. \
             This program will use C++ standard library instead... (not recommended)")
 endif()
+]]
