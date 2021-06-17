@@ -28,11 +28,13 @@ public:
 
     int selectRecord(const table &table, const vector<string> &attr, const vector<condition> &cond);
 
+    void printResult(const result &res) const;
+
 private:
 
-    bool condsTest(const std::vector<condition> &conds, const sql_tuple &tup, const std::vector<std::string> &attr);
-
     BufferManager *bm;
+
+    bool condsTest(const vector<condition> &conds, const sql_tuple &tup, const vector<std::string> &attr);
 };
 
 
