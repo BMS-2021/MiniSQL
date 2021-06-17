@@ -47,6 +47,8 @@ public:
 
     void setDirty(const string &filename, unsigned int blockID);
 
+    void unlock(string filename, unsigned int blockID);
+
     void createFile(string in);
 
     void removeFile(string filename);
@@ -61,6 +63,8 @@ private:
     Block &resetBlock(Block &block);
 
     void replace(File &file, Block &block);
+
+    void lock(string filename, unsigned int blockID);
 
     Block &getFreeBlock();
 

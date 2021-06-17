@@ -161,6 +161,18 @@ void BufferManager::setDirty(const string &filename, unsigned int blockID) {
     block.dirty = true;
 }
 
+void BufferManager::unlock(string filename, unsigned int blockID) {
+    Block &block = findBlock(filename, blockID);
+    block.lock = false;
+}
+
+void BufferManager::lock(string filename, unsigned int blockID) {
+    LRUNum++;
+    Block &block = findBlock(filename, blockID);
+    block.lock = true;
+    block.LRUCount = LRUNum;
+}
+
 void BufferManager::createFile(string in) {
     ofstream f1(in);
 }
