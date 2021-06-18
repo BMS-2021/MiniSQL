@@ -42,7 +42,7 @@ const char* interpreter::read() {
         if (!first_loop) {
             strcat_s(this->str, "\n", SQL_QUERY_LENGTH);
         }
-        strcat_s(this->str, src, SQL_QUERY_LENGTH);
+        strcat_s(this->str, src.c_str(), SQL_QUERY_LENGTH);
         if (src.length() >= 1 && *src.rbegin() == ';') {
             break;
         }

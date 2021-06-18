@@ -81,6 +81,8 @@ struct table {
 
     std::vector<sql_value_type> attribute_type;
     std::vector<std::string> attribute_names;
+    // for attributes, first stands for type, second stands for name
+    std::vector<std::pair<sql_value_type, std::string>> attributes;
     /// for index, first stands for attr name, second stands for index name.
     std::vector<std::pair<std::string, std::string>> index;
 

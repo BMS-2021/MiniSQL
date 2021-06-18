@@ -23,13 +23,13 @@ void CatalogManager::CreateTable(const std::string &table_name,
     unsigned long long len = 0;
     char auto_ind = 'A';
 
-    std::vector<std::pair<std::string, sql_value_type>>::iterator elem;
+//    std::vector<std::pair<std::string, sql_value_type>>::iterator elem;
 
-    for (elem = schema_list.begin(); elem != schema_list.end(); ++elem){
-        sql_value_type elem_type = *elem.second;
+    for (auto &elem: schema_list){
+        sql_value_type elem_type = elem.second;
         len += elem_type.size();
-        tab.attribute_names.push_back(*elem.first);
-        if (*elem.first == primary_key_name){
+        tab.attribute_names.push_back(elem.first);
+        if (elem.first == primary_key_name){
             elem_type.setPrimary();
             elem_type.setUnique();
         }
@@ -38,11 +38,12 @@ void CatalogManager::CreateTable(const std::string &table_name,
 
     tab.record_len = len;
     tab.record_cnt = 0;
+
     for (auto &t: tab.attribute_type){
         if (t.unique && !t.primary){
-            tab.index.push_back(std::make_pair(t.attrName, std::string("auto_ind_") + (auto_ind++)));
-            // TODO:Index
-            createIndex(tab, t);
+            // TODO:Implement real index
+//            tab.index.push_back(std::make_pair(t.attrName, std::string("auto_ind_") + (auto_ind++)));
+//            createIndex(tab, t);
         }
     }
     tables.push_back(tab);
@@ -60,13 +61,13 @@ CatalogManager::~CatalogManager()
     Flush();
 }
 
-void CatalogManager::Flush() const
+void CatalogManager::Flush()
 {
 
     std::ofstream ofs(meta_file_name);
     ofs << tables.size() << std::endl;
 
-    for (const auto &tb: tables)
+    for (auto &tb: tables)
     {
         ofs << tb.name << std::endl;
         ofs << tb.record_cnt << std::endl;
@@ -117,8 +118,9 @@ void CatalogManager::Flush() const
     ofs.close();
 }
 
-void CatalogManager::LoadFile()
+void CatalogManager::LoadFromFile()
 {
+#ifdef LoadFromFile
     std::fstream fp;
     if(!fp){
         fp.open(meta_file_name, ios::out);
@@ -199,23 +201,24 @@ void CatalogManager::LoadFile()
             rm->createIndex(tb, it);
         }
     }
+#endif
 }
 
-int CatalogManager::TableExist(const std::string &query_name) const
+bool CatalogManager::TableExist(const std::string &query_name) const
 {
     for (auto table = tables.begin(); table != tables.end(); ++table){
-        if(*table.name == query_name){
+        if((*table).name == query_name){
             return true;
         }
     }
     return false;
 }
 
-vector<table>::iterator &CatalogManager::GetTable(const std::string &query_name)
+table &CatalogManager::GetTable(const std::string &query_name)
 {
     for (auto table = tables.begin(); table != tables.end(); ++table){
-        if(*table.name == query_name){
-            return table;
+        if((*table).name == query_name){
+            return *table;
         }
     }
 }
@@ -223,9 +226,14 @@ vector<table>::iterator &CatalogManager::GetTable(const std::string &query_name)
 
 bool CatalogManager::DropTableByName(const std::string &table_name)
 {
-    table *table_to_drop = nullptr;
-    table_to_drop = GetTable(table_name);
-    if(!table_to_drop){
+
+    std::vector<table>::iterator table_to_drop;
+    for ( auto table = tables.begin(); table != tables.end(); ++table){
+        if((*table).name == table_name){
+            table_to_drop = table;
+        }
+    }
+    if(table_to_drop != tables.end()){
         return true;
     }
     tables.erase(table_to_drop);
@@ -235,8 +243,10 @@ bool CatalogManager::DropTableByName(const std::string &table_name)
 table &CatalogManager::GetTableWithIndex(const std::string &index_name)
 {
     for (auto table = tables.begin(); table != tables.end(); ++table){
-        for (auto i = t.index.begin(); i != t.index.end(); ++t){
-            if (*i.second == index_name) return t;
+        for (auto i = (*table).index.begin(); i != (*table).index.end(); ++i){
+            if ((*i).second == index_name){
+                return *table;
+            }
         }
 
     }

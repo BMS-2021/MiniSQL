@@ -35,11 +35,13 @@ public:
 
     bool RemoveTable(const table &table);
 
+    bool DropTableByName(const std::string &table_name);
+
     CatalogManager();
 
     ~CatalogManager();
 
-    void Flush() const;
+    void Flush() ;
 
     bool isValid() const
     { return validFlag; }
