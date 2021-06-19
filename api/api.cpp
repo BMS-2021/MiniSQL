@@ -36,7 +36,29 @@ namespace api {
     void insert_table::exec() {
         check_table_exist(this->table_name);
 
+        auto table = cat_mgt.GetTable(this->table_name);
+        if (table.attribute_names.size() != this->insert_list.size()) {
+            throw sql_exception(102, "api",
+                                "insert number mismatch: expect "
+                                + std::to_string(table.attribute_names.size())
+                                + " attributes, got "
+                                + std::to_string(this->insert_list.size()));
+        }
 
+        // TODO: validate
+
+        // TODO: index
+
+        // TODO: check unique and duplication
+
+        sql_tuple tuple;
+        tuple.element = this->insert_list;
+        rec_mgt.insertRecord(table, tuple);
+
+        // TODO: update index
+
+        table.record_cnt++;
+        std::cout << "insertion finished, 1 row affected";
     }
 
     void select_table::exec() {
