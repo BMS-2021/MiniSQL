@@ -132,6 +132,9 @@ Block &BufferManager::readBlock(const string& filename, int blockID) {
         cerr << "Fail to open file: " << filename << "." << endl;
 
     Block &block = getFreeBlock();
+    int tail = getBlockTail(filename);
+    if(tail < blockID) return nullBlock;
+
     fp.seekg(blockID * macro::BlockSize, ios::beg);
     fp.read(block.blockContent, macro::BlockSize);
     File &file = getFile(filename);

@@ -54,20 +54,21 @@ int RecordManager::insertRecord(const macro::table &table, const sql_tuple &reco
 
     string str;
     int lenOffset;
-    for (auto attr = record.element.begin(); attr < record.element.end(); attr++) {
-        switch (attr->sql_type.type) {
+    auto attr_type = table.attribute_type.begin();
+    for (auto attr = record.element.begin(); attr < record.element.end(); attr_type++, attr++) {
+        switch (attr_type->type) {
             case value_type::INT:
                 memcpy(content + offset, &attr->sql_int, sizeof(int));
                 offset += sizeof(int);
                 break;
             case value_type::CHAR:
                 str = attr->sql_str;
-                lenOffset = attr->sql_type.length - str.length();
+                lenOffset = attr_type->length - str.length();
                 if (lenOffset > 0) {
                     str.insert(str.length(), lenOffset, 0);
                 }
-                memcpy(content + offset, str.c_str(), attr->sql_type.length + 1);
-                offset += attr->sql_type.length + 1;
+                memcpy(content + offset, str.c_str(), attr_type->length + 1);
+                offset += attr_type->length + 1;
                 break;
             case value_type::FLOAT:
                 memcpy(content + offset, &attr->sql_float, sizeof(float));
@@ -109,8 +110,7 @@ bool RecordManager::deleteRecord(const macro::table &table, const vector<conditi
 int RecordManager::selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond) {
     string tableFileStr = macro::tableFile(table.name);
     int blockID = 0;
-    Block &block = buf_mgt.getBlock(tableFileStr, blockID);
-    char *content = block.blockContent;
+    char *content = buf_mgt.getBlock(tableFileStr, blockID).blockContent;
 
     int recordLen = table.record_len;
     int recordCnt = macro::BlockSize / recordLen;
@@ -118,20 +118,19 @@ int RecordManager::selectRecord(const macro::table &table, const vector<string> 
     sql_tuple tup;
     row row;
     result res;
-
     while (content) {
         for (int i = 0; i < recordCnt; i++) {
-            genTuple(content, i * recordLen, table.attribute_type);
+            if (content[i * recordLen] == 0) { continue; }
+            tup = genTuple(content, i * recordLen, table.attribute_type);
             if (condsTest(cond, tup, table.attribute_names)) {
-                row = tup.fetchRow(table.attribute_names, attr);
+                row = tup.fetchRow(table.attribute_names, table.attribute_names); //FIXME!!
                 res.row.push_back(row);
             }
         }
         buf_mgt.unlock(macro::tableFile(table.name), blockID);
         blockID++;
-        block = buf_mgt.getBlock(macro::tableFile(table.name), blockID);
+        content = buf_mgt.getBlock(macro::tableFile(table.name), blockID).blockContent;
     }
-
     printResult(res);
     return res.row.size();
 }

@@ -18,6 +18,7 @@ struct File {
     int type; //0:db file 1:table file 2: index file
 
     string filename; //the name of the file
+    int fileBlockCnt;
     int recordAmount; //the number of record in the file
     int freeNum; //the free block number which could be used for the file
     int recordLength; //the length of the record in the file
@@ -27,6 +28,7 @@ struct File {
     File() {
         type = 0;
         filename = "";
+        fileBlockCnt = 0;
         recordAmount = 0;
         freeNum = 0;
         recordLength = 0;
@@ -54,11 +56,22 @@ struct Block {
         usedSize = 0;
         LRUCount = 0;
         lock = 0;
-        blockContent = static_cast<char *>(malloc(macro::BlockSize));
+        blockContent = static_cast<char *>(calloc(1, macro::BlockSize));
+
     }
 
+    Block(bool isNull) {
+        blockID = 0;
+        dirty = 0;
+        next = nullptr;
+        file = nullptr;
+        usedSize = 0;
+        LRUCount = 0;
+        lock = 0;
+        if(isNull) blockContent = nullptr;
+    }
     ~Block() {
-        free(blockContent);
+        if(blockContent) free(blockContent);
     }
 };
 
@@ -82,6 +95,8 @@ public:
 
     static int getBlockTail(const string& filename);
 
+    Block nullBlock = Block(true);
+    File *fileHandle;
 private:
     void closeFile(File *file);
 
@@ -106,7 +121,7 @@ private:
     int LRUNum;
     int fileCnt;
     int blockCnt;
-    File *fileHandle;
+
     Block *blockHandle;
 };
 
