@@ -1,3 +1,6 @@
 cmake-build-debug
 .idea
 .DS_Store
+.vs
+.vscode
+out/
