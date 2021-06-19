@@ -79,6 +79,36 @@ int RecordManager::insertRecord(const table &table, const sql_tuple &record) {
     return blockID * recordsPreBlock + recordOffset;
 }
 
+bool RecordManager::deleteRecord(const table &table, const vector<condition> &conditions) {
+    int blockID = 0;
+    Block block = bm->getBlock(macro::tableFile(table.name), blockID);
+    char *content = block.blockContent;
+    int length = table.record_len + 1;
+    int blocks = macro::BlockSize / length;
+    sql_tuple tup;
+
+    while (*content) {
+        for (int i = 0; i < blocks; i++) {
+            if (content[i * length] == 0) { continue; }
+            tup = genTuple(content, i * length, table.attribute_type);
+            if (condsTest(conditions, tup, table.attribute_names)) {
+                content[i * length] = 0;
+//                for (auto &col: tup.element) {
+//                    for (auto &attr : table.index) {
+//                        if (col.type.attrName == attr.first) {
+//                            im->removeKey(indexFile(table.name, attr.first), col);
+//                        }
+//                    }
+//                }
+            }
+        }
+        bm->setDirty(macro::tableFile(table.name), blockID);
+        bm->unlock(macro::tableFile(table.name), blockID);
+        block = bm->getBlock(macro::tableFile(table.name), ++blockID);
+        content = block.blockContent;
+    }
+}
+
 int RecordManager::selectRecord(const table &table, const vector<string> &attr, const vector<condition> &cond) {
     string tableFileStr = macro::tableFile(table.name);
     int blockID = 0;
@@ -106,16 +136,16 @@ int RecordManager::selectRecord(const table &table, const vector<string> &attr, 
     }
 }
 
-//void RecordManager::printResult(const result &res) const {
-//    for (auto const &row : res.row) {
-//        cout << " | ";
-//        for (auto const &col : row.col) {
-//            cout << col << " | ";
-//        }
-//        cout << endl;
-//    }
-//}
-//
+void RecordManager::printResult(const result &res) const {
+    for (auto const &row : res.row) {
+        cout << " | ";
+        for (auto const &col : row.col) {
+            cout << col << " | ";
+        }
+        cout << endl;
+    }
+}
+
 bool RecordManager::condsTest(const std::vector<condition> &conds, const sql_tuple &tup, const std::vector<std::string> &attr) {
     int condPos;
     for (condition cond : conds) {

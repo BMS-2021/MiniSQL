@@ -26,6 +26,8 @@ public:
 
     int insertRecord(const table &table, const sql_tuple &record);
 
+    bool deleteRecord(const table &table, const vector<condition> &conditions);
+
     int selectRecord(const table &table, const vector<string> &attr, const vector<condition> &cond);
 
     void printResult(const result &res) const;
