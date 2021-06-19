@@ -183,7 +183,7 @@ E_INSERT_LIST: E_INSERT_LIST S_COMMA V_INSERT
     }
     | V_INSERT
     {
-        $$ = std::vector<std::variant<int, float, std::string>>();
+        $$ = std::vector<sql_value>();
         $$.push_back($1);
     }
     ;
@@ -248,12 +248,12 @@ V_INSERT: S_APOSTROPGE V_STRING S_APOSTROPGE
     | V_STRING
     {
         try {
-            $$ = std::stoi($1);
+            $$ = sql_value(std::stoi($1));
         } catch (std::exception) {
             try {
-                $$ = std::stof($1);
+                $$ = sql_value(std::stof($1));
             } catch (std::exception) {
-                $$ = $1;
+                $$ = sql_value($1);
             }
         }
     }

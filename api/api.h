@@ -8,7 +8,6 @@
 
 #include <string>
 #include <vector>
-#include <variant>
 #include <iostream>
 
 #include "../macro.h"
@@ -78,14 +77,14 @@ namespace api {
 
     class insert_table final : public base {
         std::string table_name;
-        std::vector<std::variant<int, float, std::string>> insert_list;
+        std::vector<sql_value> insert_list;
 
 
         void exec() override;
 
     public:
         insert_table(std::string& table_name,
-                     std::vector<std::variant<int, float, std::string>>& insert_list) :
+                     std::vector<sql_value>& insert_list) :
                 table_name(table_name), insert_list(insert_list) {}
     };
 

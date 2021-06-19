@@ -1574,7 +1574,7 @@ yyreduce:
   case 32:
 #line 185 "parser.y"
     {
-        (yyval.insert_list) = std::vector<std::variant<int, float, std::string>>();
+        (yyval.insert_list) = std::vector<sql_value>();
         (yyval.insert_list).push_back((yyvsp[0].v));
     }
 #line 1581 "parser.tab.cc"
@@ -1697,12 +1697,12 @@ yyreduce:
 #line 249 "parser.y"
     {
         try {
-            (yyval.v) = std::stoi((yyvsp[0].str));
+            (yyval.v) = sql_value(std::stoi((yyvsp[0].str)));
         } catch (std::exception) {
             try {
-                (yyval.v) = std::stof((yyvsp[0].str));
+                (yyval.v) = sql_value(std::stof((yyvsp[0].str)));
             } catch (std::exception) {
-                (yyval.v) = (yyvsp[0].str);
+                (yyval.v) = sql_value((yyvsp[0].str));
             }
         }
     }

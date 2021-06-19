@@ -1,7 +1,6 @@
 #ifndef MINISQL_MACRO_H
 #define MINISQL_MACRO_H
 
-#include <variant>
 #include <string>
 #include <iostream>
 #include <vector>
@@ -42,6 +41,11 @@ struct sql_value {
     float sql_float;
     std::string sql_str;
 
+    sql_value() = default;
+    sql_value(int i) : sql_int(i), sql_type(value_type::INT) {};
+    sql_value(float f) : sql_float(f), sql_type(value_type::FLOAT) {};
+    sql_value(std::string& str) : sql_str(str), sql_type(value_type::CHAR) {};
+
     void reset() {
         sql_int = 0;
         sql_float = 0;
@@ -59,66 +63,27 @@ struct sql_value {
         }
     }
 
-     bool operator<(const std::variant<int, float, std::string> &e) const {
+     std::partial_ordering operator<=>(const sql_value &e) const {
         switch (sql_type.type) {
             case value_type::INT:
-                return sql_int < std::get<int>(e);
+                return sql_int <=> e.sql_int;
             case value_type::FLOAT:
-                return sql_float < std::get<float>(e);
+                return sql_float <=> e.sql_float;
             case value_type::CHAR:
-                return sql_str < std::get<std::string>(e);
+                return sql_str <=> e.sql_str;
             default:
                 throw std::runtime_error("Undefined Type!");
         }
     }
 
-    bool operator<=(const std::variant<int, float, std::string> &e) const {
+    bool operator==(const sql_value &e) const {
         switch (sql_type.type) {
             case value_type::INT:
-                return sql_int <= std::get<int>(e);
+                return sql_int == e.sql_int;
             case value_type::FLOAT:
-                return sql_float <= std::get<float>(e);
+                return sql_float == e.sql_float;
             case value_type::CHAR:
-                return sql_str <= std::get<std::string>(e);
-            default:
-                throw std::runtime_error("Undefined Type!");
-        }
-    }
-
-    bool operator>(const std::variant<int, float, std::string> &e) const {
-        switch (sql_type.type) {
-            case value_type::INT:
-                return sql_int > std::get<int>(e);
-            case value_type::FLOAT:
-                return sql_float > std::get<float>(e);
-            case value_type::CHAR:
-                return sql_str > std::get<std::string>(e);
-            default:
-                throw std::runtime_error("Undefined Type!");
-        }
-    }
-
-    bool operator>=(const std::variant<int, float, std::string> &e) const {
-        switch (sql_type.type) {
-            case value_type::INT:
-                return sql_int >= std::get<int>(e);
-            case value_type::FLOAT:
-                return sql_float >= std::get<float>(e);
-            case value_type::CHAR:
-                return sql_str >= std::get<std::string>(e);
-            default:
-                throw std::runtime_error("Undefined Type!");
-        }
-    }
-
-    bool operator==(const std::variant<int, float, std::string> &e) const {
-        switch (sql_type.type) {
-            case value_type::INT:
-                return sql_int == std::get<int>(e);
-            case value_type::FLOAT:
-                return sql_float == std::get<float>(e);
-            case value_type::CHAR:
-                return sql_str == std::get<std::string>(e);
+                return sql_str == e.sql_str;
             default:
                 throw std::runtime_error("Undefined Type!");
         }
@@ -146,10 +111,10 @@ enum class attribute_operator {
 struct condition {
     std::string attribute_name;
     attribute_operator op;
-    std::variant<int, float, std::string> value;  //FIXME!!! chang type to sql_value
+    sql_value value;  //FIXME!!! chang type to sql_value
 
     condition() = default;
-    condition(std::string& attribute_name, attribute_operator op, std::variant<int, float, std::string>& value) :
+    condition(std::string& attribute_name, attribute_operator op, sql_value& value) :
     attribute_name(attribute_name),
     op(op),
     value(value) {}
