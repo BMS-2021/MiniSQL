@@ -164,7 +164,8 @@ struct condition {
 
 struct table {
     table() {};
-
+    table(std::string table_name, int attr_cnt)
+        :name(table_name), attribute_cnt(attr_cnt){};
 /*        table(const table &T) : name(T.name), attribute_cnt(T.attribute_cnt), record_len(T.record_len),
                                 record_cnt(T.record_cnt), size(T.size), attribute_type(T.attribute_type), attribute_names(T.attribute_names),
                                 indexNames(T.indexNames) {};*/
@@ -174,7 +175,7 @@ struct table {
 
     std::vector<sql_value_type> attribute_type;
     std::vector<std::string> attribute_names;
-    /// for index, first stands for attr name, second stands for index name.
+    // for index, first stands for attr name, second stands for index name.
     std::vector<std::pair<std::string, std::string>> index;
 
     friend std::ostream &operator<<(std::ostream &os, const table &tab) {
