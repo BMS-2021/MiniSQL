@@ -10,7 +10,7 @@ using namespace std;
 
 
 void CatalogManager::CreateTable(const std::string &table_name,
-                                 const std::vector<std::pair<std::string, sql_value_type>> &schema_list,
+                                 const std::vector<schema> &schema_list,
                                  const std::string &primary_key_name
 )
 {
@@ -18,14 +18,19 @@ void CatalogManager::CreateTable(const std::string &table_name,
     unsigned long long len = 0;
     char auto_ind = 'A';
 
-//    std::vector<std::pair<std::string, sql_value_type>>::iterator elem;
 
-    for (auto &elem: schema_list){
-        sql_value_type elem_type = elem.second;
+    for (auto &schema: schema_list){
+        sql_value_type elem_type = schema.type;
         len += elem_type.size();
-        tab.attribute_names.push_back(elem.first);
-        if (elem.first == primary_key_name){
-            elem_type.primary = elem_type.unique = true;
+        tab.attribute_names.push_back(schema.name);
+        if (schema.name == primary_key_name){
+            elem_type.primary = true;
+        }
+        if (schema.unique){
+            elem_type.unique = true;
+        }
+        if (elem_type.type == value_type::CHAR){
+            elem_type.size_of_char = schema.type.size_of_char;
         }
         tab.attribute_type.push_back(elem_type);
     }

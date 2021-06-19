@@ -18,7 +18,7 @@ class CatalogManager
 {
 public:
     void CreateTable(const std::string &table_name,
-                     const std::vector<std::pair<std::string, sql_value_type>> &schema_list,
+                     const std::vector<schema> &schema_list,
                      const std::string &primary_key_name
     );
 
