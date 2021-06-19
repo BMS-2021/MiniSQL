@@ -30,15 +30,15 @@ public:
 
     int selectRecord(const table &table, const vector<string> &attr, const vector<condition> &cond);
 
-    void printResult(const result &res) const;
+    static void printResult(const result &res) ;
 
 private:
 
     BufferManager *bm;
 
-    sql_tuple genTuple(const char *blockBuffer, int offset, const std::vector<sql_value_type> &attrType);
+    static sql_tuple genTuple(const char *blockBuffer, int offset, const std::vector<sql_value_type> &attrType);
 
-    bool condsTest(const vector<condition> &conds, const sql_tuple &tup, const vector<std::string> &attr);
+    static bool condsTest(const vector<condition> &conds, const sql_tuple &tup, const vector<std::string> &attr);
 };
 
 

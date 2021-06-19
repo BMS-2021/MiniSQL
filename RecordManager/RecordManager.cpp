@@ -8,7 +8,7 @@ using namespace std;
 
 bool RecordManager::creatTable(const string &tableName) {
     string tableFileStr = macro::tableFile(tableName);
-    bm->createFile(tableFileStr);
+    BufferManager::createFile(tableFileStr);
     return true;
 }
 
@@ -20,9 +20,8 @@ bool RecordManager::dropTable(const string &tableName) {
 
 int RecordManager::insertRecord(const table &table, const sql_tuple &record) {
     string tableFileStr = macro::tableFile(table.name);
-    int blockID = bm->getBlockTail(tableFileStr);
+    int blockID = BufferManager::getBlockTail(tableFileStr);
     Block &block = bm->getBlock(tableFileStr, blockID);
-    if(block.usedSize == macro::BlockSize);
     block = bm->getBlock(tableFileStr, ++blockID);
 
     char *content = block.blockContent;
@@ -93,13 +92,6 @@ bool RecordManager::deleteRecord(const table &table, const vector<condition> &co
             tup = genTuple(content, i * length, table.attribute_type);
             if (condsTest(conditions, tup, table.attribute_names)) {
                 content[i * length] = 0;
-//                for (auto &col: tup.element) {
-//                    for (auto &attr : table.index) {
-//                        if (col.type.attrName == attr.first) {
-//                            im->removeKey(indexFile(table.name, attr.first), col);
-//                        }
-//                    }
-//                }
             }
         }
         bm->setDirty(macro::tableFile(table.name), blockID);
@@ -136,7 +128,7 @@ int RecordManager::selectRecord(const table &table, const vector<string> &attr, 
     }
 }
 
-void RecordManager::printResult(const result &res) const {
+void RecordManager::printResult(const result &res) {
     for (auto const &row : res.row) {
         cout << " | ";
         for (auto const &col : row.col) {
@@ -148,7 +140,7 @@ void RecordManager::printResult(const result &res) const {
 
 bool RecordManager::condsTest(const std::vector<condition> &conds, const sql_tuple &tup, const std::vector<std::string> &attr) {
     int condPos;
-    for (condition cond : conds) {
+    for (const condition& cond : conds) {
         condPos = -1;
         for (int i = 0; i < attr.size(); i++) {
             if (attr[i] == cond.attribute_name) {
@@ -171,10 +163,10 @@ sql_tuple RecordManager::genTuple(const char *content, int offset, const std::ve
     sql_value e;
     sql_tuple tup;
     tup.element.clear();
-    for (int i = 0; i < attrType.size(); i++) {
+    for (auto i : attrType) {
         e.reset();
-        e.sql_type = attrType[i];
-        switch (attrType[i].type) {
+        e.sql_type = i;
+        switch (i.type) {
             case value_type::INT:
                 memcpy(&e.sql_int, curContent, sizeof(int));
                 curContent += sizeof(int);
@@ -185,7 +177,7 @@ sql_tuple RecordManager::genTuple(const char *content, int offset, const std::ve
                 break;
             case value_type::CHAR:
                 e.sql_str = curContent;
-                curContent += attrType[i].length + 1;
+                curContent += i.length + 1;
                 break;
         }
         tup.element.push_back(e);

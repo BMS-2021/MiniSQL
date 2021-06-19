@@ -29,6 +29,7 @@ Block &BufferManager::resetBlock(Block &block) {
     block.dirty = 0;
     return block;
 }
+
 void BufferManager::replace(File &file, Block &block) {
     block.file = &file;
     Block* curBlock = file.firstBlock;
@@ -96,7 +97,7 @@ void BufferManager::closeAllFile() {
     }
 }
 
-File &BufferManager::getFile(string filename) {
+File &BufferManager::getFile(const string& filename) {
     File *preFile = nullptr;
     File *curFile = fileHandle;
     while(curFile && curFile->filename != filename) {
@@ -114,7 +115,7 @@ File &BufferManager::getFile(string filename) {
     return *curFile;
 }
 
-Block &BufferManager::readBlock(string filename, int blockID) {
+Block &BufferManager::readBlock(const string& filename, int blockID) {
     fstream fp;
     fp.open(filename, ios::in | ios::out | ios::binary);
     if (!fp.good())
@@ -128,7 +129,7 @@ Block &BufferManager::readBlock(string filename, int blockID) {
     return block;
 }
 
-Block &BufferManager::getBlock(string filename, int blockID) {
+Block &BufferManager::getBlock(const string& filename, int blockID) {
     File &file = getFile(filename);
     Block *curBlock = file.firstBlock;
     while(curBlock && curBlock->blockID != blockID) {
@@ -140,7 +141,7 @@ Block &BufferManager::getBlock(string filename, int blockID) {
     return *curBlock;
 }
 
-Block &BufferManager::findBlock(string filename, int blockID) const {
+Block &BufferManager::findBlock(const string& filename, int blockID) const {
     File *curFile = fileHandle;
     while(curFile && curFile->filename != filename) {
         curFile = curFile->next;
@@ -161,23 +162,23 @@ void BufferManager::setDirty(const string &filename, unsigned int blockID) {
     block.dirty = true;
 }
 
-void BufferManager::unlock(string filename, unsigned int blockID) {
+void BufferManager::unlock(const string& filename, unsigned int blockID) {
     Block &block = findBlock(filename, blockID);
     block.lock = false;
 }
 
-void BufferManager::lock(string filename, unsigned int blockID) {
+void BufferManager::lock(const string& filename, unsigned int blockID) {
     LRUNum++;
     Block &block = findBlock(filename, blockID);
     block.lock = true;
     block.LRUCount = LRUNum;
 }
 
-void BufferManager::createFile(string in) {
+void BufferManager::createFile(const string& in) {
     ofstream f1(in);
 }
 
-void BufferManager::removeFile(string filename) {
+void BufferManager::removeFile(const string& filename) {
     File *curFile = fileHandle;
     while(curFile && curFile->filename != filename) {
         curFile = curFile->next;
@@ -188,8 +189,8 @@ void BufferManager::removeFile(string filename) {
     }
 }
 
-int BufferManager::getBlockTail(string filename) {
-    struct stat st;
+int BufferManager::getBlockTail(const string& filename) {
+    struct stat st{};
     if (stat(filename.c_str(), &st) == 0) {
         return (st.st_size / macro::BlockSize - 1);
     }

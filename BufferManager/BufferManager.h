@@ -43,38 +43,38 @@ public:
 
     void closeAllFile();
 
-    Block &getBlock(string fileName, int blockID);
+    Block &getBlock(const string& fileName, int blockID);
 
     void setDirty(const string &filename, unsigned int blockID);
 
-    void unlock(string filename, unsigned int blockID);
+    void unlock(const string& filename, unsigned int blockID);
 
-    void createFile(string in);
+    static void createFile(const string& in);
 
-    void removeFile(string filename);
+    void removeFile(const string& filename);
 
-    int getBlockTail(string filename);
+    static int getBlockTail(const string& filename);
 
 private:
     void closeFile(File *file);
 
-    Block &writeBlock(Block &block);
+    static Block &writeBlock(Block &block);
 
-    Block &resetBlock(Block &block);
+    static Block &resetBlock(Block &block);
 
-    void replace(File &file, Block &block);
+    static void replace(File &file, Block &block);
 
-    void lock(string filename, unsigned int blockID);
+    void lock(const string& filename, unsigned int blockID);
 
     Block &getFreeBlock();
 
     Block &getLRUBlock();
 
-    Block &readBlock(string filename, int blockID);
+    Block &readBlock(const string& filename, int blockID);
 
-    File &getFile(string filename);
+    File &getFile(const string& filename);
 
-    Block &findBlock(string filename, int blockID) const;
+    Block &findBlock(const string& filename, int blockID) const;
 
     int LRUNum;
     int fileCnt;
