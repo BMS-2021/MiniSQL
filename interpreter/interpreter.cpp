@@ -6,6 +6,7 @@
 #include "../api/api.h"
 #include "interpreter.h"
 #include "../utils/utils.h"
+#include "../utils/exception.h"
 
 bool sig_exit = false;
 std::unique_ptr<api::base> query_object_ptr = nullptr;
@@ -17,7 +18,11 @@ void interpret_entrance() {
         parse(inter.read());
 
         if (query_object_ptr != nullptr) {
-            query_object_ptr->exec();
+            try {
+                query_object_ptr->exec();
+            } catch (sql_exception &e) {
+                std::cerr << e << std::endl;
+            }
         }
     }
 }
