@@ -24,13 +24,13 @@ public:
 
     bool TableExist(const std::string &table_name) const;
 
-    table &GetTable(const std::string &table_name);
+    macro::table &GetTable(const std::string &table_name);
 
     bool CheckIndexNameExists(const std::string &index_name) const;
 
-    table &GetTableWithIndex(const std::string &index_name);
+    macro::table &GetTableWithIndex(const std::string &index_name);
 
-    bool RemoveTable(const table &table);
+    bool RemoveTable(const macro::table &table);
 
     bool DropTableByName(const std::string &table_name);
 
@@ -54,7 +54,7 @@ private:
     }
 
 private:
-    std::vector<table> tables;
+    std::vector<macro::table> tables;
 
     static constexpr auto meta_file_name = "tables.meta";
 

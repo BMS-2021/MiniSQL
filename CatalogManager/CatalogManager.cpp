@@ -14,7 +14,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
                                  const std::string &primary_key_name
 )
 {
-    table tab(table_name, schema_list.size());
+    macro::table tab(table_name, schema_list.size());
     unsigned long long len = 0;
     char auto_ind = 'A';
 
@@ -49,7 +49,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
 }
 
 CatalogManager::CatalogManager()
-        : tables(std::vector<table>())
+        : tables(std::vector<macro::table>())
 {
     LoadFromFile();
 }
@@ -201,7 +201,7 @@ bool CatalogManager::TableExist(const std::string &query_name) const
     return false;
 }
 
-table &CatalogManager::GetTable(const std::string &query_name)
+macro::table &CatalogManager::GetTable(const std::string &query_name)
 {
     for (auto & table : tables){
         if(table.name == query_name){
@@ -214,7 +214,7 @@ table &CatalogManager::GetTable(const std::string &query_name)
 bool CatalogManager::DropTableByName(const std::string &table_name)
 {
 
-    std::vector<table>::iterator table_to_drop;
+    std::vector<macro::table>::iterator table_to_drop;
     for ( auto table = tables.begin(); table != tables.end(); ++table){
         if((*table).name == table_name){
             table_to_drop = table;
@@ -227,7 +227,7 @@ bool CatalogManager::DropTableByName(const std::string &table_name)
     return true;
 }
 
-table &CatalogManager::GetTableWithIndex(const std::string &index_name)
+macro::table &CatalogManager::GetTableWithIndex(const std::string &index_name)
 {
     for (auto & table : tables){
         for (auto i = table.index.begin(); i != table.index.end(); ++i){

@@ -81,9 +81,7 @@ namespace api {
         std::vector<std::variant<int, float, std::string>> insert_list;
 
 
-        inline void exec() override {
-            std::cout << "Interpreter Yes!!!" << std::endl;
-        }
+        void exec() override;
 
     public:
         insert_table(std::string& table_name,
@@ -97,9 +95,7 @@ namespace api {
         std::vector<condition> condition_list;
 
 
-        inline void exec() override {
-            std::cout << "Interpreter Yes!!!" << std::endl;
-        }
+        void exec() override;
 
     public:
         select_table(std::vector<std::string>& attribute_list,

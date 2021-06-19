@@ -21,15 +21,15 @@ public:
 
     bool dropTable(const string &tableName);
 
-    bool createIndex(const table &table, const sql_value_type &index);
+    bool createIndex(const macro::table &table, const sql_value_type &index);
 
-    bool dropIndex(const table &table, const string &index);
+    bool dropIndex(const macro::table &table, const string &index);
 
-    int insertRecord(const table &table, const sql_tuple &record);
+    int insertRecord(const macro::table &table, const sql_tuple &record);
 
-    bool deleteRecord(const table &table, const vector<condition> &conditions);
+    bool deleteRecord(const macro::table &table, const vector<condition> &conditions);
 
-    int selectRecord(const table &table, const vector<string> &attr, const vector<condition> &cond);
+    int selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond);
 
     static void printResult(const result &res) ;
 

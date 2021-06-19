@@ -18,7 +18,7 @@ bool RecordManager::dropTable(const string &tableName) {
     return true;
 }
 
-int RecordManager::insertRecord(const table &table, const sql_tuple &record) {
+int RecordManager::insertRecord(const macro::table &table, const sql_tuple &record) {
     string tableFileStr = macro::tableFile(table.name);
     int blockID = BufferManager::getBlockTail(tableFileStr);
     Block &block = bm->getBlock(tableFileStr, blockID);
@@ -78,7 +78,7 @@ int RecordManager::insertRecord(const table &table, const sql_tuple &record) {
     return blockID * recordsPreBlock + recordOffset;
 }
 
-bool RecordManager::deleteRecord(const table &table, const vector<condition> &conditions) {
+bool RecordManager::deleteRecord(const macro::table &table, const vector<condition> &conditions) {
     int blockID = 0;
     Block block = bm->getBlock(macro::tableFile(table.name), blockID);
     char *content = block.blockContent;
@@ -103,7 +103,7 @@ bool RecordManager::deleteRecord(const table &table, const vector<condition> &co
     return true;
 }
 
-int RecordManager::selectRecord(const table &table, const vector<string> &attr, const vector<condition> &cond) {
+int RecordManager::selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond) {
     string tableFileStr = macro::tableFile(table.name);
     int blockID = 0;
     Block &block = bm->getBlock(tableFileStr, blockID);
