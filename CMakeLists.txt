@@ -27,6 +27,11 @@ set(DEPRECATED_INTERPRETER
         utils/exception.cpp utils/exception.h
 )
 
+set(CATALOG_MANAGER
+        CatalogManager/CatalogManager.h
+        CatalogManager/CatalogManager.cpp
+)
+
 set(BUFFER_MANAGER
         BufferManager/BufferManager.h
         BufferManager/BufferManager.cpp
@@ -51,7 +56,7 @@ else()
     message(WARNING "GNU Bison or Flex not found. \
                      This program will use pre-generated files instead... (deprecated)")
                      ]]
-    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${BUFFER_MANAGER} ${RECORD_MANAGER} utils/utils.cpp utils/utils.h)
+    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${BUFFER_MANAGER} ${RECORD_MANAGER} ${CATALOG_MANAGER} utils/utils.cpp utils/utils.h)
 # endif()
 
 #[[

@@ -30,9 +30,7 @@ namespace api {
         std::vector<schema> schema_list;
         std::string primary_key;
 
-        inline void exec() override {
-            std::cout << "Interpreter Yes!!!" << std::endl;
-        }
+        void exec() override;
 
     public:
         create_table(std::string& table_name,
@@ -46,9 +44,7 @@ namespace api {
         std::string table_name;
         std::string attribute_name;
 
-        inline void exec() override {
-            std::cout << "Interpreter Yes!!!" << std::endl;
-        }
+        void exec() override{};
 
     public:
         create_index(std::string& index_name,

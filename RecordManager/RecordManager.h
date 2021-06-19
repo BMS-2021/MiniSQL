@@ -13,6 +13,7 @@ using namespace std;
 
 class RecordManager {
 public:
+    RecordManager() = default;
     RecordManager (BufferManager *bm): bm(bm) {}
     ~RecordManager() = default;
 
