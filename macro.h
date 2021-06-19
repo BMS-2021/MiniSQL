@@ -18,6 +18,18 @@ enum class value_type {
 struct sql_value_type {
     value_type type;
     uint8_t length = 0;
+    bool primary = false, unique = false;
+    unsigned long size_of_char = 0;
+    unsigned long size() const{
+        switch(type){
+            case value_type::INT:
+                return sizeof(int);
+            case value_type::FLOAT:
+                return sizeof(float);
+            case value_type::CHAR:
+                return size_of_char + 1;
+        }
+    }
 
     sql_value_type() = default;
     sql_value_type(value_type type) : type(type) {}
