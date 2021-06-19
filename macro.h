@@ -63,14 +63,14 @@ struct sql_value {
         }
     }
 
-     std::partial_ordering operator<=>(const sql_value &e) const {
+     bool operator<(const sql_value &e) const {
         switch (sql_type.type) {
             case value_type::INT:
-                return sql_int <=> e.sql_int;
+                return sql_int < e.sql_int;
             case value_type::FLOAT:
-                return sql_float <=> e.sql_float;
+                return sql_float < e.sql_float;
             case value_type::CHAR:
-                return sql_str <=> e.sql_str;
+                return sql_str < e.sql_str;
             default:
                 throw std::runtime_error("Undefined Type!");
         }
@@ -88,6 +88,14 @@ struct sql_value {
                 throw std::runtime_error("Undefined Type!");
         }
     }
+
+    bool operator!=(const sql_value &e) const { return !operator==(e); }
+
+    bool operator>(const sql_value &e) const { return !operator<(e) && operator!=(e); }
+
+    bool operator<=(const sql_value &e) const { return operator<(e) || operator==(e); }
+
+    bool operator>=(const sql_value &e) const { return !operator<(e); }
 };
 
 struct schema {

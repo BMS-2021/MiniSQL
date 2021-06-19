@@ -115,10 +115,7 @@ namespace api {
     };
 
     class exit final : public base {
-        inline void exec() override {
-            std::cout << "Bye!" << std::endl;
-            std::exit(0);
-        }
+        void exec() override;
     };
 }
 

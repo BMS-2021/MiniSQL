@@ -6,6 +6,7 @@
 
 extern RecordManager rec_mgt;
 extern CatalogManager cat_mgt;
+extern BufferManager buf_mgt;
 
 namespace api {
     static void throw_on_table_exist(std::string &table_name) {
@@ -14,7 +15,7 @@ namespace api {
         }
     }
     static void throw_on_table_not_exist(std::string &table_name) {
-        if (cat_mgt.TableExist(table_name)) {
+        if (!cat_mgt.TableExist(table_name)) {
             throw sql_exception(101, "api", "table \"" + table_name + "\" not exist");
         }
     }
@@ -72,9 +73,15 @@ namespace api {
         auto table = cat_mgt.GetTable(this->table_name);
 
         for (const auto &i : this->condition_list) {
-            auto j = std::find(table.attribute_names.begin(), table.attribute_names.end(), ta)
+//             auto j = std::find(table.attribute_names.begin(), table.attribute_names.end(), ta)
         }
 
+    }
+
+    void exit::exec() {
+        buf_mgt.closeAllFile();
+        std::cout << "Bye!" << std::endl;
+        std::exit(0);
     }
 }
 

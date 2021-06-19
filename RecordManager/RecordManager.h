@@ -14,7 +14,6 @@ using namespace std;
 class RecordManager {
 public:
     RecordManager() = default;
-    RecordManager (BufferManager *bm): bm(bm) {}
     ~RecordManager() = default;
 
     bool creatTable(const string &tableName);
@@ -34,8 +33,6 @@ public:
     static void printResult(const result &res) ;
 
 private:
-
-    BufferManager *bm;
 
     static sql_tuple genTuple(const char *blockBuffer, int offset, const std::vector<sql_value_type> &attrType);
 

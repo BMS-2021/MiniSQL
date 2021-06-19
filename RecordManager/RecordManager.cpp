@@ -6,6 +6,8 @@
 
 using namespace std;
 
+extern BufferManager buf_mgt;
+
 bool RecordManager::creatTable(const string &tableName) {
     string tableFileStr = macro::tableFile(tableName);
     BufferManager::createFile(tableFileStr);
@@ -14,15 +16,15 @@ bool RecordManager::creatTable(const string &tableName) {
 
 bool RecordManager::dropTable(const string &tableName) {
     string tableFileStr = macro::tableFile(tableName);
-    bm->removeFile(tableFileStr);
+    buf_mgt.removeFile(tableFileStr);
     return true;
 }
 
 int RecordManager::insertRecord(const macro::table &table, const sql_tuple &record) {
     string tableFileStr = macro::tableFile(table.name);
     int blockID = BufferManager::getBlockTail(tableFileStr);
-    Block &block = bm->getBlock(tableFileStr, blockID);
-    block = bm->getBlock(tableFileStr, ++blockID);
+    Block &block = buf_mgt.getBlock(tableFileStr, blockID);
+    block = buf_mgt.getBlock(tableFileStr, ++blockID);
 
     char *content = block.blockContent;
 
@@ -42,11 +44,12 @@ int RecordManager::insertRecord(const macro::table &table, const sql_tuple &reco
 
     if (!isValid) {
         recordOffset = 0;
-        bm->unlock(tableFileStr, blockID);
-        block = bm->getBlock(tableFileStr, ++blockID);
+        buf_mgt.unlock(tableFileStr, blockID);
+        block = buf_mgt.getBlock(tableFileStr, ++blockID);
         content = block.blockContent;
     }
 
+    content[0] = 1;
     int offset = 1;
 
     string str;
@@ -73,14 +76,14 @@ int RecordManager::insertRecord(const macro::table &table, const sql_tuple &reco
         }
     }
 
-    bm->setDirty(tableFileStr, blockID);
+    buf_mgt.setDirty(tableFileStr, blockID);
 
     return blockID * recordsPreBlock + recordOffset;
 }
 
 bool RecordManager::deleteRecord(const macro::table &table, const vector<condition> &conditions) {
     int blockID = 0;
-    Block block = bm->getBlock(macro::tableFile(table.name), blockID);
+    Block block = buf_mgt.getBlock(macro::tableFile(table.name), blockID);
     char *content = block.blockContent;
     int length = table.record_len + 1;
     int blocks = macro::BlockSize / length;
@@ -94,9 +97,9 @@ bool RecordManager::deleteRecord(const macro::table &table, const vector<conditi
                 content[i * length] = 0;
             }
         }
-        bm->setDirty(macro::tableFile(table.name), blockID);
-        bm->unlock(macro::tableFile(table.name), blockID);
-        block = bm->getBlock(macro::tableFile(table.name), ++blockID);
+        buf_mgt.setDirty(macro::tableFile(table.name), blockID);
+        buf_mgt.unlock(macro::tableFile(table.name), blockID);
+        block = buf_mgt.getBlock(macro::tableFile(table.name), ++blockID);
         content = block.blockContent;
     }
 
@@ -106,7 +109,7 @@ bool RecordManager::deleteRecord(const macro::table &table, const vector<conditi
 int RecordManager::selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond) {
     string tableFileStr = macro::tableFile(table.name);
     int blockID = 0;
-    Block &block = bm->getBlock(tableFileStr, blockID);
+    Block &block = buf_mgt.getBlock(tableFileStr, blockID);
     char *content = block.blockContent;
 
     int recordLen = table.record_len;
@@ -124,9 +127,9 @@ int RecordManager::selectRecord(const macro::table &table, const vector<string> 
                 res.row.push_back(row);
             }
         }
-        bm->unlock(macro::tableFile(table.name), blockID);
+        buf_mgt.unlock(macro::tableFile(table.name), blockID);
         blockID++;
-        block = bm->getBlock(macro::tableFile(table.name), blockID);
+        block = buf_mgt.getBlock(macro::tableFile(table.name), blockID);
     }
 
     printResult(res);

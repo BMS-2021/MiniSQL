@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include "../macro.h"
 
 using namespace std;
 
@@ -22,6 +23,17 @@ struct File {
     int recordLength; //the length of the record in the file
     File *next; //the pointer points to the next file
     Block *firstBlock;
+
+    File() {
+        type = 0;
+        filename = "";
+        recordAmount = 0;
+        freeNum = 0;
+        recordLength = 0;
+        next = nullptr;
+        firstBlock = nullptr;
+    }
+
 };
 
 struct Block {
@@ -33,6 +45,21 @@ struct Block {
     int LRUCount;
     int lock; //prevent the block from replacing
     char *blockContent;
+
+    Block() {
+        blockID = 0;
+        dirty = 0;
+        next = nullptr;
+        file = nullptr;
+        usedSize = 0;
+        LRUCount = 0;
+        lock = 0;
+        blockContent = static_cast<char *>(malloc(macro::BlockSize));
+    }
+
+    ~Block() {
+        free(blockContent);
+    }
 };
 
 class BufferManager {
@@ -78,6 +105,7 @@ private:
 
     int LRUNum;
     int fileCnt;
+    int blockCnt;
     File *fileHandle;
     Block *blockHandle;
 };

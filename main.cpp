@@ -5,6 +5,7 @@
 
 RecordManager rec_mgt;
 CatalogManager cat_mgt;
+BufferManager buf_mgt;
 
 int main() {
     std::cout << "Welcome to the MiniSQL monitor. Commands end with ;" << std::endl;
