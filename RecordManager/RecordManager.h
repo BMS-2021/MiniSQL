@@ -24,17 +24,21 @@ public:
 
     bool dropIndex(const table &table, const string &index);
 
-    bool insertRecord(const table &table, const sql_tuple &record);
+    int insertRecord(const table &table, const sql_tuple &record);
+
+    bool deleteRecord(const table &table, const vector<condition> &conditions);
 
     int selectRecord(const table &table, const vector<string> &attr, const vector<condition> &cond);
 
-    void printResult(const result &res) const;
+    static void printResult(const result &res) ;
 
 private:
 
     BufferManager *bm;
 
-    bool condsTest(const vector<condition> &conds, const sql_tuple &tup, const vector<std::string> &attr);
+    static sql_tuple genTuple(const char *blockBuffer, int offset, const std::vector<sql_value_type> &attrType);
+
+    static bool condsTest(const vector<condition> &conds, const sql_tuple &tup, const vector<std::string> &attr);
 };
 
 

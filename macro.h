@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <compare>
 #include <stdexcept>
 
 enum class value_type {
@@ -21,6 +22,95 @@ struct sql_value_type {
     sql_value_type() = default;
     sql_value_type(value_type type) : type(type) {}
     sql_value_type(uint8_t length) : type(value_type::CHAR), length(length) {}
+};
+
+struct sql_value {
+    sql_value_type sql_type;
+    int sql_int;
+    float sql_float;
+    std::string sql_str;
+
+    void reset() {
+        sql_int = 0;
+        sql_float = 0;
+        sql_str.clear();
+    }
+
+    std::string toStr() const {
+        switch (sql_type.type) {
+            case value_type::INT:
+                return std::to_string(sql_int);
+            case value_type::FLOAT:
+                return std::to_string(sql_float);
+            case value_type::CHAR:
+                return this->sql_str;
+        }
+    }
+
+     bool operator<(const std::variant<int, float, std::string> &e) const {
+        switch (sql_type.type) {
+            case value_type::INT:
+                return sql_int < std::get<int>(e);
+            case value_type::FLOAT:
+                return sql_float < std::get<float>(e);
+            case value_type::CHAR:
+                return sql_str < std::get<std::string>(e);
+            default:
+                throw std::runtime_error("Undefined Type!");
+        }
+    }
+
+    bool operator<=(const std::variant<int, float, std::string> &e) const {
+        switch (sql_type.type) {
+            case value_type::INT:
+                return sql_int <= std::get<int>(e);
+            case value_type::FLOAT:
+                return sql_float <= std::get<float>(e);
+            case value_type::CHAR:
+                return sql_str <= std::get<std::string>(e);
+            default:
+                throw std::runtime_error("Undefined Type!");
+        }
+    }
+
+    bool operator>(const std::variant<int, float, std::string> &e) const {
+        switch (sql_type.type) {
+            case value_type::INT:
+                return sql_int > std::get<int>(e);
+            case value_type::FLOAT:
+                return sql_float > std::get<float>(e);
+            case value_type::CHAR:
+                return sql_str > std::get<std::string>(e);
+            default:
+                throw std::runtime_error("Undefined Type!");
+        }
+    }
+
+    bool operator>=(const std::variant<int, float, std::string> &e) const {
+        switch (sql_type.type) {
+            case value_type::INT:
+                return sql_int >= std::get<int>(e);
+            case value_type::FLOAT:
+                return sql_float >= std::get<float>(e);
+            case value_type::CHAR:
+                return sql_str >= std::get<std::string>(e);
+            default:
+                throw std::runtime_error("Undefined Type!");
+        }
+    }
+
+    bool operator==(const std::variant<int, float, std::string> &e) const {
+        switch (sql_type.type) {
+            case value_type::INT:
+                return sql_int == std::get<int>(e);
+            case value_type::FLOAT:
+                return sql_float == std::get<float>(e);
+            case value_type::CHAR:
+                return sql_str == std::get<std::string>(e);
+            default:
+                throw std::runtime_error("Undefined Type!");
+        }
+    }
 };
 
 struct schema {
@@ -44,13 +134,32 @@ enum class attribute_operator {
 struct condition {
     std::string attribute_name;
     attribute_operator op;
-    std::variant<int, float, std::string> value;
+    std::variant<int, float, std::string> value;  //FIXME!!! chang type to sql_value
 
     condition() = default;
     condition(std::string& attribute_name, attribute_operator op, std::variant<int, float, std::string>& value) :
     attribute_name(attribute_name),
     op(op),
     value(value) {}
+
+    bool test(const sql_value &e) const {
+        switch (op) {
+            case attribute_operator::EQUAL:
+                return e == value;
+            case attribute_operator::NOT_EQUAL:
+                return e != value;
+            case attribute_operator::GREATER:
+                return e > value;
+            case attribute_operator::GREATER_EQUAL:
+                return e >= value;
+            case attribute_operator::LESS:
+                return e < value;
+            case attribute_operator::LESS_EQUAL:
+                return e <= value;
+            default:
+                std::cerr << "Undefined condition width cond !" << std::endl;
+        }
+    }
 };
 
 struct table {
@@ -85,36 +194,36 @@ struct result {
 };
 
 struct sql_tuple {
-    std::vector<sql_value_type> element;
+    std::vector<sql_value> element;
 
-//    row fetchRow(const std::vector<std::string> &attrTable, const std::vector<std::string> &attrFetch) const {
-//        row row;
-//        bool attrFound;
-//        row.col.reserve(attrFetch.size());
-//        for (auto fetch : attrFetch) {
-//            attrFound = false;
-//            for (int i = 0; i < attrTable.size(); i++) {
-//                if (fetch == attrTable[i]) {
-//                    row.col.push_back(element[i].toStr());
-//                    attrFound = true;
-//                    break;
-//                }
-//            }
-//            if (!attrFound) {
-//                std::cerr << "Undefined attr in row fetching!!" << std::endl;
-//            }
-//        }
-//        return row;
-//    }
-
-    const sql_value_type &fetchElement(const std::vector<std::string> &attrTable, const std::string &attrFetch) const {
-        for (int i = 0; i < attrTable.size(); i++) {
-            if (attrFetch == attrTable[i]) {
-                return element[i];
+    row fetchRow(const std::vector<std::string> &attrTable, const std::vector<std::string> &attrFetch) const {
+        row row;
+        bool attrFound;
+        row.col.reserve(attrFetch.size());
+        for (auto fetch : attrFetch) {
+            attrFound = false;
+            for (int i = 0; i < attrTable.size(); i++) {
+                if (fetch == attrTable[i]) {
+                    row.col.push_back(element[i].toStr());
+                    attrFound = true;
+                    break;
+                }
+            }
+            if (!attrFound) {
+                std::cerr << "Undefined attr in row fetching!!" << std::endl;
             }
         }
-        std::cerr << "Undefined attr in element fetching from tuple!!" << std::endl;
+        return row;
     }
+
+//    const sql_value_type &fetchElement(const std::vector<std::string> &attrTable, const std::string &attrFetch) const {
+//        for (int i = 0; i < attrTable.size(); i++) {
+//            if (attrFetch == attrTable[i]) {
+//                return element[i];
+//            }
+//        }
+//        std::cerr << "Undefined attr in element fetching from tuple!!" << std::endl;
+//    }
 };
 
 namespace macro {
