@@ -30,7 +30,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
             elem_type.unique = true;
         }
         if (elem_type.type == value_type::CHAR){
-            elem_type.size_of_char = schema.type.size_of_char;
+            elem_type.length = schema.type.length;
         }
         tab.attribute_type.push_back(elem_type);
     }

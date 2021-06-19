@@ -73,8 +73,21 @@ namespace api {
         auto table = cat_mgt.GetTable(this->table_name);
 
         for (const auto &i : this->condition_list) {
-//             auto j = std::find(table.attribute_names.begin(), table.attribute_names.end(), ta)
+            auto iter = std::find(table.attribute_names.begin(), table.attribute_names.end(), i.attribute_name);
+            if (iter == table.attribute_names.end()) {
+                throw sql_exception(104, "api", "attribute \"" + i.attribute_name + "\" not found");
+            }
+            if (table.attribute_type.at(iter - table.attribute_names.begin()).type != i.value.sql_type.type) {
+                throw sql_exception(103, "api",
+                                    "attribute \"" + i.attribute_name + "\" type error: except type_enum "
+                                    + std::to_string(static_cast<int>(table.attribute_type.at(iter - table.attribute_names.begin()).type))
+                                    + " , got type_enum "
+                                    + std::to_string(static_cast<int>(i.value.sql_type.type)));
+            }
         }
+
+        // TODO: routine for index
+        rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
 
     }
 
