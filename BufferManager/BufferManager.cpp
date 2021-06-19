@@ -195,4 +195,5 @@ int BufferManager::getBlockTail(const string& filename) {
         return (st.st_size / macro::BlockSize - 1);
     }
     cerr << "Failed to get file tail" << endl;
+    return -1;
 }

@@ -99,6 +99,8 @@ bool RecordManager::deleteRecord(const table &table, const vector<condition> &co
         block = bm->getBlock(macro::tableFile(table.name), ++blockID);
         content = block.blockContent;
     }
+
+    return true;
 }
 
 int RecordManager::selectRecord(const table &table, const vector<string> &attr, const vector<condition> &cond) {
@@ -108,7 +110,7 @@ int RecordManager::selectRecord(const table &table, const vector<string> &attr, 
     char *content = block.blockContent;
 
     int recordLen = table.record_len;
-    int recordCnt = block.usedSize / recordLen;
+    int recordCnt = macro::BlockSize / recordLen;
 
     sql_tuple tup;
     row row;
@@ -126,6 +128,9 @@ int RecordManager::selectRecord(const table &table, const vector<string> &attr, 
         blockID++;
         block = bm->getBlock(macro::tableFile(table.name), blockID);
     }
+
+    printResult(res);
+    return res.row.size();
 }
 
 void RecordManager::printResult(const result &res) {
@@ -182,4 +187,5 @@ sql_tuple RecordManager::genTuple(const char *content, int offset, const std::ve
         }
         tup.element.push_back(e);
     }
+    return tup;
 }
