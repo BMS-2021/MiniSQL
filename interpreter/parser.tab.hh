@@ -70,7 +70,7 @@ extern int yydebug;
     T_INT = 276,
     T_FLOAT = 277,
     T_CHAR = 278,
-    S_APOSTROPGE = 279,
+    S_APOSTROPHE = 279,
     S_SEMICOLON = 280,
     S_L_BRACKETS = 281,
     S_R_BRACKETS = 282,

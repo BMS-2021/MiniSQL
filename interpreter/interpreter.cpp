@@ -9,21 +9,29 @@
 #include "../utils/exception.h"
 
 bool sig_exit = false;
+std::unique_ptr<sql_exception> parse_exception = nullptr;
 std::unique_ptr<api::base> query_object_ptr = nullptr;
 
 void interpret_entrance() {
     while (!sig_exit) {
         interpreter inter;
+        parse_exception = nullptr;
 
         parse(inter.read());
+
+        if (parse_exception != nullptr) {
+            std::cout << *parse_exception << std::endl;
+            continue;
+        }
 
         if (query_object_ptr != nullptr) {
             try {
                 query_object_ptr->exec();
             } catch (sql_exception &e) {
-                std::cerr << e << std::endl;
+                std::cout << e << std::endl;
             }
         }
+
     }
 }
 
@@ -44,6 +52,9 @@ const char* interpreter::read() {
         std::string src;
         std::cout << this->start_text();
         std::getline(std::cin, src);
+        while (src.ends_with(' ')) {
+            src.pop_back();
+        }
         if (!first_loop) {
             strcat_s(this->str, "\n", SQL_QUERY_LENGTH);
         }

@@ -746,7 +746,7 @@ return S_STAR;
 case 3:
 YY_RULE_SETUP
 #line 15 "tokenizer.l"
-return S_APOSTROPGE;
+return S_APOSTROPHE;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP

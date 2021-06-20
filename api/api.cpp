@@ -11,12 +11,12 @@ extern BufferManager buf_mgt;
 namespace api {
     static void throw_on_table_exist(std::string &table_name) {
         if (cat_mgt.TableExist(table_name)) {
-            throw sql_exception(100, "api", "table \"" + table_name + "\" exists");
+            throw sql_exception(200, "api", "table \'" + table_name + "\' exists");
         }
     }
     static void throw_on_table_not_exist(std::string &table_name) {
         if (!cat_mgt.TableExist(table_name)) {
-            throw sql_exception(101, "api", "table \"" + table_name + "\" not exist");
+            throw sql_exception(201, "api", "table \'" + table_name + "\' not exist");
         }
     }
 
@@ -26,8 +26,8 @@ namespace api {
         // const auto attr_num = this->schema_list.size();
         for (const auto &i : this->schema_list) {
             if (i.type.type == value_type::CHAR && i.type.length == 0) {
-                throw sql_exception(102, "api",
-                                    "char \"" + i.name + "\" needs to have a length between 1 and 255");
+                throw sql_exception(202, "api",
+                                    "char \'" + i.name + "\' needs to have a length between 1 and 255");
             }
         }
 
@@ -64,7 +64,7 @@ namespace api {
         // TODO: update index
 
         table.record_cnt++;
-        std::cout << "insertion finished, 1 row affected";
+        std::cout << "insertion finished, 1 row affected" << std::endl;
     }
 
     void select_table::exec() {
@@ -75,11 +75,11 @@ namespace api {
         for (const auto &i : this->condition_list) {
             auto iter = std::find(table.attribute_names.begin(), table.attribute_names.end(), i.attribute_name);
             if (iter == table.attribute_names.end()) {
-                throw sql_exception(104, "api", "attribute \"" + i.attribute_name + "\" not found");
+                throw sql_exception(204, "api", "attribute \'" + i.attribute_name + "\' not found");
             }
             if (table.attribute_type.at(iter - table.attribute_names.begin()).type != i.value.sql_type.type) {
-                throw sql_exception(103, "api",
-                                    "attribute \"" + i.attribute_name + "\" type error: except type_enum "
+                throw sql_exception(203, "api",
+                                    "attribute \'" + i.attribute_name + "\' type error: except type_enum "
                                     + std::to_string(static_cast<int>(table.attribute_type.at(iter - table.attribute_names.begin()).type))
                                     + " , got type_enum "
                                     + std::to_string(static_cast<int>(i.value.sql_type.type)));

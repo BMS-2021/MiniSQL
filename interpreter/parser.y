@@ -6,7 +6,9 @@
 
 #include "interpreter.h"
 #include "../api/api.h"
+#include "../utils/exception.h"
 
+extern std::unique_ptr<sql_exception> parse_exception;
 extern std::unique_ptr<api::base> query_object_ptr;
 
 bool bFlag; /* no meanings. */
@@ -15,7 +17,8 @@ extern int yylineno;
 extern char *yytext;
 inline int yyerror(const char *s)
 {
-    std::cerr << s << " on token " << yytext << std::endl;
+    // std::cerr << s << " on token " << yytext << std::endl;
+    parse_exception = std::make_unique<sql_exception>(100, "interpreter", std::string(s) + " near \'" + std::string(yytext) + "\' at line " + std::to_string(yylineno));
     yywrap();
     return 1;
 }
@@ -28,7 +31,7 @@ K_FROM K_WHERE K_ON K_INTO K_AND
 K_CREATE K_SELECT K_INSERT K_DROP
 K_USE K_EXIT K_PRIMARY K_KEY K_UNIQUE
 T_INT T_FLOAT T_CHAR
-S_APOSTROPGE S_SEMICOLON S_L_BRACKETS S_R_BRACKETS S_COMMA S_STAR
+S_APOSTROPHE S_SEMICOLON S_L_BRACKETS S_R_BRACKETS S_COMMA S_STAR
 S_EQUAL S_NOT_EQUAL S_GREATER S_GREATER_EQUAL S_LESS S_LESS_EQUAL
 
 %token <str> V_STRING
@@ -241,7 +244,7 @@ E_OPERATOR:
     | S_LESS_EQUAL {$$ = attribute_operator::LESS_EQUAL;}
 
 
-V_INSERT: S_APOSTROPGE V_STRING S_APOSTROPGE
+V_INSERT: S_APOSTROPHE V_STRING S_APOSTROPHE
     {
         $$ = $2;
     }

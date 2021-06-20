@@ -75,7 +75,9 @@
 
 #include "interpreter.h"
 #include "../api/api.h"
+#include "../utils/exception.h"
 
+extern std::unique_ptr<sql_exception> parse_exception;
 extern std::unique_ptr<api::base> query_object_ptr;
 
 bool bFlag; /* no meanings. */
@@ -84,13 +86,14 @@ extern int yylineno;
 extern char *yytext;
 inline int yyerror(const char *s)
 {
-    std::cerr << s << " on token " << yytext << std::endl;
+    // std::cerr << s << " on token " << yytext << std::endl;
+    parse_exception = std::make_unique<sql_exception>(100, "interpreter", std::string(s) + " near \'" + std::string(yytext) + "\' at line " + std::to_string(yylineno));
     yywrap();
     return 1;
 }
 
 
-#line 94 "parser.tab.cc"
+#line 97 "parser.tab.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -159,7 +162,7 @@ extern int yydebug;
     T_INT = 276,
     T_FLOAT = 277,
     T_CHAR = 278,
-    S_APOSTROPGE = 279,
+    S_APOSTROPHE = 279,
     S_SEMICOLON = 280,
     S_L_BRACKETS = 281,
     S_R_BRACKETS = 282,
@@ -548,11 +551,11 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    50,    50,    56,    57,    58,    59,    62,    63,    64,
-      65,    68,    69,    72,    79,    86,    94,   101,   107,   113,
-     119,   127,   132,   139,   145,   149,   153,   159,   163,   169,
-     173,   179,   184,   191,   195,   199,   206,   210,   216,   221,
-     228,   236,   237,   238,   239,   240,   241,   244,   248,   262
+       0,    53,    53,    59,    60,    61,    62,    65,    66,    67,
+      68,    71,    72,    75,    82,    89,    97,   104,   110,   116,
+     122,   130,   135,   142,   148,   152,   156,   162,   166,   172,
+     176,   182,   187,   194,   198,   202,   209,   213,   219,   224,
+     231,   239,   240,   241,   242,   243,   244,   247,   251,   265
 };
 #endif
 
@@ -564,7 +567,7 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "K_DATABASE", "K_TABLE", "K_INDEX",
   "K_VALUES", "K_FROM", "K_WHERE", "K_ON", "K_INTO", "K_AND", "K_CREATE",
   "K_SELECT", "K_INSERT", "K_DROP", "K_USE", "K_EXIT", "K_PRIMARY",
-  "K_KEY", "K_UNIQUE", "T_INT", "T_FLOAT", "T_CHAR", "S_APOSTROPGE",
+  "K_KEY", "K_UNIQUE", "T_INT", "T_FLOAT", "T_CHAR", "S_APOSTROPHE",
   "S_SEMICOLON", "S_L_BRACKETS", "S_R_BRACKETS", "S_COMMA", "S_STAR",
   "S_EQUAL", "S_NOT_EQUAL", "S_GREATER", "S_GREATER_EQUAL", "S_LESS",
   "S_LESS_EQUAL", "V_STRING", "$accept", "C_TOP_INPUT", "C_TOP_STMT",
@@ -1405,296 +1408,296 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 51 "parser.y"
+#line 54 "parser.y"
     {
         YYACCEPT;
     }
-#line 1413 "parser.tab.cc"
+#line 1416 "parser.tab.cc"
     break;
 
   case 13:
-#line 73 "parser.y"
+#line 76 "parser.y"
     {
         query_object_ptr = std::make_unique<api::exit>();
         // query_object_ptr = operation;
     }
-#line 1422 "parser.tab.cc"
+#line 1425 "parser.tab.cc"
     break;
 
   case 14:
-#line 80 "parser.y"
+#line 83 "parser.y"
     {
         query_object_ptr = std::make_unique<api::use_database>((yyvsp[0].str));
         // query_object_ptr = operation;
     }
-#line 1431 "parser.tab.cc"
+#line 1434 "parser.tab.cc"
     break;
 
   case 15:
-#line 87 "parser.y"
+#line 90 "parser.y"
     {
         query_object_ptr = std::make_unique<api::create_table>((yyvsp[-4].str), (yyvsp[-2].schema_list), (yyvsp[-1].str));
         // query_object_ptr = operation;
     }
-#line 1440 "parser.tab.cc"
+#line 1443 "parser.tab.cc"
     break;
 
   case 16:
-#line 95 "parser.y"
+#line 98 "parser.y"
     {
         query_object_ptr = std::make_unique<api::drop_table>((yyvsp[0].str));
         // query_object_ptr = operation;
     }
-#line 1449 "parser.tab.cc"
+#line 1452 "parser.tab.cc"
     break;
 
   case 17:
-#line 102 "parser.y"
+#line 105 "parser.y"
     {
         query_object_ptr = std::make_unique<api::create_index>((yyvsp[-5].str), (yyvsp[-3].str), (yyvsp[-1].str));
     }
-#line 1457 "parser.tab.cc"
+#line 1460 "parser.tab.cc"
     break;
 
   case 18:
-#line 108 "parser.y"
+#line 111 "parser.y"
     {
         query_object_ptr = std::make_unique<api::drop_index>((yyvsp[0].str));
     }
-#line 1465 "parser.tab.cc"
+#line 1468 "parser.tab.cc"
     break;
 
   case 19:
-#line 114 "parser.y"
+#line 117 "parser.y"
     {
         query_object_ptr = std::make_unique<api::insert_table>((yyvsp[-4].str), (yyvsp[-1].insert_list));
     }
-#line 1473 "parser.tab.cc"
+#line 1476 "parser.tab.cc"
     break;
 
   case 20:
-#line 120 "parser.y"
+#line 123 "parser.y"
     {
         query_object_ptr = std::make_unique<api::select_table>((yyvsp[-3].attribute_list), (yyvsp[-1].str), (yyvsp[0].condition_list));
     }
-#line 1481 "parser.tab.cc"
+#line 1484 "parser.tab.cc"
     break;
 
   case 21:
-#line 128 "parser.y"
+#line 131 "parser.y"
     {
         (yyval.schema_list) = (yyvsp[-2].schema_list);
         (yyval.schema_list).push_back((yyvsp[0].schema_item));
     }
-#line 1490 "parser.tab.cc"
+#line 1493 "parser.tab.cc"
     break;
 
   case 22:
-#line 133 "parser.y"
+#line 136 "parser.y"
     {
         (yyval.schema_list) = std::vector<schema>();
         (yyval.schema_list).push_back((yyvsp[0].schema_item));
     }
-#line 1499 "parser.tab.cc"
+#line 1502 "parser.tab.cc"
     break;
 
   case 23:
-#line 140 "parser.y"
+#line 143 "parser.y"
     {
         (yyval.schema_item) = schema((yyvsp[-2].str), (yyvsp[-1].type), (yyvsp[0].b));
     }
-#line 1507 "parser.tab.cc"
+#line 1510 "parser.tab.cc"
     break;
 
   case 24:
-#line 146 "parser.y"
+#line 149 "parser.y"
     {
         (yyval.type) = sql_value_type(value_type::INT);
     }
-#line 1515 "parser.tab.cc"
+#line 1518 "parser.tab.cc"
     break;
 
   case 25:
-#line 150 "parser.y"
+#line 153 "parser.y"
     {
         (yyval.type) = sql_value_type(value_type::FLOAT);
     }
-#line 1523 "parser.tab.cc"
+#line 1526 "parser.tab.cc"
     break;
 
   case 26:
-#line 154 "parser.y"
+#line 157 "parser.y"
     {
         (yyval.type) = sql_value_type(std::stoi((yyvsp[-1].str)));  // FIXME: exception
     }
-#line 1531 "parser.tab.cc"
+#line 1534 "parser.tab.cc"
     break;
 
   case 27:
-#line 160 "parser.y"
+#line 163 "parser.y"
     {
         (yyval.str) = (yyvsp[-1].str);
     }
-#line 1539 "parser.tab.cc"
+#line 1542 "parser.tab.cc"
     break;
 
   case 28:
-#line 164 "parser.y"
+#line 167 "parser.y"
     {
         (yyval.str) = "";
     }
-#line 1547 "parser.tab.cc"
+#line 1550 "parser.tab.cc"
     break;
 
   case 29:
-#line 170 "parser.y"
+#line 173 "parser.y"
     {
         (yyval.b) = true;
     }
-#line 1555 "parser.tab.cc"
+#line 1558 "parser.tab.cc"
     break;
 
   case 30:
-#line 174 "parser.y"
+#line 177 "parser.y"
     {
         (yyval.b) = false;
     }
-#line 1563 "parser.tab.cc"
+#line 1566 "parser.tab.cc"
     break;
 
   case 31:
-#line 180 "parser.y"
+#line 183 "parser.y"
     {
         (yyval.insert_list) = (yyvsp[-2].insert_list);
         (yyval.insert_list).push_back((yyvsp[0].v));
     }
-#line 1572 "parser.tab.cc"
+#line 1575 "parser.tab.cc"
     break;
 
   case 32:
-#line 185 "parser.y"
+#line 188 "parser.y"
     {
         (yyval.insert_list) = std::vector<sql_value>();
         (yyval.insert_list).push_back((yyvsp[0].v));
     }
-#line 1581 "parser.tab.cc"
+#line 1584 "parser.tab.cc"
     break;
 
   case 33:
-#line 192 "parser.y"
+#line 195 "parser.y"
     {
         (yyval.attribute_list) = std::vector<std::string>();
     }
-#line 1589 "parser.tab.cc"
+#line 1592 "parser.tab.cc"
     break;
 
   case 34:
-#line 196 "parser.y"
+#line 199 "parser.y"
     {
         (yyval.attribute_list).push_back((yyvsp[0].str));
     }
-#line 1597 "parser.tab.cc"
+#line 1600 "parser.tab.cc"
     break;
 
   case 35:
-#line 200 "parser.y"
+#line 203 "parser.y"
     {
         (yyval.attribute_list) = std::vector<std::string>();
         (yyval.attribute_list).push_back((yyvsp[0].str));
     }
-#line 1606 "parser.tab.cc"
+#line 1609 "parser.tab.cc"
     break;
 
   case 36:
-#line 207 "parser.y"
+#line 210 "parser.y"
     {
         (yyval.condition_list) = (yyvsp[0].condition_list);
     }
-#line 1614 "parser.tab.cc"
+#line 1617 "parser.tab.cc"
     break;
 
   case 37:
-#line 211 "parser.y"
+#line 214 "parser.y"
     {
         (yyval.condition_list) = std::vector<condition>();
     }
-#line 1622 "parser.tab.cc"
+#line 1625 "parser.tab.cc"
     break;
 
   case 38:
-#line 217 "parser.y"
+#line 220 "parser.y"
     {
         (yyval.condition_list) = (yyvsp[-2].condition_list);
         (yyval.condition_list).push_back((yyvsp[0].condition_item));
     }
-#line 1631 "parser.tab.cc"
+#line 1634 "parser.tab.cc"
     break;
 
   case 39:
-#line 222 "parser.y"
+#line 225 "parser.y"
     {
         (yyval.condition_list) = std::vector<condition>();
         (yyval.condition_list).push_back((yyvsp[0].condition_item));
     }
-#line 1640 "parser.tab.cc"
+#line 1643 "parser.tab.cc"
     break;
 
   case 40:
-#line 229 "parser.y"
+#line 232 "parser.y"
     {
         (yyval.condition_item).attribute_name = (yyvsp[-2].str);
         (yyval.condition_item).op = (yyvsp[-1].op);
         (yyval.condition_item).value = (yyvsp[0].v);
     }
-#line 1650 "parser.tab.cc"
+#line 1653 "parser.tab.cc"
     break;
 
   case 41:
-#line 236 "parser.y"
+#line 239 "parser.y"
               {(yyval.op) = attribute_operator::EQUAL;}
-#line 1656 "parser.tab.cc"
+#line 1659 "parser.tab.cc"
     break;
 
   case 42:
-#line 237 "parser.y"
+#line 240 "parser.y"
                   {(yyval.op) = attribute_operator::NOT_EQUAL;}
-#line 1662 "parser.tab.cc"
+#line 1665 "parser.tab.cc"
     break;
 
   case 43:
-#line 238 "parser.y"
+#line 241 "parser.y"
                 {(yyval.op) = attribute_operator::GREATER;}
-#line 1668 "parser.tab.cc"
+#line 1671 "parser.tab.cc"
     break;
 
   case 44:
-#line 239 "parser.y"
+#line 242 "parser.y"
                       {(yyval.op) = attribute_operator::GREATER_EQUAL;}
-#line 1674 "parser.tab.cc"
+#line 1677 "parser.tab.cc"
     break;
 
   case 45:
-#line 240 "parser.y"
+#line 243 "parser.y"
              {(yyval.op) = attribute_operator::LESS;}
-#line 1680 "parser.tab.cc"
+#line 1683 "parser.tab.cc"
     break;
 
   case 46:
-#line 241 "parser.y"
+#line 244 "parser.y"
                    {(yyval.op) = attribute_operator::LESS_EQUAL;}
-#line 1686 "parser.tab.cc"
+#line 1689 "parser.tab.cc"
     break;
 
   case 47:
-#line 245 "parser.y"
+#line 248 "parser.y"
     {
         (yyval.v) = (yyvsp[-1].str);
     }
-#line 1694 "parser.tab.cc"
+#line 1697 "parser.tab.cc"
     break;
 
   case 48:
-#line 249 "parser.y"
+#line 252 "parser.y"
     {
         try {
             (yyval.v) = sql_value(std::stoi((yyvsp[0].str)));
@@ -1706,11 +1709,11 @@ yyreduce:
             }
         }
     }
-#line 1710 "parser.tab.cc"
+#line 1713 "parser.tab.cc"
     break;
 
 
-#line 1714 "parser.tab.cc"
+#line 1717 "parser.tab.cc"
 
       default: break;
     }
@@ -1942,5 +1945,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 265 "parser.y"
+#line 268 "parser.y"
 
