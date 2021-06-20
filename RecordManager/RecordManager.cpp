@@ -107,7 +107,7 @@ bool RecordManager::deleteRecord(const macro::table &table, const vector<conditi
     return true;
 }
 
-int RecordManager::selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond) {
+result RecordManager::selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond) {
     string tableFileStr = macro::tableFile(table.name);
     int blockID = 0;
     char *content = buf_mgt.getBlock(tableFileStr, blockID).blockContent;
@@ -131,8 +131,7 @@ int RecordManager::selectRecord(const macro::table &table, const vector<string> 
         blockID++;
         content = buf_mgt.getBlock(macro::tableFile(table.name), blockID).blockContent;
     }
-    printResult(res);
-    return res.row.size();
+    return res;
 }
 
 void RecordManager::printResult(const result &res) {

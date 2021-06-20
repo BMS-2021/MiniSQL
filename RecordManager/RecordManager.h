@@ -28,7 +28,8 @@ public:
 
     bool deleteRecord(const macro::table &table, const vector<condition> &conditions);
 
-    int selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond);
+    [[nodiscard]]
+    result selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond);
 
     static void printResult(const result &res) ;
 

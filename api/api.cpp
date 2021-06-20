@@ -1,3 +1,5 @@
+#include <iomanip>
+
 #include "api.h"
 
 #include "../RecordManager/RecordManager.h"
@@ -18,6 +20,67 @@ namespace api {
         if (!cat_mgt.TableExist(table_name)) {
             throw sql_exception(201, "api", "table \'" + table_name + "\' not exist");
         }
+    }
+
+    static void print_select_result_seperator(const vector<unsigned long> &col_max_length) {
+        const auto size = col_max_length.size();
+        cout << " +-";
+        for (auto i = 0; i < size; i++) {
+            cout << std::setiosflags(ios::left)
+                 << std::setw(static_cast<int>(col_max_length.at(i)))
+                 << std::setfill('-')
+                 <<"-";
+            if (i < size - 1) {
+                cout << "-+-";
+            }
+        }
+        cout << "-+ ";
+        cout << endl;
+    }
+
+    static void print_select_result(const macro::table &table, const result &res) {
+        const auto size = table.attribute_names.size();
+        auto col_max_length = vector<unsigned long>(size, 0);
+
+        for (auto i = 0; i < size; i++) {
+            col_max_length.at(i) = std::max(table.attribute_names.at(i).size(), col_max_length.at(i));
+        }
+        for (auto const &row : res.row) {
+            for (auto i = 0; i < size; i++) {
+                col_max_length.at(i) = std::max(row.col.at(i).size(), col_max_length.at(i));
+            }
+        }
+
+        {
+            print_select_result_seperator(col_max_length);
+            cout << " | ";
+            for (auto i = 0; i < size; i++) {
+                cout << setiosflags(ios::left)
+                    << setw(static_cast<int>(col_max_length.at(i)))
+                    << std::setfill(' ')
+                    << table.attribute_names.at(i);
+                cout << " | ";
+            }
+            cout << endl;
+            print_select_result_seperator(col_max_length);
+        }
+
+        {
+            for (auto const &row : res.row) {
+                cout << " | ";
+                for (auto i = 0; i < size; i++) {
+                    cout << setiosflags(ios::left)
+                        << setw(static_cast<int>(col_max_length.at(i)))
+                        << std::setfill(' ')
+                        << row.col.at(i);
+                    cout << " | ";
+                }
+                cout << endl;
+            }
+            print_select_result_seperator(col_max_length);
+        }
+        std::cout << std::to_string(res.row.size()) << " row(s) in set"<< std::endl;
+        std::cout << endl;
     }
 
     void create_table::exec() {
@@ -87,8 +150,9 @@ namespace api {
         }
 
         // TODO: routine for index
-        rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
 
+        auto res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
+        print_select_result(table, res);
     }
 
     void exit::exec() {
