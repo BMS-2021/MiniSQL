@@ -555,7 +555,7 @@ static const yytype_int16 yyrline[] =
       68,    71,    72,    75,    82,    89,    97,   104,   110,   116,
      122,   130,   135,   142,   148,   152,   156,   162,   166,   172,
      176,   182,   187,   194,   198,   202,   209,   213,   219,   224,
-     231,   239,   240,   241,   242,   243,   244,   247,   251,   265
+     231,   239,   240,   241,   242,   243,   244,   247,   251,   266
 };
 #endif
 
@@ -1699,21 +1699,22 @@ yyreduce:
   case 48:
 #line 252 "parser.y"
     {
-        try {
-            (yyval.v) = sql_value(std::stoi((yyvsp[0].str)));
-        } catch (std::exception) {
+        if ((yyvsp[0].str).find('.') != std::string::npos) {
+            (yyval.v) = sql_value(std::stof((yyvsp[0].str)));
+        }
+        else {
             try {
-                (yyval.v) = sql_value(std::stof((yyvsp[0].str)));
+                (yyval.v) = sql_value(std::stoi((yyvsp[0].str)));
             } catch (std::exception) {
                 (yyval.v) = sql_value((yyvsp[0].str));
             }
         }
     }
-#line 1713 "parser.tab.cc"
+#line 1714 "parser.tab.cc"
     break;
 
 
-#line 1717 "parser.tab.cc"
+#line 1718 "parser.tab.cc"
 
       default: break;
     }
@@ -1945,5 +1946,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 268 "parser.y"
+#line 269 "parser.y"
 

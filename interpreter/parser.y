@@ -250,11 +250,12 @@ V_INSERT: S_APOSTROPHE V_STRING S_APOSTROPHE
     }
     | V_STRING
     {
-        try {
-            $$ = sql_value(std::stoi($1));
-        } catch (std::exception) {
+        if ($1.find('.') != std::string::npos) {
+            $$ = sql_value(std::stof($1));
+        }
+        else {
             try {
-                $$ = sql_value(std::stof($1));
+                $$ = sql_value(std::stoi($1));
             } catch (std::exception) {
                 $$ = sql_value($1);
             }
