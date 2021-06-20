@@ -18,7 +18,7 @@ namespace api {
     }
     static void throw_on_table_not_exist(std::string &table_name) {
         if (!cat_mgt.TableExist(table_name)) {
-            throw sql_exception(201, "api", "table \'" + table_name + "\' not exist");
+            throw sql_exception(201, "api", "table \'" + table_name + "\' doesn't exist");
         }
     }
 
@@ -40,6 +40,11 @@ namespace api {
 
     static void print_select_result(const macro::table &table, const result &res) {
         const auto size = table.attribute_names.size();
+
+        if (res.row.empty()) {
+            return;
+        }
+
         auto col_max_length = vector<unsigned long>(size, 0);
 
         for (auto i = 0; i < size; i++) {
@@ -79,8 +84,6 @@ namespace api {
             }
             print_select_result_seperator(col_max_length);
         }
-        std::cout << std::to_string(res.row.size()) << " row(s) in set"<< std::endl;
-        std::cout << endl;
     }
 
     void create_table::exec() {
@@ -100,6 +103,8 @@ namespace api {
 
         rec_mgt.creatTable(this->table_name);
         cat_mgt.CreateTable(this->table_name, this->schema_list, "" /*TODO*/);
+
+        std::cout << "Query OK, 0 row affected" << std::endl;
     }
 
     void insert_table::exec() {
@@ -127,7 +132,7 @@ namespace api {
         // TODO: update index
 
         table.record_cnt++;
-        std::cout << "insertion finished, 1 row affected" << std::endl;
+        std::cout << "Query OK, 1 row affected" << std::endl;
     }
 
     void select_table::exec() {
@@ -153,6 +158,13 @@ namespace api {
 
         auto res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
         print_select_result(table, res);
+
+        if (res.row.empty()) {
+            std::cout << "Empty set" << std::endl;
+        } else {
+            std::cout << std::to_string(res.row.size()) << " row(s) in set"<< std::endl;
+        }
+
     }
 
     void exit::exec() {

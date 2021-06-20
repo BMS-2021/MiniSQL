@@ -10,7 +10,7 @@ BufferManager buf_mgt;
 int main() {
     std::cout << "Welcome to the MiniSQL monitor. Commands end with ;" << std::endl;
     std::cout << "Version: v0.1-alpha.2" << std::endl;
-    std::cout << "Copyright (c) 2021, Cupcake, Enzymii, L1ght and RalXYZ." << std::endl << std::endl;
+    std::cout << "Copyright (c) 2021, Cupcake, Enzymii, L1ght and RalXYZ." << std::endl;
 
     ::rec_mgt = RecordManager();
     ::cat_mgt = CatalogManager();

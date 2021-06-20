@@ -14,6 +14,7 @@ std::unique_ptr<api::base> query_object_ptr = nullptr;
 
 void interpret_entrance() {
     while (!sig_exit) {
+        std::cout << std::endl;
         interpreter inter;
         parse_exception = nullptr;
 
