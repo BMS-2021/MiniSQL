@@ -55,10 +55,7 @@ namespace api {
     class drop_table final : public base {
         std::string table_name;
 
-        inline void exec() override {
-            std::cout << "Table to drop: " << table_name << std::endl;
-            std::cout << "Interpreter Yes!!!" << std::endl;
-        }
+        void exec() override;
 
     public:
         explicit drop_table(std::string &table_name) : table_name(table_name) {}
@@ -67,7 +64,7 @@ namespace api {
     class drop_index final : public base {
         std::string index_name;
 
-        inline void exec() override {
+        void exec() override {
             std::cout << "Interpreter Yes!!!" << std::endl;
         }
 
@@ -106,7 +103,7 @@ namespace api {
     class use_database final : public base {
         std::string database_name;
 
-        inline void exec() override {
+        void exec() override {
 
         }
 

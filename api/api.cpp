@@ -167,6 +167,18 @@ namespace api {
 
     }
 
+    void drop_table::exec() {
+        throw_on_table_not_exist(this->table_name);
+        auto table = cat_mgt.GetTable(this->table_name);
+
+        // TODO: drop all indexes in this table
+
+        // cat_mgt.RemoveTable(table); FIXME: implement this
+        cat_mgt.Flush();
+
+        rec_mgt.dropTable(this->table_name);
+    }
+
     void exit::exec() {
         buf_mgt.closeAllFile();
         std::cout << "Bye!" << std::endl;
