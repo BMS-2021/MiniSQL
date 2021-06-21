@@ -9,6 +9,7 @@
 extern RecordManager rec_mgt;
 extern CatalogManager cat_mgt;
 extern BufferManager buf_mgt;
+extern std::string file_to_exec;
 
 namespace api {
     static void throw_on_table_exist(std::string &table_name) {
@@ -177,6 +178,11 @@ namespace api {
         cat_mgt.Flush();
 
         rec_mgt.dropTable(this->table_name);
+    }
+
+    void execfile::exec() {
+        file_to_exec = this->filename;
+        std::cout << "context switched to file \'" << filename << "\'" << std::endl;
     }
 
     void exit::exec() {

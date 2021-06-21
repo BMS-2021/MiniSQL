@@ -10,8 +10,6 @@
 #include <vector>
 #include <iostream>
 
-#include "../macro.h"
-
 namespace api {
     struct base {
         /*
@@ -21,7 +19,7 @@ namespace api {
          */
         virtual ~base() = default;
 
-        virtual void exec() = 0;
+        virtual void exec() {};
     };
 
     class create_table final : public base {
@@ -109,6 +107,14 @@ namespace api {
 
     public:
         explicit use_database(std::string &database_name) : database_name(database_name) {}
+    };
+
+    class execfile final : public base {
+        std::string filename;
+        void exec() override;
+
+    public:
+        explicit execfile(std::string &filename) : filename(filename) {}
     };
 
     class exit final : public base {

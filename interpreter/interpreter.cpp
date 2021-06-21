@@ -3,12 +3,14 @@
 #endif
 
 #include <memory>
+#include <fstream>
 #include "../api/api.h"
 #include "interpreter.h"
 #include "../utils/utils.h"
 #include "../utils/exception.h"
 
 bool sig_exit = false;
+std::string file_to_exec;
 std::unique_ptr<sql_exception> parse_exception = nullptr;
 std::unique_ptr<api::base> query_object_ptr = nullptr;
 
@@ -18,21 +20,45 @@ void interpret_entrance() {
         interpreter inter;
         parse_exception = nullptr;
 
-        parse(inter.read());
+        if (file_to_exec.empty()) {
+            parse(inter.read());
 
-        if (parse_exception != nullptr) {
-            std::cout << *parse_exception << std::endl;
-            continue;
-        }
-
-        if (query_object_ptr != nullptr) {
-            try {
-                query_object_ptr->exec();
-            } catch (sql_exception &e) {
-                std::cout << e << std::endl;
+            if (parse_exception != nullptr) {
+                std::cout << *parse_exception << std::endl;
+                continue;
             }
-        }
 
+            if (query_object_ptr != nullptr) {
+                try {
+                    query_object_ptr->exec();
+                } catch (sql_exception &e) {
+                    std::cout << "awsl" << std::endl;
+                    std::cout << e << std::endl;
+                }
+            }
+        } else {  // execfile
+            std::ifstream file(file_to_exec);
+            while (!file.eof()) {
+                parse_exception = nullptr;
+
+                interpreter inter_inner;
+                parse(inter_inner.read(file));
+
+
+                if (parse_exception != nullptr) {
+                    std::cout << *parse_exception << std::endl;
+                    continue;
+                }
+                if (query_object_ptr != nullptr) {
+                    try {
+                        query_object_ptr->exec();
+                    } catch (sql_exception &e) {
+                        std::cout << e << std::endl;
+                    }
+                }
+            }
+            file_to_exec = "";
+        }
     }
 }
 
@@ -66,5 +92,11 @@ const char* interpreter::read() {
 #endif
         first_loop = false;
     }
+    return this->str;
+}
+
+const char* interpreter::read(std::istream &is) {
+    is.getline(this->str, SQL_QUERY_LENGTH, ';');
+    strcat_s(this->str, ";", SQL_QUERY_LENGTH);
     return this->str;
 }
