@@ -231,7 +231,7 @@ void BPTree<T>::remove(vector<T> &tab,
 
     while (true) {
         for (auto i = 0U; i < cur->key.size(); ++i)
-            if (cur->key.at(i) == target) {
+            if (tab.at(cur->key.at(i)) == target) {
                 cur->key.at(i) = suc;
                 break;
             }
