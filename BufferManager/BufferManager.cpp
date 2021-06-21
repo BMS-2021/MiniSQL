@@ -27,7 +27,6 @@ File::File(const string& _filename) {
 BufferManager::BufferManager() {
     LRUNum = 0;
     fileCnt = 0;
-    blockCnt = 0;
     fileHandle = nullptr;
     blockHandle = nullptr;
 }
@@ -61,14 +60,14 @@ void BufferManager::replace(File &file, Block &block) {
 
 Block &BufferManager::getFreeBlock(File &file) {
     if(!blockHandle) {
-        if(blockCnt < macro::MaxBlocks) {
-            blockCnt++;
+        if(file.blockCnt < macro::MaxBlocks) {
+            file.blockCnt++;
             Block* blockPtr = new Block;
             resetBlock(*blockPtr);
             replace(file, *blockPtr);
             return *blockPtr;
         }
-        Block &b = getLRUBlock();
+        Block &b = getLRUBlock(file);
         if(b.dirty) {
             writeBlock(b);
             return b;
@@ -80,20 +79,16 @@ Block &BufferManager::getFreeBlock(File &file) {
     return b;
 }
 
-Block &BufferManager::getLRUBlock(){
-    File* curFile = fileHandle;
+Block &BufferManager::getLRUBlock(File &file){
     int minLRU = LRUNum;
     Block *detect = nullptr;
-    while(curFile) {
-        Block* curBlock = curFile->firstBlock;
-        while(curBlock) {
-            if (curBlock->LRUCount < minLRU) {
-                minLRU = curBlock->LRUCount;
-                detect = curBlock;
-            }
-            curBlock = curBlock->next;
+    Block* curBlock = file.firstBlock;
+    while(curBlock) {
+        if (curBlock->LRUCount < minLRU) {
+            minLRU = curBlock->LRUCount;
+            detect = curBlock;
         }
-        curFile = curFile->next;
+        curBlock = curBlock->next;
     }
     return *detect;
 }

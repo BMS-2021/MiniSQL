@@ -99,7 +99,7 @@ private:
 
     Block &getFreeBlock(File &file);
 
-    Block &getLRUBlock();
+    Block &getLRUBlock(File &file);
 
     Block &readBlock(const string& filename, int blockID);
 
@@ -109,7 +109,6 @@ private:
 
     int LRUNum;
     int fileCnt;
-    int blockCnt;
 
     Block *blockHandle;
 };
