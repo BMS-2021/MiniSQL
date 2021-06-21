@@ -10,6 +10,20 @@
 
 using namespace std;
 
+File::File(const string& _filename) {
+    type = 0;
+    filename = _filename;
+    struct stat st;
+    if (stat(filename.c_str(), &st) == 0) {
+        blockCnt = (st.st_size / macro::BlockSize);
+    } else {
+        blockCnt = 0;
+    }
+    if(blockCnt <= 0) blockCnt = 1;
+    next = nullptr;
+    firstBlock = nullptr;
+}
+
 BufferManager::BufferManager() {
     LRUNum = 0;
     fileCnt = 0;
@@ -30,6 +44,7 @@ Block &BufferManager::writeBlock(Block &block) {
 Block &BufferManager::resetBlock(Block &block) {
     block.next = nullptr;
     block.dirty = 0;
+    memset(block.blockContent, 0, macro::BlockSize);
     return block;
 }
 
@@ -115,7 +130,7 @@ File &BufferManager::getFile(const string& filename) {
     }
     if(!curFile) { //file not in memory
         if(fileCnt == macro::MaxFiles) closeFile(preFile);
-        File* newFile = new File;
+        File* newFile = new File(filename);
         newFile->filename = filename;
         newFile->next = fileHandle;
         fileCnt++;
@@ -132,13 +147,17 @@ Block &BufferManager::readBlock(const string& filename, int blockID) {
         cerr << "Fail to open file: " << filename << "." << endl;
 
     Block &block = getFreeBlock();
-    int tail = getBlockTail(filename);
-    if(tail < blockID) return nullBlock;
-
-    fp.seekg(blockID * macro::BlockSize, ios::beg);
-    fp.read(block.blockContent, macro::BlockSize);
     File &file = getFile(filename);
     replace(file, block);
+    block.blockID = blockID;
+    int tail = file.blockCnt - 1;
+    if(tail < blockID) {
+        file.blockCnt = blockID + 1;
+    } else {
+        fp.seekg(blockID * macro::BlockSize, ios::beg);
+        fp.read(block.blockContent, macro::BlockSize);
+    }
+
     return block;
 }
 
@@ -202,11 +221,7 @@ void BufferManager::removeFile(const string& filename) {
     }
 }
 
-int BufferManager::getBlockTail(const string& filename) {
-    struct stat st{};
-    if (stat(filename.c_str(), &st) == 0) {
-        return (st.st_size / macro::BlockSize - 1);
-    }
-    cerr << "Failed to get file tail" << endl;
-    return -1;
+int BufferManager::getBlockCnt(const string& filename) {
+    return getFile(filename).blockCnt;
+    return 0;
 }

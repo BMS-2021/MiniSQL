@@ -13,28 +13,17 @@ using namespace std;
 
 typedef struct File File;
 typedef struct Block Block;
+typedef struct BufferManager BufferManager;
 
 struct File {
     int type; //0:db file 1:table file 2: index file
 
     string filename; //the name of the file
-    int fileBlockCnt;
-    int recordAmount; //the number of record in the file
-    int freeNum; //the free block number which could be used for the file
-    int recordLength; //the length of the record in the file
+    int blockCnt;
     File *next; //the pointer points to the next file
     Block *firstBlock;
 
-    File() {
-        type = 0;
-        filename = "";
-        fileBlockCnt = 0;
-        recordAmount = 0;
-        freeNum = 0;
-        recordLength = 0;
-        next = nullptr;
-        firstBlock = nullptr;
-    }
+    File(const string& _filename);
 
 };
 
@@ -71,7 +60,7 @@ struct Block {
         if(isNull) blockContent = nullptr;
     }
     ~Block() {
-        if(blockContent) free(blockContent);
+//        if(blockContent) free(blockContent);
     }
 };
 
@@ -93,7 +82,7 @@ public:
 
     void removeFile(const string& filename);
 
-    static int getBlockTail(const string& filename);
+    int getBlockCnt(const string& filename);
 
     Block nullBlock = Block(true);
     File *fileHandle;

@@ -22,13 +22,12 @@ bool RecordManager::dropTable(const string &tableName) {
 
 int RecordManager::insertRecord(const macro::table &table, const sql_tuple &record) {
     string tableFileStr = macro::tableFile(table.name);
-    int blockID = BufferManager::getBlockTail(tableFileStr);
+    int blockID = buf_mgt.getBlockCnt(tableFileStr) - 1;
     Block &block = buf_mgt.getBlock(tableFileStr, blockID);
-    block = buf_mgt.getBlock(tableFileStr, ++blockID);
 
     char *content = block.blockContent;
 
-    int recordLen = table.record_len;
+    int recordLen = table.record_len + 1;
     int recordsPreBlock = macro::BlockSize / recordLen;
     int recordOffset = 0;
     bool isValid = false;
@@ -63,7 +62,7 @@ int RecordManager::insertRecord(const macro::table &table, const sql_tuple &reco
                 break;
             case value_type::CHAR:
                 str = attr->sql_str;
-                lenOffset = attr_type->length - str.length();
+                lenOffset = attr_type->length + 1 - str.length();
                 if (lenOffset > 0) {
                     str.insert(str.length(), lenOffset, 0);
                 }
@@ -83,15 +82,16 @@ int RecordManager::insertRecord(const macro::table &table, const sql_tuple &reco
 }
 
 bool RecordManager::deleteRecord(const macro::table &table, const vector<condition> &conditions) {
-    int blockID = 0;
-    Block block = buf_mgt.getBlock(macro::tableFile(table.name), blockID);
-    char *content = block.blockContent;
+    string tableFileStr = macro::tableFile(table.name);
     int length = table.record_len + 1;
-    int blocks = macro::BlockSize / length;
+    int recordCnt = macro::BlockSize / length;
+    int blockCnt = buf_mgt.getBlockCnt(tableFileStr);
     sql_tuple tup;
 
-    while (*content) {
-        for (int i = 0; i < blocks; i++) {
+    for(int blockID = 0; blockID < blockCnt; blockID++) {
+        Block &block = buf_mgt.getBlock(macro::tableFile(table.name), blockID);
+        char *content = block.blockContent;
+        for (int i = 0; i < recordCnt; i++) {
             if (content[i * length] == 0) { continue; }
             tup = genTuple(content, i * length, table.attribute_type);
             if (condsTest(conditions, tup, table.attribute_names)) {
@@ -100,8 +100,6 @@ bool RecordManager::deleteRecord(const macro::table &table, const vector<conditi
         }
         buf_mgt.setDirty(macro::tableFile(table.name), blockID);
         buf_mgt.unlock(macro::tableFile(table.name), blockID);
-        block = buf_mgt.getBlock(macro::tableFile(table.name), ++blockID);
-        content = block.blockContent;
     }
 
     return true;
@@ -109,16 +107,17 @@ bool RecordManager::deleteRecord(const macro::table &table, const vector<conditi
 
 result RecordManager::selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond) {
     string tableFileStr = macro::tableFile(table.name);
-    int blockID = 0;
-    char *content = buf_mgt.getBlock(tableFileStr, blockID).blockContent;
 
-    int recordLen = table.record_len;
+    int recordLen = table.record_len + 1;
     int recordCnt = macro::BlockSize / recordLen;
+    int blockCnt = buf_mgt.getBlockCnt(tableFileStr);
 
     sql_tuple tup;
     row row;
     result res;
-    while (content) {
+    for(int blockID = 0; blockID < blockCnt; blockID++) {
+        Block &block = buf_mgt.getBlock(macro::tableFile(table.name), blockID);
+        char *content = block.blockContent;
         for (int i = 0; i < recordCnt; i++) {
             if (content[i * recordLen] == 0) { continue; }
             tup = genTuple(content, i * recordLen, table.attribute_type);
@@ -128,8 +127,6 @@ result RecordManager::selectRecord(const macro::table &table, const vector<strin
             }
         }
         buf_mgt.unlock(macro::tableFile(table.name), blockID);
-        blockID++;
-        content = buf_mgt.getBlock(macro::tableFile(table.name), blockID).blockContent;
     }
     return res;
 }
