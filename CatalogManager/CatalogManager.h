@@ -9,7 +9,6 @@
 #include <cstring>
 #include <stdexcept>
 
-//#include "../Base/Base.h"
 #include "../macro.h"
 
 //using namespace MINISQL_BASE;
@@ -26,11 +25,7 @@ public:
 
     macro::table &GetTable(const std::string &table_name);
 
-    bool CheckIndexNameExists(const std::string &index_name) const;
-
     macro::table &GetTableWithIndex(const std::string &index_name);
-
-    bool RemoveTable(const macro::table &table);
 
     bool DropTableByName(const std::string &table_name);
 
@@ -48,15 +43,11 @@ public:
 private:
     void LoadFromFile();
 
-    bool valid_assert(bool cond)
-    {
-        return cond ? cond : (validFlag = cond);
-    }
 
 private:
     std::vector<macro::table> tables;
 
-    static constexpr auto meta_file_name = "tables.meta";
+    const std::string tables_info = "tables.meta";
 
     bool validFlag = true;
 };

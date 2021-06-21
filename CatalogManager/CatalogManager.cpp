@@ -49,7 +49,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
 }
 
 CatalogManager::CatalogManager()
-        : tables(std::vector<macro::table>())
+        :tables(std::vector<macro::table>())
 {
     LoadFromFile();
 }
@@ -61,134 +61,110 @@ CatalogManager::~CatalogManager()
 
 void CatalogManager::Flush()
 {
-
-    std::ofstream ofs(meta_file_name);
+    std::ofstream ofs(tables_info);
     ofs << tables.size() << std::endl;
 
-    for (auto &tb: tables)
-    {
-        ofs << tb.name << std::endl;
-        ofs << tb.record_cnt << std::endl;
-        std::ofstream otbfs(tb.name + ".catalog");
+    for (auto &tb: tables){
+        ofs << tb.name << std::endl << tb.record_cnt << std::endl;
+        std::ofstream tab_ofs(tb.name + ".catalog");
 
-        otbfs << tb.attribute_names.size() << std::endl;
-        for(auto i = 0; i < tb.attribute_names.size(); ++i){
-            otbfs << tb.attribute_names[i] << std::endl;
+        tab_ofs << tb.attribute_names.size() << std::endl;
+        for(int i = 0; i < tb.attribute_names.size(); ++i){
+            tab_ofs << tb.attribute_names[i] << std::endl;
             const auto &attr = tb.attribute_type[i];
             switch (attr.type){
                 case value_type::INT:
-                    otbfs << "int" << std::endl;
-                    otbfs << 0 << std::endl;
+                    tab_ofs << "int" << std::endl;
+                    tab_ofs << 0 << std::endl;
                     break;
                 case value_type::FLOAT:
-                    otbfs << "float" << std::endl;
-                    otbfs << 0 << std::endl;
+                    tab_ofs << "float" << std::endl;
+                    tab_ofs << 0 << std::endl;
                     break;
                 case value_type::CHAR:
-                    otbfs << "char" << std::endl;
-                    otbfs << attr.length << std::endl;
+                    tab_ofs << "char" << std::endl;
+                    tab_ofs << attr.length << std::endl;
                     break;
             }
+            tab_ofs << (attr.primary) ? 1 : 0;
+            tab_ofs << (attr.unique) ? 1 : 0;
+
             // Index info
             std::vector<std::pair<std::string, std::string>>::iterator ind;
             for(ind = tb.index.begin(); ind != tb.index.end(); ++ind){
                 if(ind->first == tb.attribute_names[i]){
-                    otbfs << 1 << std::endl << ind->second << std::endl;
+                    tab_ofs << 1 << std::endl << ind->second << std::endl;
                 }
             }
-
             if (ind == tb.index.end()){
-                otbfs << 0 << std::endl << "-" << std::endl;
+                tab_ofs << 0 << std::endl << "-" << std::endl;
             }
         }
-        otbfs.close();
+        tab_ofs.close();
     }
     ofs.close();
 }
 
 void CatalogManager::LoadFromFile()
 {
-#ifdef LoadFromFile
-    std::fstream fp;
-    if(!fp){
-        fp.open(meta_file_name, ios::out);
+    std::ifstream ifs(tables_info);
+    if(!ifs){
+        ifs.open(tables_info);
         return;
     }
 
-    auto rm = Api::ApiHelper::getApiHelper()->getRecordManager();
+    int table_size = 0;
+    ifs >> table_size;
 
-    size_t table_cnt = 0;
-    ifs >> table_cnt;
+    for (int i = 0; i < table_size; ++i){
+        macro::table tb;
+        ifs >> tb.name >> tb.record_cnt;
+        std::string tabfile_name = tb.name + ".catalog";
+        std::ifstream tab_ifs(tabfile_name);
 
+        unsigned long long record_len = 0, attr_counts = 0;
 
-    std::string tb_name;
-    for (auto i = 0; i < table_cnt; ++i)
-    {
-        ifs >> tb_name;
-        auto file_name = tb_name + ".catalog";
-        std::ifstream itbfs(file_name);
+        tab_ifs >> attr_counts;
+        for (int attr_i = 0; attr_i < attr_counts; ++attr_i){
 
-        table tb;
-        std::vector<sql_value_type> ind_vec;
-        //size_t len{0};
-        ifs >> tb.record_cnt;
-
-        int v;
-        ifs >> v;
-
-        tb.name = tb_name;
-
-        uint16_t attr_cnts{0};
-        uint16_t record_length{0};
-
-        size_t attr_counts{0};
-        itbfs >> attr_counts;
-        for (auto ci = 0; ci < attr_counts; ++ci)
-        {
             std::string attr_name, type_name, index_name;
-            uint16_t isPri, isUni, isInd, size;
-            sql_value_type type;
-
-            itbfs >> attr_name >> type_name >> size >> isPri >> isUni >> isInd >> index_name;
-            ++attr_cnts;
-
+            tab_ifs >> attr_name;
             tb.attribute_names.push_back(attr_name);
-            if (type_name == "int")
-            {
+
+            int type_size;
+            sql_value_type type;
+            tab_ifs >> type_name >> type_size;
+
+            if (type_name == "int"){
                 type.type = value_type::INT;
-            } else if (type_name == "char")
-            {
-                type.type = value_type::CHAR;
-                type.length = size;
-            } else if (type_name == "float")
-            {
-                type.type = value_type::FLOAT;
-            } else
-            {
-                valid_assert(false);
             }
-            //TODO: Implement the member funcs
-//            record_length += type.getSize();
-//            type.primary = isPri != 0;
-//            type.unique = isUni != 0;
-//            type.attrName = attr_name;
-//            tb.attribute_type.push_back(type);
-//            if (isInd)
-//            {
-//                auto ind = std::make_pair(attr_name, index_name);
-//                tb.index.push_back(ind);
-//                ind_vec.push_back(type);
-//            }
+            else if (type_name == "char"){
+                type.type = value_type::CHAR;
+            }
+            else if (type_name == "float"){
+                type.type = value_type::FLOAT;
+            }
+            type.length = type_size;
+
+            short ifpri, ifind, ifuniq;
+            tab_ifs >> ifpri >> ifuniq;
+            tab_ifs >> ifind >> index_name;
+
+            record_len += type.size();
+            type.primary = (ifpri) ? 1 : 0;
+            type.unique = (ifuniq) ? 1 : 0;
+            tb.attribute_type.push_back(type);
+
+            //TODO: Implement real index creation in tb.index if ifind==1
+
         }
-        tb.attribute_cnt = attr_cnts;
-        tb.record_len = record_length;
+        tb.attribute_cnt = attr_counts;
+        tb.record_len = record_len;
         tables.push_back(tb);
-        for(auto &it: ind_vec)
-        {
-            rm->createIndex(tb, it);
-        }
+
+        //TODO: Create real index for whole table
+
     }
-#endif
 }
 
 bool CatalogManager::TableExist(const std::string &query_name) const
