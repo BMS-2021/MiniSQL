@@ -113,6 +113,7 @@ namespace api {
 
     void exit::exec() {
         buf_mgt.closeAllFile();
+        cat_mgt.Flush();
         std::cout << "Bye!" << std::endl;
         std::exit(0);
     }

@@ -77,7 +77,6 @@ int RecordManager::insertRecord(const macro::table &table, const sql_tuple &reco
     }
 
     buf_mgt.setDirty(tableFileStr, blockID);
-    cerr << blockID << endl;
     return blockID * recordsPreBlock + recordOffset;
 }
 

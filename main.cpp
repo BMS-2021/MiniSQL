@@ -12,8 +12,7 @@ int main() {
     std::cout << "Version: v0.1-alpha.2" << std::endl;
     std::cout << "Copyright (c) 2021, Cupcake, Enzymii, L1ght and RalXYZ." << std::endl;
 
-    ::rec_mgt = RecordManager();
-    ::cat_mgt = CatalogManager();
+    cat_mgt.LoadFromFile();
 
     interpret_entrance();
 }

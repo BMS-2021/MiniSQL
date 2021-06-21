@@ -40,7 +40,6 @@ public:
 
     mutable std::map<std::string, int> kv;
 
-private:
     void LoadFromFile();
 
 

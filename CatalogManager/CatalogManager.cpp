@@ -86,8 +86,8 @@ void CatalogManager::Flush()
                     tab_ofs << attr.length << std::endl;
                     break;
             }
-            tab_ofs << (attr.primary) ? 1 : 0;
-            tab_ofs << (attr.unique) ? 1 : 0;
+            tab_ofs << ((attr.primary) ? 1 : 0);
+            tab_ofs << ((attr.unique) ? 1 : 0);
 
             // Index info
             std::vector<std::pair<std::string, std::string>>::iterator ind;
