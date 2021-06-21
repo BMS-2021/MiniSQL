@@ -3,12 +3,9 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "../macro.h"
-
-#include <string>
-#include <vector>
-#include <iostream>
 
 namespace api {
     struct base {
