@@ -29,7 +29,7 @@ namespace api {
         rec_mgt.creatTable(this->table_name);
         cat_mgt.CreateTable(this->table_name, this->schema_list, "" /*TODO*/);
 
-        std::cout << "query OK, 0 row affected" << std::endl;
+        std::cout << "query OK, 0 row affected";
     }
 
     void insert_table::exec() {
@@ -57,7 +57,7 @@ namespace api {
         // TODO: update index
 
         table.record_cnt++;
-        std::cout << "query OK, 1 row affected" << std::endl;
+        std::cout << "query OK, 1 row affected";
     }
 
     void select_table::exec() {
@@ -75,7 +75,7 @@ namespace api {
         if (res.row.empty()) {
             std::cout << "Empty set" << std::endl;
         } else {
-            std::cout << std::to_string(res.row.size()) << " row(s) in set"<< std::endl;
+            std::cout << std::to_string(res.row.size()) << " row(s) in set";
         }
 
     }
@@ -91,7 +91,7 @@ namespace api {
             throw sql_exception(205, "api", "delete failed");
         }
 
-        std::cout << "query OK, " << "TODO" /*TODO*/ << " row(s) in set"<< std::endl;
+        std::cout << "query OK, " << "TODO" /*TODO*/ << " row(s) in set";
     }
 
     void drop_table::exec() {
@@ -108,7 +108,7 @@ namespace api {
 
     void execfile::exec() {
         file_to_exec = this->filename;
-        std::cout << "context switched to file \'" << filename << "\'" << std::endl;
+        std::cout << "context switched to file \'" << filename << "\'";
     }
 
     void exit::exec() {

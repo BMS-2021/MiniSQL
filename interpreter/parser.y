@@ -29,7 +29,7 @@ inline int yyerror(const char *s)
 K_DATABASE K_TABLE K_INDEX K_VALUES
 K_FROM K_WHERE K_ON K_INTO K_AND
 K_CREATE K_SELECT K_INSERT K_DELETE K_DROP
-K_USE K_EXIT K_PRIMARY K_KEY K_UNIQUE K_EXECFILE
+K_USE K_EXIT K_QUIT K_PRIMARY K_KEY K_UNIQUE K_EXECFILE
 T_INT T_FLOAT T_CHAR
 S_APOSTROPHE S_SEMICOLON S_L_BRACKETS S_R_BRACKETS S_COMMA S_STAR
 S_EQUAL S_NOT_EQUAL S_GREATER S_GREATER_EQUAL S_LESS S_LESS_EQUAL
@@ -59,6 +59,7 @@ C_TOP_INPUT: C_TOP_STMT S_SEMICOLON
 C_TOP_STMT: C_DDL
     | C_DML
     | I_EXIT
+    | I_QUIT
     | I_USE_DATABASE
     | I_EXECFILE
     | I_VACANT
@@ -76,6 +77,12 @@ C_DML: I_INSERT_TABLE
     ;
 
 I_EXIT: K_EXIT
+    {
+        query_object_ptr = std::make_unique<api::exit>();
+    }
+    ;
+
+I_QUIT: K_QUIT
     {
         query_object_ptr = std::make_unique<api::exit>();
     }

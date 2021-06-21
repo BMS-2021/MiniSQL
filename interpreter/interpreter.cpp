@@ -31,7 +31,7 @@ void interpret_entrance() {
             auto start = std::chrono::system_clock::now();
 
             if (parse_exception != nullptr) {
-                std::cout << *parse_exception << std::endl;
+                std::cout << *parse_exception;
                 continue;
             }
 
@@ -39,13 +39,13 @@ void interpret_entrance() {
                 try {
                     query_object_ptr->exec();
                 } catch (sql_exception &e) {
-                    std::cout << e << std::endl;
+                    std::cout << e;
                 }
             }
 
             auto end = std::chrono::system_clock::now();
 
-            std::cout << "("
+            std::cout << " ("
                       << std::fixed
                       << std::setprecision(PRECISION)
                       << static_cast<double>(duration_cast<std::chrono::microseconds>(end - start).count())
@@ -57,38 +57,42 @@ void interpret_entrance() {
             std::cout.precision(6);
         } else {  // execfile
             std::ifstream file(file_to_exec);
-            while (!file.eof()) {
-                parse_exception = nullptr;
+            if (file.fail()) {
+                std::cout << sql_exception(101, "interpreter", "file \'" + file_to_exec + "\' not found");
+            } else {
+                while (!file.eof()) {
+                    parse_exception = nullptr;
 
-                interpreter inter_inner;
-                parse(inter_inner.read(file));
+                    interpreter inter_inner;
+                    parse(inter_inner.read(file));
 
-                auto start = std::chrono::system_clock::now();
+                    auto start = std::chrono::system_clock::now();
 
-                if (parse_exception != nullptr) {
-                    std::cout << *parse_exception << std::endl;
-                    continue;
-                }
-                if (query_object_ptr != nullptr) {
-                    try {
-                        query_object_ptr->exec();
-                    } catch (sql_exception &e) {
-                        std::cout << e << std::endl;
+                    if (parse_exception != nullptr) {
+                        std::cout << *parse_exception;
+                        continue;
                     }
+                    if (query_object_ptr != nullptr) {
+                        try {
+                            query_object_ptr->exec();
+                        } catch (sql_exception &e) {
+                            std::cout << e;
+                        }
+                    }
+
+                    auto end = std::chrono::system_clock::now();
+
+                    std::cout << "("
+                              << std::fixed
+                              << std::setprecision(PRECISION)
+                              << static_cast<double>(duration_cast<std::chrono::microseconds>(end - start).count())
+                                 * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den
+                              << " sec)"
+                              << std::endl;
+
+                    std::cout.unsetf(std::ios::fixed);
+                    std::cout.precision(6);
                 }
-
-                auto end = std::chrono::system_clock::now();
-
-                std::cout << "("
-                          << std::fixed
-                          << std::setprecision(PRECISION)
-                          << static_cast<double>(duration_cast<std::chrono::microseconds>(end - start).count())
-                             * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den
-                          << " sec)"
-                          << std::endl;
-
-                std::cout.unsetf(std::ios::fixed);
-                std::cout.precision(6);
             }
             file_to_exec = "";
         }
