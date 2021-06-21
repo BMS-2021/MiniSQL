@@ -26,7 +26,7 @@ public:
 
     int insertRecord(const macro::table &table, const sql_tuple &record);
 
-    bool deleteRecord(const macro::table &table, const vector<condition> &conditions);
+    int deleteRecord(const macro::table &table, const vector<condition> &conditions);
 
     [[nodiscard]]
     result selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond);

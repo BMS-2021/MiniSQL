@@ -8,6 +8,8 @@
 #include <fstream>
 #include <sys/stat.h>
 
+#include "../utils/exception.h"
+
 using namespace std;
 
 File::File(const string& _filename) {
@@ -146,8 +148,9 @@ File &BufferManager::getFile(const string& filename) {
 Block &BufferManager::readBlock(const string& filename, int blockID) {
     fstream fp;
     fp.open(filename, ios::in | ios::out | ios::binary);
-    if (!fp.good())
-        cerr << "Fail to open file: " << filename << "." << endl;
+    if (!fp.good()) {
+        throw sql_exception(401, "buffer manager", "element not found");
+    }
 
     File &file = getFile(filename);
     Block &block = getFreeBlock(file);
@@ -182,13 +185,17 @@ Block &BufferManager::findBlock(const string& filename, int blockID) const {
     while(curFile && curFile->filename != filename) {
         curFile = curFile->next;
     }
-    if(!curFile) cerr << "Element not found!";
+    if(!curFile) {
+        throw sql_exception(401, "buffer manager", "fail to open file: " + filename);
+    }
 
     Block *curBlock = curFile->firstBlock;
     while(curBlock && curBlock->blockID != blockID) {
         curBlock = curBlock->next;
     }
-    if(!curBlock) cerr << "Element not found!";
+    if(!curBlock) {
+        throw sql_exception(401, "buffer manager", "element not found");
+    }
 
     return *curBlock;
 }
@@ -220,7 +227,7 @@ void BufferManager::removeFile(const string& filename) {
     }
     if(curFile) closeFile(curFile);
     if (remove(filename.c_str())) {
-        cerr << "Fail to remove file: " << filename << endl;
+        throw sql_exception(402, "buffer manager", "fail to remove file: " + filename);
     }
 }
 

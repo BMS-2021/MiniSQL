@@ -73,9 +73,9 @@ namespace api {
         print_select_result(table, res);
 
         if (res.row.empty()) {
-            std::cout << "Empty set" << std::endl;
+            std::cout << "empty set";
         } else {
-            std::cout << std::to_string(res.row.size()) << " row(s) in set";
+            std::cout << res.row.size() << " row(s) in set";
         }
 
     }
@@ -86,12 +86,12 @@ namespace api {
 
         validate_condition(table, this->condition_list);
 
-        auto ok = rec_mgt.deleteRecord(table, this->condition_list);
-        if (!ok) {
+        auto delete_row_count = rec_mgt.deleteRecord(table, this->condition_list);
+        if (delete_row_count == -1) {
             throw sql_exception(205, "api", "delete failed");
         }
 
-        std::cout << "query OK, " << "TODO" /*TODO*/ << " row(s) in set";
+        std::cout << "query OK, " << delete_row_count << " row(s) affected";
     }
 
     void drop_table::exec() {
@@ -114,7 +114,7 @@ namespace api {
     void exit::exec() {
         buf_mgt.closeAllFile();
         cat_mgt.Flush();
-        std::cout << "Bye!" << std::endl;
+        std::cout << "bye!" << std::endl;
         std::exit(0);
     }
 }
