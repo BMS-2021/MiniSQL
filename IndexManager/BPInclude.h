@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <queue>
+#include <exception>
 using std::vector;
 using std::queue;
 

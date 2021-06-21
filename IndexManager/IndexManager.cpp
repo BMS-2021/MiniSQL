@@ -15,7 +15,7 @@ void IndexManager::create(const string& treename, const value_type& type)
 			make_tuple(
 				BPTree<int>(TREE_SIZE, TREE_DEGREE),
 				vector<int>(),
-				queue<int>()
+				queue<ELEMENTTYPE>()
 			)));
 		break;
 	case value_type::FLOAT:
@@ -23,7 +23,7 @@ void IndexManager::create(const string& treename, const value_type& type)
 			make_tuple(
 				BPTree<float>(TREE_SIZE, TREE_DEGREE),
 				vector<float>(),
-				queue<float>()
+				queue<ELEMENTTYPE>()
 			)));
 		break;
 	case value_type::CHAR:
@@ -31,7 +31,7 @@ void IndexManager::create(const string& treename, const value_type& type)
 			make_tuple(
 				BPTree<string>(TREE_SIZE, TREE_DEGREE),
 				vector<string>(),
-				queue<string>()
+				queue<ELEMENTTYPE>()
 			)));
 		break;
 	default:
@@ -59,7 +59,7 @@ void IndexManager::drop(const string& treename, const value_type& type)
 
 ELEMENTTYPE IndexManager::search(const string& treename, const sql_value& val) const
 {
-	switch (val.sql_type)
+	switch (val.sql_type.type)
 	{
 	case value_type::INT: {
 		auto it = intmgr.find(treename)->second;
@@ -80,7 +80,7 @@ ELEMENTTYPE IndexManager::search(const string& treename, const sql_value& val) c
 
 ELEMENTTYPE IndexManager::searchHead(const string& treename, const sql_value& val) const
 {
-	return ELEMENTTYPE(); switch (val.sql_type)
+	switch (val.sql_type.type)
 	{
 	case value_type::INT: {
 		auto it = intmgr.find(treename)->second;
@@ -101,7 +101,7 @@ ELEMENTTYPE IndexManager::searchHead(const string& treename, const sql_value& va
 
 ELEMENTTYPE IndexManager::searchNext(const string& treename, const sql_value& val) const
 {
-	switch (val.sql_type)
+	switch (val.sql_type.type)
 	{
 	case value_type::INT: {
 		auto it = intmgr.find(treename)->second;
@@ -122,7 +122,7 @@ ELEMENTTYPE IndexManager::searchNext(const string& treename, const sql_value& va
 
 void IndexManager::insert(const string& treename, const sql_value& val)
 {
-	switch (val.sql_type)
+	switch (val.sql_type.type)
 	{
 	case value_type::INT: {
 		auto it = intmgr.find(treename)->second;
@@ -146,7 +146,7 @@ void IndexManager::insert(const string& treename, const sql_value& val)
 
 void IndexManager::remove(const string& treename, const sql_value& val)
 {
-	switch (val.sql_type)
+	switch (val.sql_type.type)
 	{
 	case value_type::INT: {
 		auto it = intmgr.find(treename)->second;
@@ -172,11 +172,11 @@ void IndexManager::remove(const string& treename, const sql_value& val)
 void IndexManager::save() {
 	std::ofstream f(index_file);
 	std::ofstream g(vecque_file);
-	f << intmgr.size() << " " << floatmgr.size() << " " << strmgr.size() << std::endl;
+	f << intmgr.size() << " " << floatmgr.size() << " " << stringmgr.size() << std::endl;
 	for (auto& x : intmgr) {
-		auto _map = get<0>(x.second),
-			_vec = get<1>(x.second),
-			_que = get<2>(x.second);
+		auto _map = get<0>(x.second);
+		auto _vec = get<1>(x.second);
+		auto _que = get<2>(x.second);
 		_map.write_file(index_file, x.first);
 		g << _vec.size() << " " << _que.size();
 		for (auto& v : _vec)
@@ -186,10 +186,10 @@ void IndexManager::save() {
 			_que.pop();
 		}
 	}
-	for (auto& x : floatMap) {
-		auto _map = get<0>(x.second),
-			_vec = get<1>(x.second),
-			_que = get<2>(x.second);
+	for (auto& x : floatmgr) {
+        auto _map = get<0>(x.second);
+        auto _vec = get<1>(x.second);
+        auto _que = get<2>(x.second);
 		_map.write_file(index_file, x.first);
 		g << x.first << " " << _vec.size() << " " << _que.size();
 		for (auto& v : _vec)
@@ -199,10 +199,10 @@ void IndexManager::save() {
 			_que.pop();
 		}
 	}
-	for (auto& x : strMap) {
-		auto _map = get<0>(x.second),
-			_vec = get<1>(x.second),
-			_que = get<2>(x.second);
+	for (auto& x : stringmgr) {
+        auto _map = get<0>(x.second);
+        auto _vec = get<1>(x.second);
+        auto _que = get<2>(x.second);
 		_map.write_file(index_file, x.first);
 		g << x.first << " " << _vec.size() << " " << _que.size();
 		for (auto& v : _vec)
@@ -217,7 +217,7 @@ void IndexManager::load() {
 	std::ifstream f(index_file);
 	std::ifstream g(vecque_file);
 	int int_sz, float_sz, str_sz;
-	f >> int_sz >> float_sz >> str_sz >> std::endl;
+	f >> int_sz >> float_sz >> str_sz;
 	for (int i = 0; i < int_sz; ++i) {
 		string file_info, treename;
 		std::getline(f, file_info);
@@ -229,15 +229,15 @@ void IndexManager::load() {
 		for (int i = 0; i < vec_sz; ++i) {
 			int w; g >> w; v.push_back(w);
 		}
-		for (int i = 0; i < q_sz; ++i) {
-			ELEMENTTYPE w; g >> w; q.push_back(w);
+		for (int i = 0; i < que_sz; ++i) {
+			ELEMENTTYPE w; g >> w; q.push(w);
 		}
 		intmgr.insert(make_pair(treename, make_tuple(int_bpt, v, q)));
 	}
 	for (int i = 0; i < float_sz; ++i) {
 		string file_info, treename;
 		std::getline(f, file_info);
-		auto float = BPTree<float>(file_info, 233, treename);
+		auto float_bpt = BPTree<float>(file_info, 233, treename);
 		int vec_sz, que_sz;
 		g >> vec_sz >> que_sz;
 		vector<float> v;
@@ -245,15 +245,15 @@ void IndexManager::load() {
 		for (int i = 0; i < vec_sz; ++i) {
 			float w; g >> w; v.push_back(w);
 		}
-		for (int i = 0; i < q_sz; ++i) {
-			ELEMENTTYPE w; g >> w; q.push_back(w);
+		for (int i = 0; i < que_sz; ++i) {
+			ELEMENTTYPE w; g >> w; q.push(w);
 		}
-		intmgr.insert(make_pair(treename, make_tuple(int_bpt, v, q)));
+		floatmgr.insert(make_pair(treename, make_tuple(float_bpt, v, q)));
 	}
 	for (int i = 0; i < str_sz; ++i) {
 		string file_info, treename;
 		std::getline(f, file_info);
-		auto int_bpt = BPTree<string>(file_info, 233, treename);
+		auto string_bpt = BPTree<string>(file_info, 233, treename);
 		int vec_sz, que_sz;
 		g >> vec_sz >> que_sz;
 		vector<string> v;
@@ -261,9 +261,9 @@ void IndexManager::load() {
 		for (int i = 0; i < vec_sz; ++i) {
 			string w; g >> w; v.push_back(w);
 		}
-		for (int i = 0; i < q_sz; ++i) {
-			ELEMENTTYPE w; g >> w; q.push_back(w);
+		for (int i = 0; i < que_sz; ++i) {
+			ELEMENTTYPE w; g >> w; q.push(w);
 		}
-		intmgr.insert(make_pair(treename, make_tuple(int_bpt, v, q)));
+        stringmgr.insert(make_pair(treename, make_tuple(string_bpt, v, q)));
 	}
 }
