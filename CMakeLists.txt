@@ -8,7 +8,7 @@ set(INTERPRETER
         interpreter/interpreter.cpp
         interpreter/utils.cpp
         interpreter/utils.h
-)
+        api/utils.cpp api/utils.h)
 
 set(API
         api/api.h
