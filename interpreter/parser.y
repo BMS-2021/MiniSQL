@@ -28,7 +28,7 @@ inline int yyerror(const char *s)
 %token
 K_DATABASE K_TABLE K_INDEX K_VALUES
 K_FROM K_WHERE K_ON K_INTO K_AND
-K_CREATE K_SELECT K_INSERT K_DROP
+K_CREATE K_SELECT K_INSERT K_DELETE K_DROP
 K_USE K_EXIT K_PRIMARY K_KEY K_UNIQUE K_EXECFILE
 T_INT T_FLOAT T_CHAR
 S_APOSTROPHE S_SEMICOLON S_L_BRACKETS S_R_BRACKETS S_COMMA S_STAR
@@ -72,34 +72,35 @@ C_DDL: I_CREATE_TABLE
 
 C_DML: I_INSERT_TABLE
     | I_SELECT_TABLE
+    | I_DELETE_TABLE
     ;
 
 I_EXIT: K_EXIT
     {
         query_object_ptr = std::make_unique<api::exit>();
-        // query_object_ptr = operation;
     }
     ;
 
 I_USE_DATABASE: K_USE K_DATABASE V_STRING
     {
         query_object_ptr = std::make_unique<api::use_database>($3);
-        // query_object_ptr = operation;
     }
     ;
 
 I_CREATE_TABLE: K_CREATE K_TABLE V_STRING S_L_BRACKETS E_SCHEMA_LIST E_PRIMARY_KEY S_R_BRACKETS
     {
         query_object_ptr = std::make_unique<api::create_table>($3, $5, $6);
-        // query_object_ptr = operation;
     }
     ;
 
+I_DELETE_TABLE: K_DELETE K_FROM V_STRING E_WHERE
+    {
+        query_object_ptr = std::make_unique<api::delete_table>($3, $4);
+    }
 
 I_DROP_TABLE: K_DROP K_TABLE V_STRING
     {
         query_object_ptr = std::make_unique<api::drop_table>($3);
-        // query_object_ptr = operation;
     }
     ;
 

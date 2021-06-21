@@ -50,6 +50,18 @@ namespace api {
                 index_name(index_name), table_name(table_name), attribute_name(attribute_name) {}
     };
 
+    class delete_table final : public base {
+        std::string table_name;
+        std::vector<condition> condition_list;
+
+        void exec() override;
+
+    public:
+        explicit delete_table(std::string& table_name,
+                              std::vector<condition>& condition_list) :
+                table_name(table_name), condition_list(condition_list) {}
+    };
+
     class drop_table final : public base {
         std::string table_name;
 

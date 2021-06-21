@@ -84,4 +84,20 @@ namespace api {
             print_select_result_seperator(col_max_length);
         }
     }
+
+    void validate_condition(const macro::table &table, const std::vector<condition> &condition) {
+        for (const auto &i : condition) {
+            auto iter = std::find(table.attribute_names.begin(), table.attribute_names.end(), i.attribute_name);
+            if (iter == table.attribute_names.end()) {
+                throw sql_exception(204, "api", "attribute \'" + i.attribute_name + "\' not found");
+            }
+            if (table.attribute_type.at(iter - table.attribute_names.begin()).type != i.value.sql_type.type) {
+                throw sql_exception(203, "api",
+                                    "attribute \'" + i.attribute_name + "\' type error: except type_enum "
+                                    + std::to_string(static_cast<int>(table.attribute_type.at(iter - table.attribute_names.begin()).type))
+                                    + " , got type_enum "
+                                    + std::to_string(static_cast<int>(i.value.sql_type.type)));
+            }
+        }
+    }
 }

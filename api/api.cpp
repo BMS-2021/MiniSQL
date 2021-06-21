@@ -29,7 +29,7 @@ namespace api {
         rec_mgt.creatTable(this->table_name);
         cat_mgt.CreateTable(this->table_name, this->schema_list, "" /*TODO*/);
 
-        std::cout << "Query OK, 0 row affected" << std::endl;
+        std::cout << "query OK, 0 row affected" << std::endl;
     }
 
     void insert_table::exec() {
@@ -57,7 +57,7 @@ namespace api {
         // TODO: update index
 
         table.record_cnt++;
-        std::cout << "Query OK, 1 row affected" << std::endl;
+        std::cout << "query OK, 1 row affected" << std::endl;
     }
 
     void select_table::exec() {
@@ -65,19 +65,7 @@ namespace api {
 
         auto table = cat_mgt.GetTable(this->table_name);
 
-        for (const auto &i : this->condition_list) {
-            auto iter = std::find(table.attribute_names.begin(), table.attribute_names.end(), i.attribute_name);
-            if (iter == table.attribute_names.end()) {
-                throw sql_exception(204, "api", "attribute \'" + i.attribute_name + "\' not found");
-            }
-            if (table.attribute_type.at(iter - table.attribute_names.begin()).type != i.value.sql_type.type) {
-                throw sql_exception(203, "api",
-                                    "attribute \'" + i.attribute_name + "\' type error: except type_enum "
-                                    + std::to_string(static_cast<int>(table.attribute_type.at(iter - table.attribute_names.begin()).type))
-                                    + " , got type_enum "
-                                    + std::to_string(static_cast<int>(i.value.sql_type.type)));
-            }
-        }
+        validate_condition(table, this->condition_list);
 
         // TODO: routine for index
 
@@ -90,6 +78,20 @@ namespace api {
             std::cout << std::to_string(res.row.size()) << " row(s) in set"<< std::endl;
         }
 
+    }
+
+    void delete_table::exec() {
+        throw_on_table_not_exist(this->table_name);
+        auto table = cat_mgt.GetTable(this->table_name);
+
+        validate_condition(table, this->condition_list);
+
+        auto ok = rec_mgt.deleteRecord(table, this->condition_list);
+        if (!ok) {
+            throw sql_exception(205, "api", "delete failed");
+        }
+
+        std::cout << "query OK, " << "TODO" /*TODO*/ << " row(s) in set"<< std::endl;
     }
 
     void drop_table::exec() {
