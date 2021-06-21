@@ -23,9 +23,9 @@ bool RecordManager::dropTable(const string &tableName) {
 int RecordManager::insertRecord(const macro::table &table, const sql_tuple &record) {
     string tableFileStr = macro::tableFile(table.name);
     int blockID = buf_mgt.getBlockCnt(tableFileStr) - 1;
-    Block &block = buf_mgt.getBlock(tableFileStr, blockID);
+    Block *block = &buf_mgt.getBlock(tableFileStr, blockID);
 
-    char *content = block.blockContent;
+    char *content = block->blockContent;
 
     int recordLen = table.record_len + 1;
     int recordsPreBlock = macro::BlockSize / recordLen;
@@ -44,8 +44,8 @@ int RecordManager::insertRecord(const macro::table &table, const sql_tuple &reco
     if (!isValid) {
         recordOffset = 0;
         buf_mgt.unlock(tableFileStr, blockID);
-        block = buf_mgt.getBlock(tableFileStr, ++blockID);
-        content = block.blockContent;
+        block = &buf_mgt.getBlock(tableFileStr, ++blockID);
+        content = block->blockContent;
     }
 
     content[0] = 1;
@@ -77,7 +77,7 @@ int RecordManager::insertRecord(const macro::table &table, const sql_tuple &reco
     }
 
     buf_mgt.setDirty(tableFileStr, blockID);
-
+    cerr << blockID << endl;
     return blockID * recordsPreBlock + recordOffset;
 }
 

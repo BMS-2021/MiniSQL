@@ -38,6 +38,7 @@ Block &BufferManager::writeBlock(Block &block) {
     fp.seekg(block.blockID * macro::BlockSize, ios::beg);
     fp.write(block.blockContent, macro::BlockSize);
     fp.close();
+    memset(block.blockContent, 0, macro::BlockSize);
     return block;
 }
 
@@ -58,16 +59,18 @@ void BufferManager::replace(File &file, Block &block) {
     }
 }
 
-Block &BufferManager::getFreeBlock() {
+Block &BufferManager::getFreeBlock(File &file) {
     if(!blockHandle) {
         if(blockCnt < macro::MaxBlocks) {
             blockCnt++;
             Block* blockPtr = new Block;
+            resetBlock(*blockPtr);
+            replace(file, *blockPtr);
             return *blockPtr;
         }
         Block &b = getLRUBlock();
         if(b.dirty) {
-            resetBlock(writeBlock(b));
+            writeBlock(b);
             return b;
         }
     }
@@ -146,10 +149,10 @@ Block &BufferManager::readBlock(const string& filename, int blockID) {
     if (!fp.good())
         cerr << "Fail to open file: " << filename << "." << endl;
 
-    Block &block = getFreeBlock();
     File &file = getFile(filename);
-    replace(file, block);
+    Block &block = getFreeBlock(file);
     block.blockID = blockID;
+
     int tail = file.blockCnt - 1;
     if(tail < blockID) {
         file.blockCnt = blockID + 1;
@@ -168,8 +171,9 @@ Block &BufferManager::getBlock(const string& filename, int blockID) {
         curBlock = curBlock->next;
     }
     if(!curBlock) { //block not found
-        return readBlock(filename, blockID);
+        curBlock = &readBlock(filename, blockID);
     }
+    lock(*curBlock);
     return *curBlock;
 }
 
@@ -199,9 +203,8 @@ void BufferManager::unlock(const string& filename, unsigned int blockID) {
     block.lock = false;
 }
 
-void BufferManager::lock(const string& filename, unsigned int blockID) {
+void BufferManager::lock(Block &block) {
     LRUNum++;
-    Block &block = findBlock(filename, blockID);
     block.lock = true;
     block.LRUCount = LRUNum;
 }

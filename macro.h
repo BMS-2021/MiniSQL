@@ -189,8 +189,8 @@ struct sql_tuple {
 
 namespace macro {
 
-    const int BlockSize = 4096;
-    const int MaxBlocks = 128;
+    const int BlockSize = 128;
+    const int MaxBlocks = 4;
     const int MaxFiles = 6;
 
     inline std::string tableFile(const std::string &tableName) { return tableName + ".tb"; }

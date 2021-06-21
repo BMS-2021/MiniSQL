@@ -95,9 +95,9 @@ private:
 
     static void replace(File &file, Block &block);
 
-    void lock(const string& filename, unsigned int blockID);
+    void lock(Block &block);
 
-    Block &getFreeBlock();
+    Block &getFreeBlock(File &file);
 
     Block &getLRUBlock();
 
