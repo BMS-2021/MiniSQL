@@ -118,13 +118,12 @@ result RecordManager::selectRecord(const macro::table &table, const vector<strin
         Block &block = buf_mgt.getBlock(macro::tableFile(table.name), blockID);
         char *content = block.blockContent;
         for (int i = 0; i < recordCnt; i++) {
-            if (content[0] == 0) { continue; }
-            tup = genTuple(content, recordLen, table.attribute_type);
+            if (content[i * recordLen] == 0) { continue; }
+            tup = genTuple(content, i * recordLen, table.attribute_type);
             if (condsTest(cond, tup, table.attribute_names)) {
                 row = tup.fetchRow(table.attribute_names, table.attribute_names); //FIXME!!
                 res.row.push_back(row);
             }
-            content += recordLen;
         }
         buf_mgt.unlock(macro::tableFile(table.name), blockID);
     }
