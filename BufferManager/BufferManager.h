@@ -20,6 +20,7 @@ struct File {
 
     string filename; //the name of the file
     int blockCnt;
+    int totBlockCnt;
     File *next; //the pointer points to the next file
     Block *firstBlock;
 

@@ -13,16 +13,20 @@ using namespace std;
 File::File(const string& _filename) {
     type = 0;
     filename = _filename;
+    blockCnt = 0;
+
     struct stat st;
     if (stat(filename.c_str(), &st) == 0) {
-        blockCnt = (st.st_size / macro::BlockSize);
+        totBlockCnt = (st.st_size / macro::BlockSize);
     } else {
-        blockCnt = 0;
+        totBlockCnt = 0;
     }
-    if(blockCnt <= 0) blockCnt = 1;
+    if(totBlockCnt <= 0) totBlockCnt = 1;
+
     next = nullptr;
     firstBlock = nullptr;
 }
+
 
 BufferManager::BufferManager() {
     LRUNum = 0;
@@ -70,8 +74,8 @@ Block &BufferManager::getFreeBlock(File &file) {
         Block &b = getLRUBlock(file);
         if(b.dirty) {
             writeBlock(b);
-            return b;
         }
+        return b;
     }
 
     Block &b = *blockHandle;
@@ -102,6 +106,7 @@ void BufferManager::closeFile(File *file) {
         if(curBlock->dirty) writeBlock(*curBlock);
         curBlock = nextBlock;
     }
+
     Block *bh = blockHandle;
     if(!bh) blockHandle = file->firstBlock;
     else {
@@ -148,9 +153,9 @@ Block &BufferManager::readBlock(const string& filename, int blockID) {
     Block &block = getFreeBlock(file);
     block.blockID = blockID;
 
-    int tail = file.blockCnt - 1;
-    if(tail < blockID) {
-        file.blockCnt = blockID + 1;
+    if(file.totBlockCnt <= blockID) {
+        file.totBlockCnt = blockID + 1;
+        memset(block.blockContent, 0, macro::BlockSize);
     } else {
         fp.seekg(blockID * macro::BlockSize, ios::beg);
         fp.read(block.blockContent, macro::BlockSize);
@@ -220,6 +225,6 @@ void BufferManager::removeFile(const string& filename) {
 }
 
 int BufferManager::getBlockCnt(const string& filename) {
-    return getFile(filename).blockCnt;
+    return getFile(filename).totBlockCnt;
     return 0;
 }
