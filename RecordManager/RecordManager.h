@@ -14,7 +14,6 @@ using namespace std;
 class RecordManager {
 public:
     RecordManager() = default;
-    RecordManager (BufferManager *bm): bm(bm) {}
     ~RecordManager() = default;
 
     bool creatTable(const string &tableName);
@@ -29,13 +28,12 @@ public:
 
     bool deleteRecord(const macro::table &table, const vector<condition> &conditions);
 
-    int selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond);
+    [[nodiscard]]
+    result selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond);
 
     static void printResult(const result &res) ;
 
 private:
-
-    BufferManager *bm;
 
     static sql_tuple genTuple(const char *blockBuffer, int offset, const std::vector<sql_value_type> &attrType);
 

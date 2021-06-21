@@ -10,8 +10,6 @@
 #include <vector>
 #include <iostream>
 
-#include "../macro.h"
-
 namespace api {
     struct base {
         /*
@@ -21,7 +19,7 @@ namespace api {
          */
         virtual ~base() = default;
 
-        virtual void exec() = 0;
+        virtual void exec() {};
     };
 
     class create_table final : public base {
@@ -52,13 +50,22 @@ namespace api {
                 index_name(index_name), table_name(table_name), attribute_name(attribute_name) {}
     };
 
+    class delete_table final : public base {
+        std::string table_name;
+        std::vector<condition> condition_list;
+
+        void exec() override;
+
+    public:
+        explicit delete_table(std::string& table_name,
+                              std::vector<condition>& condition_list) :
+                table_name(table_name), condition_list(condition_list) {}
+    };
+
     class drop_table final : public base {
         std::string table_name;
 
-        inline void exec() override {
-            std::cout << "Table to drop: " << table_name << std::endl;
-            std::cout << "Interpreter Yes!!!" << std::endl;
-        }
+        void exec() override;
 
     public:
         explicit drop_table(std::string &table_name) : table_name(table_name) {}
@@ -67,7 +74,7 @@ namespace api {
     class drop_index final : public base {
         std::string index_name;
 
-        inline void exec() override {
+        void exec() override {
             std::cout << "Interpreter Yes!!!" << std::endl;
         }
 
@@ -106,7 +113,7 @@ namespace api {
     class use_database final : public base {
         std::string database_name;
 
-        inline void exec() override {
+        void exec() override {
 
         }
 
@@ -114,11 +121,16 @@ namespace api {
         explicit use_database(std::string &database_name) : database_name(database_name) {}
     };
 
+    class execfile final : public base {
+        std::string filename;
+        void exec() override;
+
+    public:
+        explicit execfile(std::string &filename) : filename(filename) {}
+    };
+
     class exit final : public base {
-        inline void exec() override {
-            std::cout << "Bye!" << std::endl;
-            std::exit(0);
-        }
+        void exec() override;
     };
 }
 

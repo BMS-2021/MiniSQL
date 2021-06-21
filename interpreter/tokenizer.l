@@ -12,7 +12,7 @@
 [ \t\r\n]		;
 
 "*"         return S_STAR;
-"'"         return S_APOSTROPGE;
+"'"         return S_APOSTROPHE;
 ";"         return S_SEMICOLON;
 "("         return S_L_BRACKETS;
 ")"         return S_R_BRACKETS;

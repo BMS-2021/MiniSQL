@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include "../macro.h"
 
 using namespace std;
 
@@ -17,11 +18,24 @@ struct File {
     int type; //0:db file 1:table file 2: index file
 
     string filename; //the name of the file
+    int fileBlockCnt;
     int recordAmount; //the number of record in the file
     int freeNum; //the free block number which could be used for the file
     int recordLength; //the length of the record in the file
     File *next; //the pointer points to the next file
     Block *firstBlock;
+
+    File() {
+        type = 0;
+        filename = "";
+        fileBlockCnt = 0;
+        recordAmount = 0;
+        freeNum = 0;
+        recordLength = 0;
+        next = nullptr;
+        firstBlock = nullptr;
+    }
+
 };
 
 struct Block {
@@ -33,6 +47,32 @@ struct Block {
     int LRUCount;
     int lock; //prevent the block from replacing
     char *blockContent;
+
+    Block() {
+        blockID = 0;
+        dirty = 0;
+        next = nullptr;
+        file = nullptr;
+        usedSize = 0;
+        LRUCount = 0;
+        lock = 0;
+        blockContent = static_cast<char *>(calloc(1, macro::BlockSize));
+
+    }
+
+    Block(bool isNull) {
+        blockID = 0;
+        dirty = 0;
+        next = nullptr;
+        file = nullptr;
+        usedSize = 0;
+        LRUCount = 0;
+        lock = 0;
+        if(isNull) blockContent = nullptr;
+    }
+    ~Block() {
+        if(blockContent) free(blockContent);
+    }
 };
 
 class BufferManager {
@@ -55,6 +95,8 @@ public:
 
     static int getBlockTail(const string& filename);
 
+    Block nullBlock = Block(true);
+    File *fileHandle;
 private:
     void closeFile(File *file);
 
@@ -78,7 +120,8 @@ private:
 
     int LRUNum;
     int fileCnt;
-    File *fileHandle;
+    int blockCnt;
+
     Block *blockHandle;
 };
 

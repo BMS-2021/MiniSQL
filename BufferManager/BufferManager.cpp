@@ -11,6 +11,9 @@
 using namespace std;
 
 BufferManager::BufferManager() {
+    LRUNum = 0;
+    fileCnt = 0;
+    blockCnt = 0;
     fileHandle = nullptr;
     blockHandle = nullptr;
 }
@@ -34,12 +37,19 @@ void BufferManager::replace(File &file, Block &block) {
     block.file = &file;
     Block* curBlock = file.firstBlock;
     if(!curBlock) file.firstBlock = &block;
-    while(curBlock->next) curBlock = curBlock->next;
-    curBlock->next = &block;
+    else {
+        block.next = file.firstBlock;
+        file.firstBlock = &block;
+    }
 }
 
 Block &BufferManager::getFreeBlock() {
     if(!blockHandle) {
+        if(blockCnt < macro::MaxBlocks) {
+            blockCnt++;
+            Block* blockPtr = new Block;
+            return *blockPtr;
+        }
         Block &b = getLRUBlock();
         if(b.dirty) {
             resetBlock(writeBlock(b));
@@ -67,7 +77,6 @@ Block &BufferManager::getLRUBlock(){
         }
         curFile = curFile->next;
     }
-    if (detect == nullptr) { cerr << "No LRU block found!"; }
     return *detect;
 }
 
@@ -111,6 +120,7 @@ File &BufferManager::getFile(const string& filename) {
         newFile->next = fileHandle;
         fileCnt++;
         fileHandle = newFile;
+        curFile = newFile;
     }
     return *curFile;
 }
@@ -122,6 +132,9 @@ Block &BufferManager::readBlock(const string& filename, int blockID) {
         cerr << "Fail to open file: " << filename << "." << endl;
 
     Block &block = getFreeBlock();
+    int tail = getBlockTail(filename);
+    if(tail < blockID) return nullBlock;
+
     fp.seekg(blockID * macro::BlockSize, ios::beg);
     fp.read(block.blockContent, macro::BlockSize);
     File &file = getFile(filename);

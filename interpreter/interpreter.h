@@ -61,6 +61,7 @@ public:
     }
 
     const char* read();
+    const char* read(std::istream&);
 };
 
 #endif //MINISQL_INTERPRETER_H

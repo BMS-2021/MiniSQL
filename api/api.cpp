@@ -1,4 +1,5 @@
 #include "api.h"
+#include "utils.h"
 
 #include "../RecordManager/RecordManager.h"
 #include "../CatalogManager/CatalogManager.h"
@@ -6,27 +7,18 @@
 
 extern RecordManager rec_mgt;
 extern CatalogManager cat_mgt;
+extern BufferManager buf_mgt;
+extern std::string file_to_exec;
 
 namespace api {
-    static void throw_on_table_exist(std::string &table_name) {
-        if (cat_mgt.TableExist(table_name)) {
-            throw sql_exception(100, "api", "table \"" + table_name + "\" exists");
-        }
-    }
-    static void throw_on_table_not_exist(std::string &table_name) {
-        if (!cat_mgt.TableExist(table_name)) {
-            throw sql_exception(101, "api", "table \"" + table_name + "\" not exist");
-        }
-    }
-
     void create_table::exec() {
         throw_on_table_exist(this->table_name);
 
         // const auto attr_num = this->schema_list.size();
         for (const auto &i : this->schema_list) {
             if (i.type.type == value_type::CHAR && i.type.length == 0) {
-                throw sql_exception(102, "api",
-                                    "char \"" + i.name + "\" needs to have a length between 1 and 255");
+                throw sql_exception(202, "api",
+                                    "char \'" + i.name + "\' needs to have a length between 1 and 255");
             }
         }
 
@@ -36,6 +28,8 @@ namespace api {
 
         rec_mgt.creatTable(this->table_name);
         cat_mgt.CreateTable(this->table_name, this->schema_list, "" /*TODO*/);
+
+        std::cout << "query OK, 0 row affected" << std::endl;
     }
 
     void insert_table::exec() {
@@ -63,7 +57,7 @@ namespace api {
         // TODO: update index
 
         table.record_cnt++;
-        std::cout << "insertion finished, 1 row affected";
+        std::cout << "query OK, 1 row affected" << std::endl;
     }
 
     void select_table::exec() {
@@ -71,10 +65,56 @@ namespace api {
 
         auto table = cat_mgt.GetTable(this->table_name);
 
-        for (const auto &i : this->condition_list) {
-            // auto j = std::find(table.attribute_names.begin(), table.attribute_names.end(), ta)
+        validate_condition(table, this->condition_list);
+
+        // TODO: routine for index
+
+        auto res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
+        print_select_result(table, res);
+
+        if (res.row.empty()) {
+            std::cout << "Empty set" << std::endl;
+        } else {
+            std::cout << std::to_string(res.row.size()) << " row(s) in set"<< std::endl;
         }
 
+    }
+
+    void delete_table::exec() {
+        throw_on_table_not_exist(this->table_name);
+        auto table = cat_mgt.GetTable(this->table_name);
+
+        validate_condition(table, this->condition_list);
+
+        auto ok = rec_mgt.deleteRecord(table, this->condition_list);
+        if (!ok) {
+            throw sql_exception(205, "api", "delete failed");
+        }
+
+        std::cout << "query OK, " << "TODO" /*TODO*/ << " row(s) in set"<< std::endl;
+    }
+
+    void drop_table::exec() {
+        throw_on_table_not_exist(this->table_name);
+        auto table = cat_mgt.GetTable(this->table_name);
+
+        // TODO: drop all indexes in this table
+
+        // cat_mgt.RemoveTable(table); FIXME: implement this
+        cat_mgt.Flush();
+
+        rec_mgt.dropTable(this->table_name);
+    }
+
+    void execfile::exec() {
+        file_to_exec = this->filename;
+        std::cout << "context switched to file \'" << filename << "\'" << std::endl;
+    }
+
+    void exit::exec() {
+        buf_mgt.closeAllFile();
+        std::cout << "Bye!" << std::endl;
+        std::exit(0);
     }
 }
 

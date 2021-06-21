@@ -10,6 +10,7 @@ class sql_exception : public std::exception {
     std::string detail;
 
 public:
+    sql_exception() = default;
     sql_exception(unsigned int code, std::string& module_name, std::string& detail) :
             code(code), module_name(module_name), detail(detail) {}
 

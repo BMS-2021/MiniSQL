@@ -6,7 +6,9 @@
 
 #include "interpreter.h"
 #include "../api/api.h"
+#include "../utils/exception.h"
 
+extern std::unique_ptr<sql_exception> parse_exception;
 extern std::unique_ptr<api::base> query_object_ptr;
 
 bool bFlag; /* no meanings. */
@@ -15,7 +17,8 @@ extern int yylineno;
 extern char *yytext;
 inline int yyerror(const char *s)
 {
-    std::cerr << s << " on token " << yytext << std::endl;
+    // std::cerr << s << " on token " << yytext << std::endl;
+    parse_exception = std::make_unique<sql_exception>(100, "interpreter", std::string(s) + " near \'" + std::string(yytext) + "\' at line " + std::to_string(yylineno));
     yywrap();
     return 1;
 }
@@ -25,10 +28,10 @@ inline int yyerror(const char *s)
 %token
 K_DATABASE K_TABLE K_INDEX K_VALUES
 K_FROM K_WHERE K_ON K_INTO K_AND
-K_CREATE K_SELECT K_INSERT K_DROP
-K_USE K_EXIT K_PRIMARY K_KEY K_UNIQUE
+K_CREATE K_SELECT K_INSERT K_DELETE K_DROP
+K_USE K_EXIT K_PRIMARY K_KEY K_UNIQUE K_EXECFILE
 T_INT T_FLOAT T_CHAR
-S_APOSTROPGE S_SEMICOLON S_L_BRACKETS S_R_BRACKETS S_COMMA S_STAR
+S_APOSTROPHE S_SEMICOLON S_L_BRACKETS S_R_BRACKETS S_COMMA S_STAR
 S_EQUAL S_NOT_EQUAL S_GREATER S_GREATER_EQUAL S_LESS S_LESS_EQUAL
 
 %token <str> V_STRING
@@ -57,6 +60,8 @@ C_TOP_STMT: C_DDL
     | C_DML
     | I_EXIT
     | I_USE_DATABASE
+    | I_EXECFILE
+    | I_VACANT
     ;
 
 C_DDL: I_CREATE_TABLE
@@ -67,34 +72,35 @@ C_DDL: I_CREATE_TABLE
 
 C_DML: I_INSERT_TABLE
     | I_SELECT_TABLE
+    | I_DELETE_TABLE
     ;
 
 I_EXIT: K_EXIT
     {
         query_object_ptr = std::make_unique<api::exit>();
-        // query_object_ptr = operation;
     }
     ;
 
 I_USE_DATABASE: K_USE K_DATABASE V_STRING
     {
         query_object_ptr = std::make_unique<api::use_database>($3);
-        // query_object_ptr = operation;
     }
     ;
 
 I_CREATE_TABLE: K_CREATE K_TABLE V_STRING S_L_BRACKETS E_SCHEMA_LIST E_PRIMARY_KEY S_R_BRACKETS
     {
         query_object_ptr = std::make_unique<api::create_table>($3, $5, $6);
-        // query_object_ptr = operation;
     }
     ;
 
+I_DELETE_TABLE: K_DELETE K_FROM V_STRING E_WHERE
+    {
+        query_object_ptr = std::make_unique<api::delete_table>($3, $4);
+    }
 
 I_DROP_TABLE: K_DROP K_TABLE V_STRING
     {
         query_object_ptr = std::make_unique<api::drop_table>($3);
-        // query_object_ptr = operation;
     }
     ;
 
@@ -121,6 +127,17 @@ I_SELECT_TABLE: K_SELECT E_ATTRIBUTE_LIST K_FROM V_STRING E_WHERE
         query_object_ptr = std::make_unique<api::select_table>($2, $4, $5);
     }
     ;
+
+I_EXECFILE: K_EXECFILE S_APOSTROPHE V_STRING S_APOSTROPHE
+    {
+        query_object_ptr = std::make_unique<api::execfile>($3);
+    }
+    ;
+
+I_VACANT: E_VACANT
+    {
+        query_object_ptr = std::make_unique<api::base>();
+    }
 
 /******************************************************************************/
 
@@ -241,17 +258,18 @@ E_OPERATOR:
     | S_LESS_EQUAL {$$ = attribute_operator::LESS_EQUAL;}
 
 
-V_INSERT: S_APOSTROPGE V_STRING S_APOSTROPGE
+V_INSERT: S_APOSTROPHE V_STRING S_APOSTROPHE
     {
         $$ = $2;
     }
     | V_STRING
     {
-        try {
-            $$ = sql_value(std::stoi($1));
-        } catch (std::exception) {
+        if ($1.find('.') != std::string::npos) {
+            $$ = sql_value(std::stof($1));
+        }
+        else {
             try {
-                $$ = sql_value(std::stof($1));
+                $$ = sql_value(std::stoi($1));
             } catch (std::exception) {
                 $$ = sql_value($1);
             }
