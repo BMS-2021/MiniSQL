@@ -8,11 +8,13 @@ set(INTERPRETER
         interpreter/interpreter.cpp
         interpreter/utils.cpp
         interpreter/utils.h
-        api/utils.cpp api/utils.h)
+        interpreter/readline.c)
 
 set(API
         api/api.h
         api/api.cpp
+        api/utils.cpp
+        api/utils.h
 )
 
 set(EXCEPTION

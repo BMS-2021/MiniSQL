@@ -1,5 +1,6 @@
 #ifdef READLINE_FOUND
 #include <readline/readline.h>
+extern "C" char **keyword_completion(const char *, int, int);
 #endif
 
 #include <iomanip>
@@ -100,19 +101,15 @@ void interpret_entrance() {
 }
 
 const char* interpreter::read() {
-    while (true) {
 #ifdef READLINE_FOUND
-        char *src = readline(this->start_text());
-        if (!first_loop) {
-            strcat_s(this->str, "\n", SQL_QUERY_LENGTH);
-        }
-        strcat_s(this->str, src, SQL_QUERY_LENGTH);
-        if (std::strlen(src) >= 1 && src[std::strlen(src) - 1] == ';') {
-            std::free(src);
-            break;
-        }
-        std::free(src);
+    rl_attempted_completion_function = keyword_completion;
+    if (this->str != nullptr) {
+        std::free(this->str);
+        this->str = nullptr;
+    }
+    this->str = readline(this->start_text());
 #else
+    while (true) {
         std::string src;
         std::cout << this->start_text();
         std::getline(std::cin, src);
@@ -126,9 +123,9 @@ const char* interpreter::read() {
         if (src.length() >= 1 && *src.rbegin() == ';') {
             break;
         }
-#endif
         first_loop = false;
     }
+#endif
     return this->str;
 }
 
