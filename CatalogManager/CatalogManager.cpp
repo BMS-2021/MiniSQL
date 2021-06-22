@@ -8,7 +8,8 @@
 #include "../IndexManager/IndexManager.h"
 
 using namespace std;
-IndexManager IdxMgr;
+
+extern IndexManager idx_mgt;
 
 
 void CatalogManager::CreateTable(const std::string &table_name,
@@ -35,8 +36,8 @@ void CatalogManager::CreateTable(const std::string &table_name,
         }
         if (schema.type.primary){
             std::string default_index = "default_index";
-            tab.index.push_back(std::make_pair(primary_key_name, default_index));
-            IdxMgr.create(default_index, schema.type.type);
+            tab.index.emplace_back(primary_key_name, default_index);
+            // idx_mgt.create(default_index, schema.type.type);  FIXME
         }
 
         tab.attribute_type.push_back(elem_type);
