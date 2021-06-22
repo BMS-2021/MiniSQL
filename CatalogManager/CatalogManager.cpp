@@ -4,6 +4,7 @@
 #include <list>
 #include <fstream>
 #include <algorithm>
+#include <cstdio>
 
 
 using namespace std;
@@ -62,6 +63,7 @@ CatalogManager::~CatalogManager()
 void CatalogManager::Flush()
 {
     std::ofstream ofs(tables_info);
+
     ofs << tables.size() << std::endl;
 
     for (auto &tb: tables){
@@ -196,13 +198,21 @@ bool CatalogManager::DropTableByName(const std::string &table_name)
             table_to_drop = table;
         }
     }
+    std::string tab_file;
+    tab_file = table_name + ".catalog";
+    std::ifstream ifs(tab_file, ios::in);
+    if(ifs.is_open()){
+        remove(const_cast<char *>(tab_file.c_str()));
+    }
+
+
     if(table_to_drop != tables.end()){
         tables.erase(table_to_drop);
         return true;
     }
     return false;
 }
-//create table ddd(a int);
+
 macro::table &CatalogManager::GetTableWithIndex(const std::string &index_name)
 {
     for (auto & table : tables){
