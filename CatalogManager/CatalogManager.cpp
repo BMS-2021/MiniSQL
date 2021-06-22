@@ -197,12 +197,12 @@ bool CatalogManager::DropTableByName(const std::string &table_name)
         }
     }
     if(table_to_drop != tables.end()){
+        tables.erase(table_to_drop);
         return true;
     }
-    tables.erase(table_to_drop);
-    return true;
+    return false;
 }
-
+//create table ddd(a int);
 macro::table &CatalogManager::GetTableWithIndex(const std::string &index_name)
 {
     for (auto & table : tables){
