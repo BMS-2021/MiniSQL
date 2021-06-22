@@ -51,7 +51,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
 CatalogManager::CatalogManager()
         :tables(std::vector<macro::table>())
 {
-    LoadFromFile();
+
 }
 
 CatalogManager::~CatalogManager()
@@ -83,7 +83,7 @@ void CatalogManager::Flush()
                     break;
                 case value_type::CHAR:
                     tab_ofs << "char" << std::endl;
-                    tab_ofs << attr.length << std::endl;
+                    tab_ofs << std::to_string(attr.length) << std::endl;
                     break;
             }
             tab_ofs << ((attr.primary) ? 1 : 0) << std::endl;

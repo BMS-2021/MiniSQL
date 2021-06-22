@@ -90,7 +90,6 @@ namespace api {
         if (delete_row_count == -1) {
             throw sql_exception(205, "api", "delete failed");
         }
-
         std::cout << "query OK, " << delete_row_count << " row(s) affected";
     }
 
@@ -99,8 +98,8 @@ namespace api {
         auto table = cat_mgt.GetTable(this->table_name);
 
         // TODO: drop all indexes in this table
+        cat_mgt.DropTableByName(this->table_name);
 
-        // cat_mgt.RemoveTable(table); FIXME: implement this
         cat_mgt.Flush();
 
         rec_mgt.dropTable(this->table_name);
