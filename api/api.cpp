@@ -40,7 +40,7 @@ namespace api {
                 throw sql_exception(206, "api", "invalid primary key \'" + primary_key + "\'");
             }
 
-            idx_mgt.create(this->table_name + ".pk", pk_type);
+//            idx_mgt.create(this->table_name + ".pk", pk_type);
         }
 
         rec_mgt.creatTable(this->table_name);

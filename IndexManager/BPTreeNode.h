@@ -3,6 +3,8 @@
 #include "../macro.h"
 #include "BPInclude.h"
 
+sql_value find_idx_val(ELEMENTTYPE rec_id, uint32_t idx_pos);
+
 class BPTreeNode
 {
 public:
@@ -12,18 +14,7 @@ public:
 
 	// for leaf node: insert pos
 	// for non-leaf node: which child is in
-	uint32_t binary_search(const vector<sql_value>& tab, const sql_value& target) const;
+    uint32_t binary_search(uint32_t idx_pos, const sql_value& target) const;
 };
 
 
-inline uint32_t BPTreeNode::binary_search(const vector<sql_value>& tab, const sql_value& target) const
-{
-	int l = 0, r = key.size() - 1;
-	while (l <= r) {
-		int mid = (l + r) / 2;
-		if (tab.at(key.at(mid)) <= target)
-			l = mid + 1;
-		else r = mid - 1;
-	}
-	return l;
-}

@@ -45,9 +45,11 @@ set(RECORD_MANAGER
 set(INDEX_MANAGER
         IndexManager/BPInclude.h
         IndexManager/BPTree.h
-        IndexManager/BPTree.h
+        IndexManager/BPTreeNode.h
+        IndexManager/BPTree.cpp
         IndexManager/IndexManager.h
-        IndexManager/IndexManager.cpp)
+        IndexManager/IndexManager.cpp
+        IndexManager/BPTreeNode.cpp)
 
 find_package(BISON)
 find_package(FLEX)
