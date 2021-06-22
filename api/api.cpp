@@ -54,7 +54,7 @@ namespace api {
 
         auto table = cat_mgt.GetTable(this->table_name);
         if (table.attribute_names.size() != this->insert_list.size()) {
-            throw sql_exception(103, "api",
+            throw sql_exception(203, "api",
                                 "insert number mismatch: expect "
                                 + std::to_string(table.attribute_names.size())
                                 + " attributes, got "
@@ -65,7 +65,27 @@ namespace api {
 
         // idx_mgt.insert();
 
-        // TODO: check unique and duplication
+        // check unique and duplication
+        {
+            std::vector<condition> duplication_check_list;
+            for (int i = 0; i < table.attribute_names.size(); i++) {
+                if (table.attribute_type.at(i).unique) {
+                    duplication_check_list.emplace_back(table.attribute_names.at(i),
+                                                               attribute_operator::EQUAL,
+                                                               this->insert_list.at(i));
+                }
+            }
+            for (const auto &i: duplication_check_list) {
+                std::vector<condition> cond;
+                cond.push_back(i);
+                auto res = rec_mgt.selectRecord(table, vector<std::string>(), cond);
+                if(!res.row.empty()) {
+                    throw sql_exception(207, "api",
+                                        "there exists a duplicated value on attribute \'"
+                                        + i.attribute_name +"\'");
+                }
+            }
+        }
 
         sql_tuple tuple;
         tuple.element = this->insert_list;
