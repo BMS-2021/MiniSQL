@@ -93,11 +93,22 @@ namespace api {
             }
             if (table.attribute_type.at(iter - table.attribute_names.begin()).type != i.value.sql_type.type) {
                 throw sql_exception(203, "api",
-                                    "attribute \'" + i.attribute_name + "\' type error: except type_enum "
-                                    + std::to_string(static_cast<int>(table.attribute_type.at(iter - table.attribute_names.begin()).type))
-                                    + " , got type_enum "
-                                    + std::to_string(static_cast<int>(i.value.sql_type.type)));
+                                    "attribute \'" + i.attribute_name + "\' type error: except "
+                                    + return_value_name(table.attribute_type.at(iter - table.attribute_names.begin()).type)
+                                    + " , got "
+                                    + return_value_name(i.value.sql_type.type));
             }
+        }
+    }
+
+    std::string return_value_name(value_type v) {
+        switch (v) {
+            case value_type::CHAR:
+                return "CHAR";
+            case value_type::INT:
+                return "INT";
+            case value_type::FLOAT:
+                return "FLOAT";
         }
     }
 }

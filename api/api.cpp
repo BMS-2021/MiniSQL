@@ -51,19 +51,31 @@ namespace api {
 
     void insert_table::exec() {
         throw_on_table_not_exist(this->table_name);
-
         auto table = cat_mgt.GetTable(this->table_name);
+
+        // validate input amount
         if (table.attribute_names.size() != this->insert_list.size()) {
             throw sql_exception(203, "api",
-                                "insert number mismatch: expect "
+                                "insert attribute amount mismatch: needs "
                                 + std::to_string(table.attribute_names.size())
                                 + " attributes, got "
                                 + std::to_string(this->insert_list.size()));
         }
 
-        // TODO: validate
-
-        // idx_mgt.insert();
+        // validate the input  type
+        {
+            for (int i = 0; i < this->insert_list.size(); i++) {
+                if (table.attribute_type.at(i).type != this->insert_list.at(i).sql_type.type) {
+                    throw sql_exception(208, "api",
+                                        "insert attribute type mismatch: at attribute "
+                                        + std::to_string(i)
+                                        + ", needs "
+                                        + return_value_name(table.attribute_type.at(i).type)
+                                        + ", got "
+                                        + return_value_name(this->insert_list.at(i).sql_type.type));
+                }
+            }
+        }
 
         // check unique and duplication
         {
@@ -91,7 +103,7 @@ namespace api {
         tuple.element = this->insert_list;
         rec_mgt.insertRecord(table, tuple);
 
-        // TODO: update index
+        // TODO idx_mgt.insert();
 
         table.record_cnt++;
         std::cout << "query OK, 1 row affected";
@@ -127,6 +139,9 @@ namespace api {
         if (delete_row_count == -1) {
             throw sql_exception(205, "api", "delete failed");
         }
+
+        // TODO: delete index
+
         std::cout << "query OK, " << delete_row_count << " row(s) affected";
     }
 
@@ -140,6 +155,24 @@ namespace api {
         cat_mgt.Flush();
 
         rec_mgt.dropTable(this->table_name);
+
+        std::cout << "table \'" << this->table_name << "\' has been dropped";
+    }
+
+    void create_index::exec() {
+        throw_on_table_not_exist(this->table_name);
+        auto table = cat_mgt.GetTable(this->table_name);
+
+        // TODO: check if the index is valid
+        cat_mgt.CreateIndex(this->table_name, this->attribute_name, this->index_name);
+
+        // TODO: create an index in index_mgr
+
+        std::cout << "index \'" << this->index_name << "\' created on table \'" << this->table_name << "." << this->attribute_name << "\'";
+    }
+
+    void drop_index::exec() {
+        // TODO: drop a specific index in catalog_mgr and index_mgr
     }
 
     void execfile::exec() {

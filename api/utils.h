@@ -10,6 +10,7 @@ namespace api {
     void print_select_result_seperator(const std::vector<unsigned long> &);
     void print_select_result(const macro::table &, const result &);
     void validate_condition(const macro::table &, const std::vector<condition> &);
+    std::string return_value_name(value_type);
 }
 
 #endif //MINISQL_API_UTILS_H

@@ -38,7 +38,7 @@ namespace api {
         std::string table_name;
         std::string attribute_name;
 
-        void exec() override{};
+        void exec() override;
 
     public:
         create_index(std::string& index_name,
@@ -71,9 +71,7 @@ namespace api {
     class drop_index final : public base {
         std::string index_name;
 
-        void exec() override {
-            std::cout << "Interpreter Yes!!!" << std::endl;
-        }
+        void exec() override;
 
     public:
         explicit drop_index(std::string &index_name) : index_name(index_name) {}
@@ -111,7 +109,7 @@ namespace api {
         std::string database_name;
 
         void exec() override {
-
+            std::cout << "currently not supported";  // TODO
         }
 
     public:
