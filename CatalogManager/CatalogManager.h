@@ -42,6 +42,10 @@ public:
 
     void LoadFromFile();
 
+    bool CreateIndex(const std::string &table_name, const std::string &attr_name, const std::string &index_name);
+
+    bool DropIndex(const std::string &table_name, const std::string &attr_name);
+
 
 private:
     std::vector<macro::table> tables;

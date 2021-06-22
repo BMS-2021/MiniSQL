@@ -5,9 +5,10 @@
 #include <fstream>
 #include <algorithm>
 #include <cstdio>
-
+#include "../IndexManager/IndexManager.h"
 
 using namespace std;
+IndexManager IdxMgr;
 
 
 void CatalogManager::CreateTable(const std::string &table_name,
@@ -17,7 +18,6 @@ void CatalogManager::CreateTable(const std::string &table_name,
 {
     macro::table tab(table_name, schema_list.size());
     unsigned long long len = 0;
-    char auto_ind = 'A';
 
 
     for (auto &schema: schema_list){
@@ -33,19 +33,19 @@ void CatalogManager::CreateTable(const std::string &table_name,
         if (elem_type.type == value_type::CHAR){
             elem_type.length = schema.type.length;
         }
+        if (schema.type.primary){
+            std::string default_index = "default_index";
+            tab.index.push_back(std::make_pair(primary_key_name, default_index));
+            IdxMgr.create(default_index, schema.type.type);
+        }
+
         tab.attribute_type.push_back(elem_type);
     }
 
     tab.record_len = len;
     tab.record_cnt = 0;
 
-    for (auto &t: tab.attribute_type){
-        if (t.unique && !t.primary){
-            // TODO:Implement real index
-//            tab.index.push_back(std::make_pair(t.attrName, std::string("auto_ind_") + (auto_ind++)));
-//            createIndex(tab, t);
-        }
-    }
+
     tables.push_back(tab);
 }
 
@@ -158,6 +158,9 @@ void CatalogManager::LoadFromFile()
             tb.attribute_type.push_back(type);
 
             //TODO: Implement real index creation in tb.index if ifind==1
+            if (ifind){
+                tb.index.emplace_back(attr_name, index_name);
+            }
 
         }
         tb.attribute_cnt = attr_counts;
@@ -224,4 +227,32 @@ macro::table &CatalogManager::GetTableWithIndex(const std::string &index_name)
 
     }
 }
+
+
+bool CatalogManager::CreateIndex(const std::string &table_name, const std::string &attr_name, const std::string &index_name)
+{
+    if(!TableExist(table_name)){
+        return false;
+    }
+    macro::table &tab = GetTable(table_name);
+    tab.index.emplace_back(attr_name, index_name);
+    return true;
+
+}
+
+bool CatalogManager::DropIndex(const std::string &table_name, const std::string &attr_name)
+{
+    if(!TableExist(table_name)){
+        return false;
+    }
+    macro::table &tab = GetTable(table_name);
+    for (auto iter = tab.index.begin(); iter != tab.index.end(); iter++){
+        if (iter->first == attr_name){
+            tab.index.erase(iter);
+            return true;
+        }
+    }
+
+}
+
 
