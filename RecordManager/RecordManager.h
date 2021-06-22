@@ -16,7 +16,7 @@ public:
     RecordManager() = default;
     ~RecordManager() = default;
 
-    sql_tuple getRecord(uint32_t id);
+    sql_tuple getRecord(uint32_t id) {}  // FIXME: implement this
 
     bool creatTable(const string &tableName);
 
