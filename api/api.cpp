@@ -3,11 +3,13 @@
 
 #include "../RecordManager/RecordManager.h"
 #include "../CatalogManager/CatalogManager.h"
+#include "../IndexManager/IndexManager.h"
 #include "../utils/exception.h"
 
 extern RecordManager rec_mgt;
 extern CatalogManager cat_mgt;
 extern BufferManager buf_mgt;
+extern IndexManager idx_mgt;
 extern std::string file_to_exec;
 
 namespace api {
@@ -22,12 +24,27 @@ namespace api {
             }
         }
 
+        // create index for primary key
         if (!this->primary_key.empty()) {
-            // TODO
+            bool pk_is_valid = false;
+            value_type pk_type;
+            for (const auto &i : this->schema_list) {
+                if (i.name == this->primary_key) {
+                    pk_is_valid = true;
+                    pk_type = i.type.type;
+                    break;
+                }
+            }
+
+            if (!pk_is_valid) {
+                throw sql_exception(206, "api", "invalid primary key \'" + primary_key + "\'");
+            }
+
+            idx_mgt.create(this->table_name + ".pk", pk_type);
         }
 
         rec_mgt.creatTable(this->table_name);
-        cat_mgt.CreateTable(this->table_name, this->schema_list, "" /*TODO*/);
+        cat_mgt.CreateTable(this->table_name, this->schema_list, this->primary_key);
 
         std::cout << "query OK, 0 row affected";
     }
@@ -46,7 +63,7 @@ namespace api {
 
         // TODO: validate
 
-        // TODO: index
+        // idx_mgt.insert();
 
         // TODO: check unique and duplication
 

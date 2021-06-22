@@ -16,6 +16,8 @@ public:
     RecordManager() = default;
     ~RecordManager() = default;
 
+    sql_tuple getRecord(uint32_t id);
+
     bool creatTable(const string &tableName);
 
     bool dropTable(const string &tableName);
