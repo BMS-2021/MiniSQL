@@ -25,6 +25,7 @@ public:
 	~IndexManager();
 
 	void create(const string& treename, const value_type& type);
+	void create(const string& treename, const vector<sql_value>& indexs);
 	void drop(const string& treename, const value_type& type);
 
 	ELEMENTTYPE search(const string& treename, const sql_value& val) const;

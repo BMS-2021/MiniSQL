@@ -39,6 +39,40 @@ void IndexManager::create(const string& treename, const value_type& type)
 	}
 }
 
+void IndexManager::create(const string& treename, const vector<sql_value>& indexs)
+{
+	switch (indexs.at(0).sql_type.type)
+	{
+	case value_type::INT: {
+		auto idxtree = BPTree<int>(TREE_SIZE, TREE_DEGREE);
+		auto vec = vector<int>();
+		auto que = queue<ELEMENTTYPE>();
+		for (auto& x : indexs)
+			idxtree.insert(vec, que, x.sql_int);
+		intmgr.insert(make_pair(treename, make_tuple(idxtree, vec, que)));
+		break;
+	}
+	case value_type::FLOAT: {
+		auto idxtree = BPTree<float>(TREE_SIZE, TREE_DEGREE);
+		auto vec = vector<float>();
+		auto que = queue<ELEMENTTYPE>();
+		for (auto& x : indexs)
+			idxtree.insert(vec, que, x.sql_float);
+		floatmgr.insert(make_pair(treename, make_tuple(idxtree, vec, que)));
+	}
+	case value_type::CHAR: {
+		auto idxtree = BPTree<string>(TREE_SIZE, TREE_DEGREE);
+		auto vec = vector<string>();
+		auto que = queue<ELEMENTTYPE>();
+		for (auto& x : indexs)
+			idxtree.insert(vec, que, x.sql_str);
+		stringmgr.insert(make_pair(treename, make_tuple(idxtree, vec, que)));
+	}
+	default:
+		break;
+	}
+}
+
 void IndexManager::drop(const string& treename, const value_type& type)
 {
 	switch (type)
