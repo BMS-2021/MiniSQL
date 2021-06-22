@@ -9,20 +9,21 @@
 
 using std::string;
 
-template<typename T>
+extern RecordManager rec_mgt;
+
 class BPTree {
 public:
-    void insert(vector<T> &tab, const queue<ELEMENTTYPE> &que, const T &target);
+    void insert(uint32_t idx_pos, ELEMENTTYPE rec_id, const sql_value&target);
 
-    ELEMENTTYPE search(const vector<T> &tab, const T &target) const;
+    ELEMENTTYPE search(uint32_t idx_pos, const sql_value& target) const;
 
-    void remove(vector<T> &tab, queue<ELEMENTTYPE> &que, const T &target);
+    void remove(uint32_t idx_pos, ELEMENTTYPE rec_id, const sql_value&target);
 
     void write_file(string filename, string treename);
 
     ELEMENTTYPE searchHead() const;
 
-    ELEMENTTYPE searchNext(const vector<T> &tab, const T &target) const;
+    ELEMENTTYPE searchNext(const sql_value& target) const;
 
     BPTree() = default;
 
@@ -33,108 +34,21 @@ public:
     BPTree(string treestr, uint32_t max_size, string &treename);
 
 private:
-    BPTreeNode<T> *root;
+    BPTreeNode *root;
     uint32_t degree;
     uint32_t size;
 
-    BPTreeNode<T> *pool;
+    BPTreeNode *pool;
     queue<uint32_t> deleted_id;
 
-    BPTreeNode<T> *new_node();
+    BPTreeNode *new_node();
 
-    void delete_node(BPTreeNode<T> *node);
+	sql_value find_idx_val(ELEMENTTYPE rec_id, uint32_t idx_pos);
+
+	void delete_node(BPTreeNode* node);
 };
 
-template<typename T>
-inline void BPTree<T>::insert(vector<T> &tab,
-                              const queue<ELEMENTTYPE> &que,
-                              const T &target) {
-    /*
-    Case 1: not full -> directly add
-    Case 2: full -> split
-            1) split at middle
-            2) move second half to sibling
-            3) set split point to fa
-            4) arrange pointer
-            5) solve fa recursively
-    */
-    BPTreeNode<T> *cur = root;
-    if (cur == nullptr) {  // no root
-        cur = new_node();
-        cur->fa = nullptr;
-        root = cur;
-    }
-    while (cur->ch.size() > 0 && cur->ch.at(0) != nullptr) {
-        auto i = 0U;
-        for (; i < cur->key.size(); ++i)
-            if (tab.at(cur->key.at(i)) > target)
-                break;
-        cur = cur->ch[i];
-    }  // find until leaf
-    ELEMENTTYPE new_key;
-    if (que.empty()) {
-        new_key = tab.size();
-        tab.push_back(target);
-    } else {
-        new_key = que.front();
-        tab.at(new_key) = target;
-    }
-    T tar = target;  // target value (actually to find, will change when split up)
-    BPTreeNode<T> *child = nullptr;
 
-    while (true) {                              // from botton to top
-        auto tmp = cur->binary_search(tab, tar);  // find pos to insert
-        if (tmp >= cur->key.size()) {
-            cur->key.push_back(new_key);
-            cur->ch.push_back(child);
-        } else {
-            cur->key.insert(cur->key.begin() + tmp, new_key);
-            cur->ch.insert(cur->ch.begin() + tmp + (cur->ch.at(0) != nullptr), child);
-        }
-        if (cur->ch.size() <= degree)  // degree(leaf) | degree-1(non-leaf)
-            break;                       // no need to split
-
-        /* split */
-        int non_leaf = cur->ch.at(0) != nullptr;  // actually use bool as 0/1
-        uint32_t split_pos = (degree + 1) / 2 -
-                             (non_leaf);  // split at deg/2(leaf) | deg/2-1(non-leaf
-        BPTreeNode<T> *sibling = new_node();
-        BPTreeNode<T> *fa;
-
-        // arrange pointer
-        if (cur->fa == nullptr) {
-            fa = new_node();
-            fa->fa = nullptr;
-            fa->ch.push_back(cur);
-            cur->fa = root = fa;
-        } else {
-            fa = cur->fa;
-        }
-        sibling->fa = fa;
-
-        // update value to update
-        new_key = cur->key.at(split_pos);
-        tar = tab.at(new_key);
-        child = sibling;
-
-        // modify value
-        for (auto i = split_pos + non_leaf; i < cur->key.size(); ++i)
-            sibling->key.push_back(cur->key.at(i));
-        for (auto i = split_pos + non_leaf; i < cur->ch.size(); ++i) {
-            sibling->ch.push_back(cur->ch.at(i));
-            if (cur->ch.at(i) != nullptr)
-                cur->ch.at(i)->fa = sibling;
-        }
-        cur->key.erase(cur->key.begin() + split_pos, cur->key.end());
-        cur->ch.erase(cur->ch.begin() + split_pos + non_leaf, cur->ch.end());
-
-        sibling->nxt = cur->nxt;
-        cur->nxt = sibling;
-
-        // recursive
-        cur = fa;
-    }
-}
 
 template<typename T>
 ELEMENTTYPE BPTree<T>::search(const vector<T> &tab, const T &target) const {

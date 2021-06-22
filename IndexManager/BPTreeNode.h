@@ -1,22 +1,22 @@
 #pragma once
 
+#include "../macro.h"
 #include "BPInclude.h"
 
-template<typename T>
 class BPTreeNode
 {
 public:
-	BPTreeNode *fa, *nxt;
+	BPTreeNode* fa, * nxt;
 	vector<BPTreeNode*> ch;
 	vector<ELEMENTTYPE> key;
 
 	// for leaf node: insert pos
 	// for non-leaf node: which child is in
-	uint32_t binary_search(const vector<T>& tab, const T& target) const;
+	uint32_t binary_search(const vector<sql_value>& tab, const sql_value& target) const;
 };
 
-template<typename T>
-inline uint32_t BPTreeNode<T>::binary_search(const vector<T>& tab, const T& target) const
+
+inline uint32_t BPTreeNode::binary_search(const vector<sql_value>& tab, const sql_value& target) const
 {
 	int l = 0, r = key.size() - 1;
 	while (l <= r) {
