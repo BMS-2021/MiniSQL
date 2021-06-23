@@ -53,7 +53,7 @@ namespace api {
 
     void insert_table::exec() {
         throw_on_table_not_exist(this->table_name);
-        auto table = cat_mgt.GetTable(this->table_name);
+        auto& table = cat_mgt.GetTable(this->table_name);
 
         // validate input amount
         if (table.attribute_names.size() != this->insert_list.size()) {
@@ -114,7 +114,7 @@ namespace api {
     void select_table::exec() {
         throw_on_table_not_exist(this->table_name);
 
-        auto table = cat_mgt.GetTable(this->table_name);
+        auto& table = cat_mgt.GetTable(this->table_name);
 
         validate_condition(table, this->condition_list);
 
@@ -133,7 +133,7 @@ namespace api {
 
     void delete_table::exec() {
         throw_on_table_not_exist(this->table_name);
-        auto table = cat_mgt.GetTable(this->table_name);
+        auto& table = cat_mgt.GetTable(this->table_name);
 
         validate_condition(table, this->condition_list);
 
@@ -168,7 +168,7 @@ namespace api {
 
     void create_index::exec() {
         throw_on_table_not_exist(this->table_name);
-        auto table = cat_mgt.GetTable(this->table_name);
+        auto& table = cat_mgt.GetTable(this->table_name);
 /*
         if (cat_mgt.IsIndexExist(this->index_name)) {
             auto conflict_table_name = cat_mgt.GetTableWithIndex(this->index_name).name;

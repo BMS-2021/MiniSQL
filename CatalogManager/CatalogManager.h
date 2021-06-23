@@ -52,13 +52,11 @@ public:
 
     bool DropIndex(const std::string &index_name);
 
-    std::string GetAttrByIndex(const std::string &index_name);
-
 
 private:
     std::vector<macro::table> tables;
 
-    std::map<std::string, std::string> indexes; // <index_name, attr_name>
+    std::map<std::string, std::string> indexes; // <index_name, table_name>
 
     const std::string tables_info = "tables.meta";
 

@@ -251,7 +251,7 @@ bool CatalogManager::CreateIndex(const std::string &table_name, const std::strin
     }
     macro::table &tab = GetTable(table_name);
     tab.index.emplace_back(attr_name, index_name);
-    const auto [iter, success] = indexes.insert({index_name, attr_name});
+    const auto [iter, success] = indexes.insert({index_name, table_name});
     if(!success){
         throw sql_exception(601, "catalog manager", "repetition of index name \'" + index_name + "\'");
     }
@@ -261,7 +261,7 @@ bool CatalogManager::CreateIndex(const std::string &table_name, const std::strin
 bool CatalogManager::CreateIndex(macro::table &table, const std::string &attr_name, const std::string &index_name)
 {
     table.index.emplace_back(attr_name, index_name);
-    const auto [iter, success] = indexes.insert({index_name, attr_name});
+    const auto [iter, success] = indexes.insert({index_name, table.name});
     if(!success){
         throw sql_exception(601, "catalog manager", "repetition of index name \'" + index_name + "\'");
     }
@@ -288,10 +288,28 @@ bool CatalogManager::DropIndex(const std::string &table_name, const std::string 
 
 }
 
+// create index asd on foo(bar);
 bool CatalogManager::DropIndex(const std::string &index_name)
 {
-    std::string attr_name = GetAttrByIndex(index_name);
-    auto &tab = GetTableWithIndex(index_name);
+    std::string attr_name;
+    std::string table_name;
+
+    try {
+        table_name = indexes.at(index_name);
+    } catch (const out_of_range &e){
+        throw sql_exception(602, "catalog manager", "index not found");
+    }
+
+    auto &tab = GetTable(table_name);
+    for (const auto &i : tab.index) {
+        if (i.second == index_name) {
+            attr_name = i.first;
+        }
+    }
+    if (attr_name.empty()) {
+        throw sql_exception(602, "catalog manager", "index not found");
+    }
+
     for (auto iter = tab.index.begin(); iter != tab.index.end(); iter++){
         if (iter->first == attr_name){
             tab.index.erase(iter);
@@ -304,16 +322,3 @@ bool CatalogManager::DropIndex(const std::string &index_name)
     }
     return false;
 }
-
-std::string CatalogManager::GetAttrByIndex(const std::string &index_name)
-{
-    std::string attr_name;
-    try {
-        attr_name = indexes.at(index_name);
-    } catch (const out_of_range &e){
-        throw sql_exception(602, "catalog manager", "index not found");
-    }
-    return attr_name;
-}
-
-
