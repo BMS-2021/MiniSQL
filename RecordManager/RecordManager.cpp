@@ -3,6 +3,7 @@
 //
 
 #include"RecordManager.h"
+#include "../utils/exception.h"
 
 using namespace std;
 
@@ -117,7 +118,7 @@ result RecordManager::selectRecord(const macro::table &table, const vector<strin
     row row;
     result res;
     for(int blockID = 0; blockID < blockCnt; blockID++) {
-        Block &block = buf_mgt.getBlock(macro::tableFile(table.name), blockID);
+        Block &block = buf_mgt.getBlock(tableFileStr, blockID);
         char *content = block.blockContent;
         for (int i = 0; i < recordCnt; i++) {
             if (content[i * recordLen] == 0) { continue; }
@@ -129,6 +130,51 @@ result RecordManager::selectRecord(const macro::table &table, const vector<strin
         }
         buf_mgt.unlock(macro::tableFile(table.name), blockID);
     }
+    return res;
+}
+
+sql_tuple RecordManager::getRecord(const macro::table &table, uint32_t id) {
+    string tableFileStr = macro::tableFile(table.name);
+
+    int recordLen = table.record_len + 1;
+    int recordCnt = macro::BlockSize / recordLen;
+    int blockCnt = buf_mgt.getBlockCnt(tableFileStr);
+    int blockId = id / recordCnt;
+    if(blockId + 1 < blockCnt) {
+        throw sql_exception(501, "record manager", "record beyond range");
+    }
+
+    Block &block = buf_mgt.getBlock(tableFileStr, blockId);
+    char *content = block.blockContent;
+    int recordOffset = id - blockId * recordCnt;
+    if(content[recordOffset * recordLen] != 1) {
+        throw sql_exception(502, "record manager", "invalid record");
+    }
+
+    sql_tuple tup = genTuple(content, recordOffset * recordLen, table.attribute_type);
+    return tup;
+}
+
+vector<pair<uint32_t, sql_tuple>> RecordManager::getRecordPairs(const macro::table &table) {
+    string tableFileStr = macro::tableFile(table.name);
+
+    int recordLen = table.record_len + 1;
+    int recordCnt = macro::BlockSize / recordLen;
+    int blockCnt = buf_mgt.getBlockCnt(tableFileStr);
+    vector<pair<uint32_t, sql_tuple>> res;
+    sql_tuple tup;
+
+    for(int blockID = 0; blockID < blockCnt; blockID++) {
+        Block &block = buf_mgt.getBlock(tableFileStr, blockID);
+        char *content = block.blockContent;
+        for (int i = 0; i < recordCnt; i++) {
+            if (content[i * recordLen] == 0) { continue; }
+            tup = genTuple(content, i * recordLen, table.attribute_type);
+            res.emplace_back(blockID * recordLen + i, tup);
+        }
+        buf_mgt.unlock(macro::tableFile(table.name), blockID);
+    }
+
     return res;
 }
 

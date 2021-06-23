@@ -16,7 +16,9 @@ public:
     RecordManager() = default;
     ~RecordManager() = default;
 
-    sql_tuple getRecord(uint32_t id) {}  // FIXME: implement this
+    sql_tuple getRecord(const macro::table &table, uint32_t id);
+
+    vector<pair<uint32_t, sql_tuple>> getRecordPairs(const macro::table &table);
 
     bool creatTable(const string &tableName);
 
