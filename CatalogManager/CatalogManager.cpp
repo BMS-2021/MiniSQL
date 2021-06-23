@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdio>
 #include "../IndexManager/IndexManager.h"
+#include "../utils/utils.h"
 
 using namespace std;
 
@@ -35,7 +36,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
             elem_type.length = schema.type.length;
         }
         if (schema.type.primary){
-            std::string default_index = "default_index";
+            auto default_index = generate_table_pk_name(table_name);
             CreateIndex(tab, primary_key_name, default_index);
 
             // idx_mgt.create(default_index, schema.type.type);  FIXME
@@ -222,14 +223,26 @@ macro::table &CatalogManager::GetTableWithIndex(const std::string &index_name)
 {
     for (auto & table : tables){
         for (auto i = table.index.begin(); i != table.index.end(); ++i){
-            if ((*i).second == index_name){
+            if (i->second == index_name){
                 return table;
             }
         }
-
     }
+    throw sql_exception(600, "catalog manager", "cannot find index \'" + index_name + "\'");
 }
-
+/*
+bool CatalogManager::IsIndexExist(const std::string &index_name)
+{
+    for (auto & table : tables){
+        for (auto & i : table.index){
+            if (i.second == index_name){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+ */
 
 bool CatalogManager::CreateIndex(const std::string &table_name, const std::string &attr_name, const std::string &index_name)
 {
@@ -240,7 +253,7 @@ bool CatalogManager::CreateIndex(const std::string &table_name, const std::strin
     tab.index.emplace_back(attr_name, index_name);
     const auto [iter, success] = indexes.insert({index_name, attr_name});
     if(!success){
-        throw sql_exception(501, "Catalog Manager", "Repetition of index name.");
+        throw sql_exception(601, "catalog manager", "repetition of index name \'" + index_name + "\'");
     }
     return true;
 }
@@ -250,7 +263,7 @@ bool CatalogManager::CreateIndex(macro::table &table, const std::string &attr_na
     table.index.emplace_back(attr_name, index_name);
     const auto [iter, success] = indexes.insert({index_name, attr_name});
     if(!success){
-        throw sql_exception(501, "Catalog Manager", "Repetition of index name.");
+        throw sql_exception(601, "catalog manager", "repetition of index name \'" + index_name + "\'");
     }
     return true;
 }
@@ -298,7 +311,7 @@ std::string CatalogManager::GetAttrByIndex(const std::string &index_name)
     try {
         attr_name = indexes.at(index_name);
     } catch (const out_of_range &e){
-        throw sql_exception(502, "Catalog Manager", "Index not found.");
+        throw sql_exception(602, "catalog manager", "index not found");
     }
     return attr_name;
 }

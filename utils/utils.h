@@ -5,4 +5,6 @@
 
 char* strcat_s(char*, const char*, std::size_t);
 
+std::string generate_table_pk_name(const std::string&);
+
 #endif //MINISQL_UTILS_H

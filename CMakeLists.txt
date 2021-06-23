@@ -53,6 +53,8 @@ set(INDEX_MANAGER
         IndexManager/IndexManager.cpp
         IndexManager/BPTreeNode.cpp)
 
+add_definitions(-DDETACH_INDEX_MANAGER)
+
 find_package(BISON)
 find_package(FLEX)
 #[[

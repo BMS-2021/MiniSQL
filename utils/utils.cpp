@@ -9,4 +9,6 @@ char* strcat_s(char* dest, const char* src, std::size_t max_length) {
     return std::strcat(dest, src);
 }
 
-
+std::string generate_table_pk_name(const std::string& table_name) {
+    return table_name + ".pk";
+}

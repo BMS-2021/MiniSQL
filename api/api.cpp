@@ -5,6 +5,7 @@
 #include "../CatalogManager/CatalogManager.h"
 #include "../IndexManager/IndexManager.h"
 #include "../utils/exception.h"
+#include "../utils//utils.h"
 
 extern RecordManager rec_mgt;
 extern CatalogManager cat_mgt;
@@ -39,8 +40,9 @@ namespace api {
             if (!pk_is_valid) {
                 throw sql_exception(206, "api", "invalid primary key \'" + primary_key + "\'");
             }
-
-//            idx_mgt.create(this->table_name + ".pk", pk_type);
+#ifndef DETACH_INDEX_MANAGER
+            idx_mgt.create(generate_table_pk_name(this->table_name));
+#endif
         }
 
         rec_mgt.creatTable(this->table_name);
@@ -149,9 +151,14 @@ namespace api {
         throw_on_table_not_exist(this->table_name);
         auto table = cat_mgt.GetTable(this->table_name);
 
-        // TODO: drop all indexes in this table
-        cat_mgt.DropTableByName(this->table_name);
+#ifndef DETACH_INDEX_MANAGER
+        // drop every index in the table
+        for (auto & i : table.index) {
+            idx_mgt.drop(i.second);
+        }
+#endif
 
+        cat_mgt.DropTableByName(this->table_name);
         cat_mgt.Flush();
 
         rec_mgt.dropTable(this->table_name);
@@ -162,17 +169,22 @@ namespace api {
     void create_index::exec() {
         throw_on_table_not_exist(this->table_name);
         auto table = cat_mgt.GetTable(this->table_name);
-
-        // TODO: check if the index is valid
-        cat_mgt.CreateIndex(this->table_name, this->attribute_name, this->index_name);
+/*
+        if (cat_mgt.IsIndexExist(this->index_name)) {
+            auto conflict_table_name = cat_mgt.GetTableWithIndex(this->index_name).name;
+            throw sql_exception(209, "api", "duplication on index \'" + this->index_name + "\' of table \'" + conflict_table_name + "\'");
+        }
+        */
+        cat_mgt.CreateIndex(table, this->attribute_name, this->index_name);
 
         // TODO: create an index in index_mgr
 
-        std::cout << "index \'" << this->index_name << "\' created on table \'" << this->table_name << "." << this->attribute_name << "\'";
+        std::cout << "index \'" << this->index_name << "\' created on \'" << this->table_name << "." << this->attribute_name << "\'";
     }
 
     void drop_index::exec() {
-        // TODO: drop a specific index in catalog_mgr and index_mgr
+        cat_mgt.DropIndex(this->index_name);
+        std::cout << "index \'" << this->index_name << "\' dropped";
     }
 
     void execfile::exec() {

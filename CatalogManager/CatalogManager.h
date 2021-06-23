@@ -27,6 +27,8 @@ public:
 
     macro::table &GetTableWithIndex(const std::string &index_name);
 
+    // bool IsIndexExist(const std::string &index_name);
+
     bool DropTableByName(const std::string &table_name);
 
     CatalogManager();
