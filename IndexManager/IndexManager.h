@@ -1,11 +1,11 @@
-#include "BPTree.h"
 #include "../macro.h"
+#include "BPTree.h"
 
 #include <map>
 #include <string>
+using std::make_pair;
 using std::map;
 using std::string;
-using std::make_pair;
 
 const string index_file = "trees.ind";
 const int TREE_SIZE = 666;
@@ -15,25 +15,37 @@ using std::get;
 using std::make_tuple;
 
 class IndexManager {
-public:
-	IndexManager() = default;
-	~IndexManager();
+ public:
+  IndexManager() = default;
+  ~IndexManager();
 
-	void create(const string& treename);
-	void create(const string& treename, const vector<sql_value>& indexs);
-	void drop(const string& treename);
+  void create(const string& treename);
+  void create(const string& treename, const vector<sql_value>& indexs);
+  void drop(const string& treename);
 
-	ELEMENTTYPE search(const string& treename, const sql_value& val, uint32_t idx_pos) const;
-	ELEMENTTYPE searchHead(const string& treename, const sql_value& val) const;
-	ELEMENTTYPE searchNext(const string& treename, const sql_value& val, uint32_t idx_pos) const;
+  ELEMENTTYPE search(const string& treename,
+                     const sql_value& val,
+                     uint32_t idx_pos,
+                     const macro::table& table) const;
+  ELEMENTTYPE searchHead(const string& treename, const sql_value& val) const;
+  ELEMENTTYPE searchNext(const string& treename,
+                         const sql_value& val,
+                         uint32_t idx_pos,
+                         const macro::table& table) const;
 
-	void insert(const string& treename, const sql_value& val, uint32_t idx_pos, ELEMENTTYPE new_key);
-	void remove(const string& treename, const sql_value& val, uint32_t idx_pos);
+  void insert(const string& treename,
+              const sql_value& val,
+              uint32_t idx_pos,
+              const macro::table& table,
+              ELEMENTTYPE new_key);
+  void remove(const string& treename,
+              const sql_value& val,
+              uint32_t idx_pos,
+              const macro::table& table);
 
-	void save();
-	void load();
+  void save();
+  void load();
 
-private:
-	map<string, BPTree> index_manager;
+ private:
+  map<string, BPTree> index_manager;
 };
-	
