@@ -36,7 +36,8 @@ void CatalogManager::CreateTable(const std::string &table_name,
         }
         if (schema.type.primary){
             std::string default_index = "default_index";
-            tab.index.emplace_back(primary_key_name, default_index);
+            CreateIndex(tab, primary_key_name, default_index);
+
             // idx_mgt.create(default_index, schema.type.type);  FIXME
         }
 
@@ -160,7 +161,7 @@ void CatalogManager::LoadFromFile()
 
             //TODO: Implement real index creation in tb.index if ifind==1
             if (ifind){
-                tb.index.emplace_back(attr_name, index_name);
+                CreateIndex(tb, attr_name, index_name);
             }
 
         }
@@ -237,8 +238,21 @@ bool CatalogManager::CreateIndex(const std::string &table_name, const std::strin
     }
     macro::table &tab = GetTable(table_name);
     tab.index.emplace_back(attr_name, index_name);
+    const auto [iter, success] = indexes.insert({index_name, attr_name});
+    if(!success){
+        throw sql_exception(501, "Catalog Manager", "Repetition of index name.");
+    }
     return true;
+}
 
+bool CatalogManager::CreateIndex(macro::table &table, const std::string &attr_name, const std::string &index_name)
+{
+    table.index.emplace_back(attr_name, index_name);
+    const auto [iter, success] = indexes.insert({index_name, attr_name});
+    if(!success){
+        throw sql_exception(501, "Catalog Manager", "Repetition of index name.");
+    }
+    return true;
 }
 
 bool CatalogManager::DropIndex(const std::string &table_name, const std::string &attr_name)
@@ -250,10 +264,43 @@ bool CatalogManager::DropIndex(const std::string &table_name, const std::string 
     for (auto iter = tab.index.begin(); iter != tab.index.end(); iter++){
         if (iter->first == attr_name){
             tab.index.erase(iter);
+            auto index_iter = indexes.find(iter->second);
+            if(index_iter != indexes.end()){
+                indexes.erase(index_iter);
+            }
             return true;
         }
     }
+    return false;
 
+}
+
+bool CatalogManager::DropIndex(const std::string &index_name)
+{
+    std::string attr_name = GetAttrByIndex(index_name);
+    auto &tab = GetTableWithIndex(index_name);
+    for (auto iter = tab.index.begin(); iter != tab.index.end(); iter++){
+        if (iter->first == attr_name){
+            tab.index.erase(iter);
+            auto index_iter = indexes.find(iter->second);
+            if(index_iter != indexes.end()){
+                indexes.erase(index_iter);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string CatalogManager::GetAttrByIndex(const std::string &index_name)
+{
+    std::string attr_name;
+    try {
+        attr_name = indexes.at(index_name);
+    } catch (const out_of_range &e){
+        throw sql_exception(502, "Catalog Manager", "Index not found.");
+    }
+    return attr_name;
 }
 
 
