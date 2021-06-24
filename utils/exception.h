@@ -5,11 +5,12 @@
 #include <string>
 
 class sql_exception : public std::exception {
-    unsigned int code;
     std::string module_name;
     std::string detail;
 
 public:
+    unsigned int code;
+
     sql_exception() = default;
     sql_exception(unsigned int code, std::string& module_name, std::string& detail) :
             code(code), module_name(module_name), detail(detail) {}

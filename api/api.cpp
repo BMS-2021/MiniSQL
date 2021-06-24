@@ -76,7 +76,7 @@ namespace api {
                                 + std::to_string(this->insert_list.size()));
         }
 
-        // validate the input  type
+        // validate the input type
         {
             for (int i = 0; i < this->insert_list.size(); i++) {
                 if (table.attribute_type.at(i).type != this->insert_list.at(i).sql_type.type) {
@@ -114,10 +114,7 @@ namespace api {
             }
         }
 
-        sql_tuple tuple;
-        tuple.element = this->insert_list;
-        auto index_row_in_record = rec_mgt.insertRecord(table, tuple);
-#ifndef DETACH_INDEX_MANAGER
+#ifndef DETACH_INDEX_MANAGER  // validate
         for (const auto &i : table.index) {
             // i : pair<attr, index>
             int j = 0;
@@ -136,10 +133,40 @@ namespace api {
                                     + table_name
                                     + "\'");
             }
+
+            auto found_element = false;
+            try {
+                idx_mgt.search(i.second, this->insert_list.at(j), j, table);
+                found_element = true;
+            } catch (sql_exception &e) {
+                if (e.code != 300) {
+                    throw e;
+                }
+            }
+            if (found_element) {
+                throw sql_exception(213, "api", "duplicated index value: " + this->insert_list.at(j).toStr());
+            }
+
+        }
+#endif
+        sql_tuple tuple;
+        tuple.element = this->insert_list;
+        const auto index_row_in_record = rec_mgt.insertRecord(table, tuple);
+
+#ifndef DETACH_INDEX_MANAGER
+        for (const auto &i : table.index) {
+            // i : pair<attr, index>
+            int j = 0;
+            for (; j < table.attribute_names.size(); j++) {
+                if (i.first == table.attribute_names.at(j)) {
+                    break;
+                }
+            }
             auto value = rec_mgt.getRecord(table, index_row_in_record).element.at(j);
             idx_mgt.insert(i.second, value, j, table, index_row_in_record);
         }
 #endif
+
         table.record_cnt++;
         std::cout << "query OK, 1 row affected";
     }
@@ -171,7 +198,9 @@ namespace api {
 
         result res;
 
-        if (this->condition_list.size() == 1 && this->condition_list.at(0).op == attribute_operator::EQUAL) {
+        if (this->condition_list.size() == 1 &&
+            this->condition_list.at(0).op == attribute_operator::EQUAL &&
+            !table.index.empty()) {
             uint32_t idx_pos = -1;
             string treename;
             for(auto i = 0; i < table.index.size(); ++i) {
@@ -186,7 +215,8 @@ namespace api {
                 auto record = rec_mgt.getRecord(table, search_res);
                 res = convert_sql_tuple_to_result(table.attribute_names, this->attribute_list, record);
             }
-        } else {
+        }
+        if (res.row.empty()) {
             res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
         }
 

@@ -30,13 +30,6 @@ void BPTree::insert(uint32_t idx_pos,
     cur = cur->ch[i];
   }  // find until leaf
 
-#ifndef ENABLE_DUPLICATED_INDEX
-  auto tmp = cur->binary_search(idx_pos, table, target);
-  if(tmp > 0 && find_idx_val(cur->key.at(tmp - 1), idx_pos, table) == target) {
-    throw sql_exception(303, "index manager", "duplicated index value: " + target);
-  }
-#endif
-
   ELEMENTTYPE new_key = rec_id;
   sql_value tar =
       target;  // target value (actually to find, will change when split up)
