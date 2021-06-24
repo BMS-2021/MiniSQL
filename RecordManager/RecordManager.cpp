@@ -107,6 +107,9 @@ vector<pair<uint32_t, sql_tuple>> RecordManager::deleteRecord(const macro::table
     return deleteRec;
 }
 
+/*
+ * if attr is empty, this means that a SELECT * has been executed
+ */
 result RecordManager::selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond) {
     string tableFileStr = macro::tableFile(table.name);
 
@@ -124,7 +127,11 @@ result RecordManager::selectRecord(const macro::table &table, const vector<strin
             if (content[i * recordLen] == 0) { continue; }
             tup = genTuple(content, i * recordLen, table.attribute_type);
             if (condsTest(cond, tup, table.attribute_names)) {
-                row = tup.fetchRow(table.attribute_names, table.attribute_names); //FIXME!!
+                if (attr.empty()) {
+                    row = tup.fetchRow(table.attribute_names, table.attribute_names);
+                } else {
+                    row = tup.fetchRow(table.attribute_names, attr);
+                }
                 res.row.push_back(row);
             }
         }
@@ -141,7 +148,7 @@ sql_tuple RecordManager::getRecord(const macro::table &table, uint32_t id) {
     int blockCnt = buf_mgt.getBlockCnt(tableFileStr);
     int blockId = id / recordCnt;
     if(blockId + 1 < blockCnt) {
-        throw sql_exception(501, "record manager", "record beyond range");
+        throw sql_exception(501, "record manager", "record \'" + std::to_string(id) + "\' beyond range");
     }
 
     Block &block = buf_mgt.getBlock(tableFileStr, blockId);
