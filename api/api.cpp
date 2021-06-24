@@ -148,6 +148,9 @@ namespace api {
         throw_on_table_not_exist(this->table_name);
 
         auto& table = cat_mgt.GetTable(this->table_name);
+        if (this->attribute_list.empty()) {
+            this->attribute_list = table.attribute_names;
+        }
 
         // validate attribute list, if attribute list is empty, this means SELECT *
         {
@@ -172,7 +175,7 @@ namespace api {
             uint32_t idx_pos = -1;
             string treename;
             for(auto i = 0; i < table.index.size(); ++i) {
-                if(this->attribute_list.at(0) == table.index.at(i).first) {
+                if(this->condition_list.at(0).attribute_name == table.index.at(i).first) {
                     idx_pos = i;
                     treename = table.index.at(i).second;
                     break;
@@ -187,11 +190,7 @@ namespace api {
             res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
         }
 
-        if (this->attribute_list.empty()) {
-            print_select_result(table.attribute_names, res);
-        } else {
-            print_select_result(this->attribute_list, res);
-        }
+        print_select_result(this->attribute_list, res);
 
         if (res.row.empty()) {
             std::cout << "empty set";
