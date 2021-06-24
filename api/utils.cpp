@@ -111,4 +111,12 @@ namespace api {
                 return "FLOAT";
         }
     }
+
+    result convert_sql_tuple_to_result(
+        const std::vector<std::string> &attrTable, 
+        const std::vector<std::string> &attrFetch,
+        const sql_tuple& tup
+    ) {
+        tup.fetchRow();
+    }
 }

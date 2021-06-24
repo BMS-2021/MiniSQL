@@ -11,6 +11,11 @@ namespace api {
     void print_select_result(const macro::table &, const result &);
     void validate_condition(const macro::table &, const std::vector<condition> &);
     std::string return_value_name(value_type);
+    result convert_sql_tuple_to_result(
+        const std::vector<std::string> &, 
+        const std::vector<std::string> &,
+        const sql_tuple& tup
+    );
 }
 
 #endif //MINISQL_API_UTILS_H

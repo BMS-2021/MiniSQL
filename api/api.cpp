@@ -103,6 +103,7 @@ namespace api {
             }
             for (const auto &i: duplication_check_list) {
                 std::vector<condition> cond;
+                
                 cond.push_back(i);
                 auto res = rec_mgt.selectRecord(table, vector<std::string>(), cond);
                 if(!res.row.empty()) {
@@ -150,9 +151,26 @@ namespace api {
 
         validate_condition(table, this->condition_list);
 
-        // TODO: routine for index
+        result res;
 
-        auto res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
+        if (this->condition_list.size() == 1 && this->condition_list.at(0).op == attribute_operator::EQUAL) {
+            uint32_t idx_pos = -1;
+            string treename;
+            for(auto i = 0; i < table.index.size(); ++i) {
+                if(this->attribute_list.at(0) == table.index.at(i).first) {
+                    idx_pos = i;
+                    treename = table.index.at(i).second;
+                    break;
+                }
+            }
+            if(is_index) {
+                auto search_res = idx_mgt.search(treename, this->condition_list.at(0).value, idx_pos, table);
+                auto record = rec_mgt.getRecord(table, res);
+                res = convert_sql_tuple_to_result(this->attribute_list, this->attribute_list, record);
+            }
+        }
+
+        res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
         print_select_result(table, res);
 
         if (res.row.empty()) {
