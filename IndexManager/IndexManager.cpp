@@ -11,14 +11,14 @@ void IndexManager::create(const string& treename) {
 }
 
 void IndexManager::create(const string& treename,
-                          const vector<std::pair<uint32_t, sql_value>>& indexs) {
-  //    auto idxtree = BPTree(TREE_SIZE, TREE_DEGREE);
-  //    auto vec = vector<int>();
-  //    auto que = queue<ELEMENTTYPE>();
-  //    for (auto &x : indexs)
-  //        idxtree.insert(x.sql_int);
-  //    intmgr.insert(make_pair(treename, make_tuple(idxtree, vec, que)));
-  //    break;
+                          const vector<std::pair<uint32_t, sql_value>>& indexs,
+                          uint32_t idx_pos,
+                          const macro::table table) {
+  auto idxtree = BPTree(TREE_SIZE, TREE_DEGREE);
+
+  for (auto& x : indexs)
+    idxtree.insert(idx_pos, table, x.first, x.second);
+  index_manager.insert(make_pair(treename, idxtree));
 }
 
 void IndexManager::drop(const string& treename) {
