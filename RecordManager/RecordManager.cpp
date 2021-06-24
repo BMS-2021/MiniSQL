@@ -81,12 +81,12 @@ int RecordManager::insertRecord(const macro::table &table, const sql_tuple &reco
     return blockID * recordsPreBlock + recordOffset;
 }
 
-int RecordManager::deleteRecord(const macro::table &table, const vector<condition> &conditions) {
+vector<pair<uint32_t, sql_tuple>> RecordManager::deleteRecord(const macro::table &table, const vector<condition> &conditions) {
     string tableFileStr = macro::tableFile(table.name);
     int length = table.record_len + 1;
     int recordCnt = macro::BlockSize / length;
     int blockCnt = buf_mgt.getBlockCnt(tableFileStr);
-    int deleteRowCnt = 0;
+    vector<pair<uint32_t, sql_tuple>> deleteRec;
     sql_tuple tup;
 
     for(int blockID = 0; blockID < blockCnt; blockID++) {
@@ -97,14 +97,14 @@ int RecordManager::deleteRecord(const macro::table &table, const vector<conditio
             tup = genTuple(content, i * length, table.attribute_type);
             if (condsTest(conditions, tup, table.attribute_names)) {
                 content[i * length] = 0;
-                deleteRowCnt++;
+                deleteRec.emplace_back(make_pair(blockID * recordCnt + i, tup));
             }
         }
         buf_mgt.setDirty(macro::tableFile(table.name), blockID);
         buf_mgt.unlock(macro::tableFile(table.name), blockID);
     }
 
-    return deleteRowCnt;
+    return deleteRec;
 }
 
 result RecordManager::selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond) {

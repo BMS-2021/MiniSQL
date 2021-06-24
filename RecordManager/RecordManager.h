@@ -31,7 +31,7 @@ public:
     [[nodiscard]]
     int insertRecord(const macro::table &table, const sql_tuple &record);
 
-    int deleteRecord(const macro::table &table, const vector<condition> &conditions);
+    vector<pair<uint32_t, sql_tuple>> deleteRecord(const macro::table &table, const vector<condition> &conditions);
 
     [[nodiscard]]
     result selectRecord(const macro::table &table, const vector<string> &attr, const vector<condition> &cond);
