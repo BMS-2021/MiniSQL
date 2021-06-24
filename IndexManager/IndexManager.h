@@ -20,7 +20,7 @@ class IndexManager {
   ~IndexManager();
 
   void create(const string& treename);
-  void create(const string& treename, const vector<sql_value>& indexs);
+  void create(const string& treename, const vector<std::pair<uint32_t, sql_value>>& indexs);
   void drop(const string& treename);
 
   ELEMENTTYPE search(const string& treename,

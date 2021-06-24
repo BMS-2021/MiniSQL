@@ -114,10 +114,30 @@ namespace api {
 
         sql_tuple tuple;
         tuple.element = this->insert_list;
-        rec_mgt.insertRecord(table, tuple);
-
-        // TODO idx_mgt.insert();
-
+        auto index_row_in_record = rec_mgt.insertRecord(table, tuple);
+#ifndef DETACH_INDEX_MANAGER
+        for (const auto &i : table.index) {
+            // i : pair<attr, index>
+            int j = 0;
+            for (; j < table.attribute_names.size(); j++) {
+                if (i.first == table.attribute_names.at(j)) {
+                    break;
+                }
+            }
+            if (j == table.attribute_names.size()) {
+                throw sql_exception(211, "api",
+                                    "attribute \'"
+                                    + i.first
+                                    + "\' of index \'"
+                                    + i.second
+                                    + "cannot be found in table \'"
+                                    + table_name
+                                    + "\'");
+            }
+            auto value = rec_mgt.getRecord(table, index_row_in_record).element.at(j);
+            idx_mgt.insert(i.second, value, j, table, index_row_in_record);
+        }
+#endif
         table.record_cnt++;
         std::cout << "query OK, 1 row affected";
     }
@@ -153,7 +173,28 @@ namespace api {
             throw sql_exception(205, "api", "delete failed");
         }
 
-        // TODO: delete index
+#ifndef DETACH_INDEX_MANAGER
+        for (const auto &i : table.index) {
+            // i : pair<attr, index>
+            int j = 0;
+            for (; j < table.attribute_names.size(); j++) {
+                if (i.first == table.attribute_names.at(j)) {
+                    break;
+                }
+            }
+            if (j == table.attribute_names.size()) {
+                throw sql_exception(211, "api",
+                                    "attribute \'"
+                                    + i.first
+                                    + "\' of index \'"
+                                    + i.second
+                                    + "cannot be found in table \'"
+                                    + table_name
+                                    + "\'");
+            }
+            // TODO: remove all deleted rows in B+ tree
+        }
+#endif
 
         std::cout << "query OK, " << delete_row_count << " row(s) affected";
     }
@@ -180,21 +221,44 @@ namespace api {
     void create_index::exec() {
         throw_on_table_not_exist(this->table_name);
         auto& table = cat_mgt.GetTable(this->table_name);
-/*
-        if (cat_mgt.IsIndexExist(this->index_name)) {
-            auto conflict_table_name = cat_mgt.GetTableWithIndex(this->index_name).name;
-            throw sql_exception(209, "api", "duplication on index \'" + this->index_name + "\' of table \'" + conflict_table_name + "\'");
-        }
-        */
+
         cat_mgt.CreateIndex(table, this->attribute_name, this->index_name);
+#ifndef DETACH_INDEX_MANAGER
+        auto record_row_tuple_pairs = rec_mgt.getRecordPairs(table);
+        for (const auto &i : table.index) {
+            // i : pair<attr, index>
+            int j = 0;
+            for (; j < table.attribute_names.size(); j++) {
+                if (i.first == table.attribute_names.at(j)) {
+                    break;
+                }
+            }
+            if (j == table.attribute_names.size()) {
+                throw sql_exception(211, "api",
+                                    "attribute \'"
+                                    + i.first
+                                    + "\' of index \'"
+                                    + i.second
+                                    + "cannot be found in table \'"
+                                    + table_name
+                                    + "\'");
+            }
 
-        // TODO: create an index in index_mgr
-
+            auto record_to_insert = std::vector<std::pair<uint32_t, sql_value>>();
+            for (const auto &iter : record_row_tuple_pairs) {
+                record_to_insert.emplace_back(iter.first, iter.second.element.at(j));
+            }
+            idx_mgt.create(i.second, record_to_insert);
+        }
+#endif
         std::cout << "index \'" << this->index_name << "\' created on \'" << this->table_name << "." << this->attribute_name << "\'";
     }
 
     void drop_index::exec() {
         cat_mgt.DropIndex(this->index_name);
+#ifndef DETACH_INDEX_MANAGER
+        idx_mgt.drop(this->index_name);
+#endif
         std::cout << "index \'" << this->index_name << "\' dropped";
     }
 

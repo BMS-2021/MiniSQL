@@ -28,6 +28,7 @@ public:
 
     bool dropIndex(const macro::table &table, const string &index);
 
+    [[nodiscard]]
     int insertRecord(const macro::table &table, const sql_tuple &record);
 
     int deleteRecord(const macro::table &table, const vector<condition> &conditions);

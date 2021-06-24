@@ -11,7 +11,7 @@ void IndexManager::create(const string& treename) {
 }
 
 void IndexManager::create(const string& treename,
-                          const vector<sql_value>& indexs) {
+                          const vector<std::pair<uint32_t, sql_value>>& indexs) {
   //    auto idxtree = BPTree(TREE_SIZE, TREE_DEGREE);
   //    auto vec = vector<int>();
   //    auto que = queue<ELEMENTTYPE>();
