@@ -189,8 +189,13 @@ void BPTree::remove(uint32_t idx_pos,
         cur->key.at(i) = suc;
         break;
       }
-    if (cur == root || cur->ch.size() >= degree / 2)
-      break;
+    if (cur == root || cur->ch.size() >= degree / 2) {
+        if(root->key.empty()) {
+            delete_node(root);
+            root = nullptr;
+        }
+        break;
+    }
 
     auto get_wh = cur->fa->binary_search(idx_pos, table, target, umap);
     BPTreeNode *lsib, *rsib;
