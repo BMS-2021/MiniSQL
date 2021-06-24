@@ -1,6 +1,7 @@
 #include "api.h"
 #include "utils.h"
 #include <unordered_set>
+#include <unordered_map>
 
 #include "../RecordManager/RecordManager.h"
 #include "../CatalogManager/CatalogManager.h"
@@ -174,6 +175,10 @@ namespace api {
         }
 
 #ifndef DETACH_INDEX_MANAGER
+        unordered_map<uint32_t, sql_tuple> umap;
+        for (const auto &x: delete_row_count)
+            umap.insert(x);
+
         for (const auto &i : table.index) {
             // i : pair<attr, index>
             int j = 0;
@@ -193,6 +198,8 @@ namespace api {
                                     + "\'");
             }
             // TODO: remove all deleted rows in B+ tree
+            for(auto &x: delete_row_count)
+                idx_mgt.remove(i.second, x.second.element.at(j), j, table, umap);
         }
 #endif
 

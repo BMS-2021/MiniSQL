@@ -112,7 +112,8 @@ ELEMENTTYPE BPTree::search(uint32_t idx_pos,
 
 void BPTree::remove(uint32_t idx_pos,
                     const macro::table& table,
-                    const sql_value& target) {
+                    const sql_value& target,
+                    std::unordered_map<uint32_t, sql_tuple> umap) {
   /*
   Case I. key not appear in internal node
           1. size enough -> directly delete
@@ -162,13 +163,13 @@ void BPTree::remove(uint32_t idx_pos,
   while (cur->ch.at(0) != nullptr) {
     auto i = 0U;
     for (; i < cur->key.size(); ++i)
-      if (find_idx_val(cur->key.at(i), idx_pos, table) > target)
+      if (find_idx_val(cur->key.at(i), idx_pos, table, umap) > target)
         break;
     cur = cur->ch[i];
   }
-  auto tmp = cur->binary_search(idx_pos, table, target);
+  auto tmp = cur->binary_search(idx_pos, table, target, umap);
   if (tmp == 0 ||
-      find_idx_val(cur->key.at(tmp - 1), idx_pos, table) != target) {
+      find_idx_val(cur->key.at(tmp - 1), idx_pos, table, umap) != target) {
     throw sql_exception(300, "index manager", "element not found");
   }
   // throw std::exception("Fix Me: Deletion Not Implemented");
@@ -184,14 +185,14 @@ void BPTree::remove(uint32_t idx_pos,
 
   while (true) {
     for (auto i = 0U; i < cur->key.size(); ++i)
-      if (find_idx_val(cur->key.at(i), idx_pos, table) == target) {
+      if (find_idx_val(cur->key.at(i), idx_pos, table, umap) == target) {
         cur->key.at(i) = suc;
         break;
       }
     if (cur == root || cur->ch.size() >= degree / 2)
       break;
 
-    auto get_wh = cur->fa->binary_search(idx_pos, table, target);
+    auto get_wh = cur->fa->binary_search(idx_pos, table, target, umap);
     BPTreeNode *lsib, *rsib;
     bool is_leaf = cur->ch.size() == cur->key.size();
 

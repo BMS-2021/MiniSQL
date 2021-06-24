@@ -20,7 +20,7 @@ class IndexManager {
   ~IndexManager();
 
   void create(const string& treename);
-  void IndexManager::create(
+  void create(
       const string& treename,
       const vector<std::pair<uint32_t, sql_value>>& indexs,
       uint32_t idx_pos,
@@ -45,7 +45,8 @@ class IndexManager {
   void remove(const string& treename,
               const sql_value& val,
               uint32_t idx_pos,
-              const macro::table& table);
+              const macro::table& table,
+              std::unordered_map<uint32_t, sql_tuple> umap);
 
   void save();
   void load();

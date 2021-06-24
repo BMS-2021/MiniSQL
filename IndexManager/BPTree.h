@@ -22,7 +22,8 @@ class BPTree {
 
   void remove(uint32_t idx_pos,
               const macro::table& table,
-              const sql_value& target);
+              const sql_value& target,
+              std::unordered_map<uint32_t, sql_tuple> umap);
 
   void write_file(string filename, string treename);
 

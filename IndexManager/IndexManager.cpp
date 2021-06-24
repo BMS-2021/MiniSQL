@@ -55,8 +55,9 @@ void IndexManager::insert(const string& treename,
 void IndexManager::remove(const string& treename,
                           const sql_value& val,
                           uint32_t idx_pos,
-                          const macro::table& table) {
-  index_manager.find(treename)->second.remove(idx_pos, table, val);
+                          const macro::table& table,
+                          std::unordered_map<uint32_t, sql_tuple> umap) {
+  index_manager.find(treename)->second.remove(idx_pos, table, val, umap);
 }
 
 void IndexManager::save() {
