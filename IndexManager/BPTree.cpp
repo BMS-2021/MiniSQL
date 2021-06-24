@@ -190,11 +190,11 @@ void BPTree::remove(uint32_t idx_pos,
         break;
       }
     if (cur == root || cur->ch.size() >= degree / 2) {
-        if(root->key.empty()) {
-            delete_node(root);
-            root = nullptr;
-        }
-        break;
+      if (root->key.empty()) {
+        delete_node(root);
+        root = nullptr;
+      }
+      break;
     }
 
     auto get_wh = cur->fa->binary_search(idx_pos, table, target, umap);
@@ -210,8 +210,7 @@ void BPTree::remove(uint32_t idx_pos,
     else
       rsib = nullptr;
 
-    if (lsib != nullptr &&
-        lsib->ch.size() > (degree + is_leaf - 1) / 2) {  // if left enough
+    if (lsib != nullptr && lsib->key.size() > degree / 2) {  // if left enough
       // rrotate
       auto pivot_key = lsib->key.at(lsib->key.size() - 1);
       auto pivot_ch = lsib->ch.at(lsib->ch.size() - 1);
@@ -224,9 +223,9 @@ void BPTree::remove(uint32_t idx_pos,
       cur->fa->key.at(get_wh - 1) = pivot_key;
       lsib->key.pop_back();
       lsib->ch.pop_back();
-    } else if (rsib != nullptr && rsib->ch.size() > (degree + is_leaf - 1) /
-                                                        2) {  // if right enough
-                                                              // lrotate
+    } else if (rsib != nullptr &&
+               rsib->key.size() > degree / 2) {  // if right enough
+                                                 // lrotate
       auto pivot_key = rsib->key.at(0);
       auto pivot_ch = rsib->ch.at(0);
 
@@ -251,8 +250,11 @@ void BPTree::remove(uint32_t idx_pos,
       cur->fa->ch.erase(cur->fa->ch.begin() + get_wh);
       for (auto& i : cur->key)
         lsib->key.push_back(i);
-      for (auto& i : cur->ch)
+      for (auto& i : cur->ch) {
         lsib->ch.push_back(i);
+        if (i != nullptr)
+          i->fa = lsib;
+      }
       delete_node(cur);
       cur = lsib;
     }
