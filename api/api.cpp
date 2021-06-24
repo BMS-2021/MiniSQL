@@ -132,7 +132,7 @@ namespace api {
                                     + i.first
                                     + "\' of index \'"
                                     + i.second
-                                    + "cannot be found in table \'"
+                                    + "\' cannot be found in table \'"
                                     + table_name
                                     + "\'");
             }
@@ -231,7 +231,7 @@ namespace api {
                                     + i.first
                                     + "\' of index \'"
                                     + i.second
-                                    + "cannot be found in table \'"
+                                    + "\' cannot be found in table \'"
                                     + table_name
                                     + "\'");
             }
@@ -267,34 +267,36 @@ namespace api {
         throw_on_table_not_exist(this->table_name);
         auto& table = cat_mgt.GetTable(this->table_name);
 
+        for (const auto &i : table.attribute_names) {
+
+        }
+
+        // i : pair<attr, index>
+        int column = 0;
+        for (; column < table.attribute_names.size(); column++) {
+            if (this->attribute_name == table.attribute_names.at(column)) {
+                break;
+            }
+        }
+        if (column == table.attribute_names.size()) {
+            throw sql_exception(212, "api",
+                                "attribute \'"
+                                + this->attribute_name
+                                + "\' cannot be found in table \'"
+                                + table_name
+                                + "\'");
+        }
+
         cat_mgt.CreateIndex(table, this->attribute_name, this->index_name);
+
 #ifndef DETACH_INDEX_MANAGER
         auto record_row_tuple_pairs = rec_mgt.getRecordPairs(table);
-        for (const auto &i : table.index) {
-            // i : pair<attr, index>
-            int j = 0;
-            for (; j < table.attribute_names.size(); j++) {
-                if (i.first == table.attribute_names.at(j)) {
-                    break;
-                }
-            }
-            if (j == table.attribute_names.size()) {
-                throw sql_exception(211, "api",
-                                    "attribute \'"
-                                    + i.first
-                                    + "\' of index \'"
-                                    + i.second
-                                    + "cannot be found in table \'"
-                                    + table_name
-                                    + "\'");
-            }
 
-            auto record_to_insert = std::vector<std::pair<uint32_t, sql_value>>();
-            for (const auto &iter : record_row_tuple_pairs) {
-                record_to_insert.emplace_back(iter.first, iter.second.element.at(j));
-            }
-            idx_mgt.create(this->index_name, record_to_insert, j, table);
+        auto record_to_insert = std::vector<std::pair<uint32_t, sql_value>>();
+        for (const auto &iter : record_row_tuple_pairs) {
+            record_to_insert.emplace_back(iter.first, iter.second.element.at(column));
         }
+        idx_mgt.create(this->index_name, record_to_insert, column, table);
 #endif
         std::cout << "index \'" << this->index_name << "\' created on \'" << this->table_name << "." << this->attribute_name << "\'";
     }
