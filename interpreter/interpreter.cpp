@@ -1,5 +1,6 @@
 #ifdef READLINE_FOUND
 #include <readline/readline.h>
+#include <readline/history.h>
 extern "C" char **keyword_completion(const char *, int, int);
 #endif
 
@@ -107,7 +108,9 @@ const char* interpreter::read() {
         std::free(this->str);
         this->str = nullptr;
     }
-    this->str = readline(this->start_text());
+    const char *input = readline(this->start_text());
+    add_history(input);
+    return input;
 #else
     while (true) {
         std::string src;
@@ -125,8 +128,8 @@ const char* interpreter::read() {
         }
         first_loop = false;
     }
-#endif
     return this->str;
+#endif
 }
 
 const char* interpreter::read(std::istream &is) {
