@@ -36,9 +36,9 @@ namespace api {
         cout << endl;
     }
 
-    void print_select_result(const macro::table &table, const result &res) {
+    void print_select_result(const std::vector<std::string>&attribute_names, const result &res) {
         using namespace std;
-        const auto size = table.attribute_names.size();
+        const auto size = attribute_names.size();
 
         if (res.row.empty()) {
             return;
@@ -47,7 +47,7 @@ namespace api {
         auto col_max_length = vector<unsigned long>(size, 0);
 
         for (auto i = 0; i < size; i++) {
-            col_max_length.at(i) = std::max(table.attribute_names.at(i).size(), col_max_length.at(i));
+            col_max_length.at(i) = std::max(attribute_names.at(i).size(), col_max_length.at(i));
         }
         for (auto const &row : res.row) {
             for (auto i = 0; i < size; i++) {
@@ -62,7 +62,7 @@ namespace api {
                 cout << setiosflags(ios::left)
                      << setw(static_cast<int>(col_max_length.at(i)))
                      << std::setfill(' ')
-                     << table.attribute_names.at(i);
+                     << attribute_names.at(i);
                 cout << " | ";
             }
             cout << endl;
@@ -117,6 +117,8 @@ namespace api {
         const std::vector<std::string> &attrFetch,
         const sql_tuple& tup
     ) {
-        tup.fetchRow(attrTable, attrFetch);
+        auto result_to_return = result();
+        result_to_return.row.push_back(tup.fetchRow(attrTable, attrFetch));
+        return result_to_return;
     }
 }

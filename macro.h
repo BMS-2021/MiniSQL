@@ -157,6 +157,10 @@ struct result {
 struct sql_tuple {
     std::vector<sql_value> element;
 
+    /*
+     * attrTable: all columns
+     * attrFetch: columns to be selected
+     */
     row fetchRow(const std::vector<std::string> &attrTable, const std::vector<std::string> &attrFetch) const {
         row row;
         bool attrFound;
@@ -194,10 +198,6 @@ namespace macro {
     const int MaxFiles = 6;
 
     inline std::string tableFile(const std::string &tableName) { return tableName + ".tb"; }
-
-    inline std::string indexFile(const std::string &tableName, const std::string &index) {
-        return tableName + "_" + index + ".ind";
-    }
 
     struct table {
         table() {};

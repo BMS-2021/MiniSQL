@@ -149,6 +149,21 @@ namespace api {
 
         auto& table = cat_mgt.GetTable(this->table_name);
 
+        // validate attribute list, if attribute list is empty, this means SELECT *
+        {
+            auto attribute_set = std::unordered_set<std::string>();
+            for (const auto &i : table.attribute_names) {
+                attribute_set.insert(i);
+            }
+            for (const auto &i : this->attribute_list) {
+                if (attribute_set.contains(i)) {
+                    attribute_set.erase(i);
+                } else {
+                    throw sql_exception(212, "api", "attribute \'" + i + "\' invalid");
+                }
+            }
+        }
+
         validate_condition(table, this->condition_list);
 
         result res;
@@ -166,13 +181,17 @@ namespace api {
             if (idx_pos != -1) {
                 auto search_res = idx_mgt.search(treename, this->condition_list.at(0).value, idx_pos, table);
                 auto record = rec_mgt.getRecord(table, search_res);
-                res = convert_sql_tuple_to_result(this->attribute_list, this->attribute_list, record);
+                res = convert_sql_tuple_to_result(table.attribute_names, this->attribute_list, record);
             }
         } else {
             res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
         }
 
-        print_select_result(table, res);
+        if (this->attribute_list.empty()) {
+            print_select_result(table.attribute_names, res);
+        } else {
+            print_select_result(this->attribute_list, res);
+        }
 
         if (res.row.empty()) {
             std::cout << "empty set";
