@@ -1,5 +1,6 @@
 #include "api.h"
 #include "utils.h"
+#include <unordered_set>
 
 #include "../RecordManager/RecordManager.h"
 #include "../CatalogManager/CatalogManager.h"
@@ -14,14 +15,24 @@ extern IndexManager idx_mgt;
 extern std::string file_to_exec;
 
 namespace api {
+    void base::exec() {
+        throw sql_exception(209, "api", "no query specified");
+    }
+
     void create_table::exec() {
         throw_on_table_exist(this->table_name);
 
-        // const auto attr_num = this->schema_list.size();
+        std::unordered_set<std::string> attribute_duplication_check;
+
         for (const auto &i : this->schema_list) {
             if (i.type.type == value_type::CHAR && i.type.length == 0) {
                 throw sql_exception(202, "api",
                                     "char \'" + i.name + "\' needs to have a length between 1 and 255");
+            }
+            if (attribute_duplication_check.contains(i.name)) {
+                throw sql_exception(210, "api", "duplicate column name \'" + i.name + "\'");
+            } else {
+                attribute_duplication_check.insert(i.name);
             }
         }
 

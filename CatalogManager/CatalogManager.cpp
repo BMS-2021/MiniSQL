@@ -192,6 +192,7 @@ macro::table &CatalogManager::GetTable(const std::string &query_name)
             return table;
         }
     }
+    throw sql_exception(603, "catalog manager", "cannot find table \'" + query_name + "\'");
 }
 
 

@@ -16,7 +16,7 @@ namespace api {
          */
         virtual ~base() = default;
 
-        virtual void exec() {};
+        virtual void exec();
     };
 
     class create_table final : public base {

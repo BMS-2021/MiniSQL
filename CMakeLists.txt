@@ -64,11 +64,11 @@ if(BISON_FOUND AND FLEX_FOUND)
     FLEX_TARGET(MyScanner interpreter/tokenizer.l ${CMAKE_CURRENT_BINARY_DIR}/interpreter/lex.yy.cc)
     ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
     include_directories("interpreter")
-    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS} ${CACHE_MANAGER})
+    add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS} ${BUFFER_MANAGER} ${RECORD_MANAGER} ${CATALOG_MANAGER} ${INDEX_MANAGER} utils/utils.cpp utils/utils.h)
 else()
     message(WARNING "GNU Bison or Flex not found. \
                      This program will use pre-generated files instead... (deprecated)")
-                     ]]
+]]
     add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${BUFFER_MANAGER} ${RECORD_MANAGER} ${CATALOG_MANAGER} ${INDEX_MANAGER} utils/utils.cpp utils/utils.h)
 # endif()
 #[[
