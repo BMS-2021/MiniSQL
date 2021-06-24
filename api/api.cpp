@@ -169,7 +169,7 @@ namespace api {
         validate_condition(table, this->condition_list);
 
         auto delete_row_count = rec_mgt.deleteRecord(table, this->condition_list);
-        if (delete_row_count == -1) {
+        if (delete_row_count.empty()) {
             throw sql_exception(205, "api", "delete failed");
         }
 
@@ -196,7 +196,7 @@ namespace api {
         }
 #endif
 
-        std::cout << "query OK, " << delete_row_count << " row(s) affected";
+        std::cout << "query OK, " << delete_row_count.size() << " row(s) affected";
     }
 
     void drop_table::exec() {
@@ -248,7 +248,7 @@ namespace api {
             for (const auto &iter : record_row_tuple_pairs) {
                 record_to_insert.emplace_back(iter.first, iter.second.element.at(j));
             }
-            idx_mgt.create(i.second, record_to_insert);
+            idx_mgt.create(this->index_name, record_to_insert, j, table);
         }
 #endif
         std::cout << "index \'" << this->index_name << "\' created on \'" << this->table_name << "." << this->attribute_name << "\'";
