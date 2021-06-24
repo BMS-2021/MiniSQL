@@ -117,6 +117,6 @@ namespace api {
         const std::vector<std::string> &attrFetch,
         const sql_tuple& tup
     ) {
-        tup.fetchRow();
+        tup.fetchRow(attrTable, attrFetch);
     }
 }

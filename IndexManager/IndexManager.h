@@ -1,10 +1,10 @@
 #include "../macro.h"
 #include "BPTree.h"
 
-#include <map>
+#include <unordered_map>
 #include <string>
+#include <memory>
 using std::make_pair;
-using std::map;
 using std::string;
 
 const string index_file = "trees.ind";
@@ -52,5 +52,5 @@ class IndexManager {
   void load();
 
  private:
-  map<string, BPTree> index_manager;
+  std::unordered_map<string, std::shared_ptr<BPTree>> index_manager;
 };

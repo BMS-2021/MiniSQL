@@ -23,7 +23,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
 
 
     for (auto &schema: schema_list){
-        sql_value_type elem_type = schema.type;
+        auto elem_type = schema.type;
         len += elem_type.size();
         tab.attribute_names.push_back(schema.name);
         if (schema.name == primary_key_name){
@@ -35,11 +35,9 @@ void CatalogManager::CreateTable(const std::string &table_name,
         if (elem_type.type == value_type::CHAR){
             elem_type.length = schema.type.length;
         }
-        if (schema.type.primary){
+        if (elem_type.primary){
             auto default_index = generate_table_pk_name(table_name);
             CreateIndex(tab, primary_key_name, default_index);
-
-            // idx_mgt.create(default_index, schema.type.type);  FIXME
         }
 
         tab.attribute_type.push_back(elem_type);

@@ -7,17 +7,18 @@ IndexManager::~IndexManager() {
 }
 
 void IndexManager::create(const string& treename) {
-  index_manager.insert(make_pair(treename, BPTree(TREE_SIZE, TREE_DEGREE)));
+  index_manager.insert(make_pair(treename, std::make_shared<BPTree>(TREE_SIZE, TREE_DEGREE)));
 }
 
 void IndexManager::create(const string& treename,
                           const vector<std::pair<uint32_t, sql_value>>& indexs,
                           uint32_t idx_pos,
                           const macro::table table) {
-  auto idxtree = BPTree(TREE_SIZE, TREE_DEGREE);
+  auto idxtree = std::make_shared<BPTree>(TREE_SIZE, TREE_DEGREE);
 
   for (auto& x : indexs)
-    idxtree.insert(idx_pos, table, x.first, x.second);
+
+    idxtree->insert(idx_pos, table, x.first, x.second);
   index_manager.insert(make_pair(treename, idxtree));
 }
 
@@ -29,19 +30,19 @@ ELEMENTTYPE IndexManager::search(const string& treename,
                                  const sql_value& val,
                                  uint32_t idx_pos,
                                  const macro::table& table) const {
-  return index_manager.find(treename)->second.search(idx_pos, table, val);
+  return index_manager.find(treename)->second->search(idx_pos, table, val);
 }
 
 ELEMENTTYPE IndexManager::searchHead(const string& treename,
                                      const sql_value& val) const {
-  return index_manager.find(treename)->second.searchHead();
+  return index_manager.find(treename)->second->searchHead();
 }
 
 ELEMENTTYPE IndexManager::searchNext(const string& treename,
                                      const sql_value& val,
                                      uint32_t idx_pos,
                                      const macro::table& table) const {
-  return index_manager.find(treename)->second.searchNext(idx_pos, table, val);
+  return index_manager.find(treename)->second->searchNext(idx_pos, table, val);
 }
 
 void IndexManager::insert(const string& treename,
@@ -49,7 +50,7 @@ void IndexManager::insert(const string& treename,
                           uint32_t idx_pos,
                           const macro::table& table,
                           ELEMENTTYPE new_key) {
-  index_manager.find(treename)->second.insert(idx_pos, table, new_key, val);
+  index_manager.find(treename)->second->insert(idx_pos, table, new_key, val);
 }
 
 void IndexManager::remove(const string& treename,
@@ -57,14 +58,14 @@ void IndexManager::remove(const string& treename,
                           uint32_t idx_pos,
                           const macro::table& table,
                           std::unordered_map<uint32_t, sql_tuple> umap) {
-  index_manager.find(treename)->second.remove(idx_pos, table, val, umap);
+  index_manager.find(treename)->second->remove(idx_pos, table, val, umap);
 }
 
 void IndexManager::save() {
   std::ofstream f(index_file);
   f << index_manager.size() << std::endl;
   for (auto& x : index_manager) {
-    x.second.write_file(index_file, x.first);
+    x.second->write_file(index_file, x.first);
   }
 }
 
@@ -75,7 +76,6 @@ void IndexManager::load() {
   for (int i = 0; i < map_sz; ++i) {
     string treestr, name;
     f >> treestr;
-    auto tree = BPTree(treestr, TREE_SIZE, name);
-    index_manager.insert(make_pair(name, tree));
+    index_manager.insert(make_pair(name, std::make_shared<BPTree>(treestr, TREE_SIZE, name)));
   }
 }

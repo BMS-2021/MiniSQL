@@ -163,14 +163,15 @@ namespace api {
                     break;
                 }
             }
-            if(is_index) {
+            if (idx_pos != -1) {
                 auto search_res = idx_mgt.search(treename, this->condition_list.at(0).value, idx_pos, table);
-                auto record = rec_mgt.getRecord(table, res);
+                auto record = rec_mgt.getRecord(table, search_res);
                 res = convert_sql_tuple_to_result(this->attribute_list, this->attribute_list, record);
             }
+        } else {
+            res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
         }
 
-        res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
         print_select_result(table, res);
 
         if (res.row.empty()) {
@@ -295,6 +296,7 @@ namespace api {
     void exit::exec() {
         buf_mgt.closeAllFile();
         cat_mgt.Flush();
+        idx_mgt.save();
         std::cout << "bye!" << std::endl;
         std::exit(0);
     }

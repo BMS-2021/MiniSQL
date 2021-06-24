@@ -15,6 +15,6 @@ int main() {
     std::cout << "Copyright (c) 2021, Cupcake, Enzymii, L1ght and RalXYZ." << std::endl;
 
     cat_mgt.LoadFromFile();
-
+    idx_mgt.load();
     interpret_entrance();
 }

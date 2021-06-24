@@ -335,7 +335,7 @@ BPTree::BPTree(uint32_t max_size, uint32_t deg) {
 }
 
 BPTree::~BPTree() {
-  delete pool;
+  delete[] pool;
 }
 
 BPTree::BPTree(string treestr, uint32_t max_size, string& treename) {
