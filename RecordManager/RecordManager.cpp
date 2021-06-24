@@ -148,7 +148,7 @@ sql_tuple RecordManager::getRecord(const macro::table &table, uint32_t id) {
     int blockCnt = buf_mgt.getBlockCnt(tableFileStr);
     int blockId = id / recordCnt;
     if(blockId + 1 < blockCnt) {
-        throw sql_exception(501, "record manager", "record beyond range");
+        throw sql_exception(501, "record manager", "record \'" + std::to_string(id) + "\' beyond range");
     }
 
     Block &block = buf_mgt.getBlock(tableFileStr, blockId);
