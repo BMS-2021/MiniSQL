@@ -7,7 +7,8 @@ IndexManager::~IndexManager() {
 }
 
 void IndexManager::create(const string& treename) {
-  index_manager.insert(make_pair(treename, std::make_shared<BPTree>(TREE_SIZE, TREE_DEGREE)));
+  index_manager.insert(
+      make_pair(treename, std::make_shared<BPTree>(TREE_SIZE, TREE_DEGREE)));
 }
 
 void IndexManager::create(const string& treename,
@@ -71,11 +72,16 @@ void IndexManager::save() {
 
 void IndexManager::load() {
   std::ifstream f(index_file);
+  if (!f)
+    return;
   int map_sz;
-  f >> map_sz;
+  string map_sz_str;
+  std::getline(f, map_sz_str);
+  map_sz = std::stoi(map_sz_str);
   for (int i = 0; i < map_sz; ++i) {
     string treestr, name;
-    f >> treestr;
-    index_manager.insert(make_pair(name, std::make_shared<BPTree>(treestr, TREE_SIZE, name)));
+    std::getline(f, treestr);
+    auto tree = std::make_shared<BPTree>(treestr, TREE_SIZE, name);
+    index_manager.insert(make_pair(name, tree));
   }
 }
