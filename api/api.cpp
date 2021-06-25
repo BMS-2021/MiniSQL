@@ -76,7 +76,7 @@ namespace api {
                                 + std::to_string(this->insert_list.size()));
         }
 
-        // validate the input  type
+        // validate the input type
         {
             for (int i = 0; i < this->insert_list.size(); i++) {
                 if (table.attribute_type.at(i).type != this->insert_list.at(i).sql_type.type) {
@@ -114,10 +114,7 @@ namespace api {
             }
         }
 
-        sql_tuple tuple;
-        tuple.element = this->insert_list;
-        auto index_row_in_record = rec_mgt.insertRecord(table, tuple);
-#ifndef DETACH_INDEX_MANAGER
+#ifndef DETACH_INDEX_MANAGER  // validate
         for (const auto &i : table.index) {
             // i : pair<attr, index>
             int j = 0;
@@ -132,14 +129,44 @@ namespace api {
                                     + i.first
                                     + "\' of index \'"
                                     + i.second
-                                    + "cannot be found in table \'"
+                                    + "\' cannot be found in table \'"
                                     + table_name
                                     + "\'");
+            }
+
+            auto found_element = false;
+            try {
+                idx_mgt.search(i.second, this->insert_list.at(j), j, table);
+                found_element = true;
+            } catch (sql_exception &e) {
+                if (e.code != 300) {
+                    throw e;
+                }
+            }
+            if (found_element) {
+                throw sql_exception(213, "api", "duplicated index value: " + this->insert_list.at(j).toStr());
+            }
+
+        }
+#endif
+        sql_tuple tuple;
+        tuple.element = this->insert_list;
+        const auto index_row_in_record = rec_mgt.insertRecord(table, tuple);
+
+#ifndef DETACH_INDEX_MANAGER
+        for (const auto &i : table.index) {
+            // i : pair<attr, index>
+            int j = 0;
+            for (; j < table.attribute_names.size(); j++) {
+                if (i.first == table.attribute_names.at(j)) {
+                    break;
+                }
             }
             auto value = rec_mgt.getRecord(table, index_row_in_record).element.at(j);
             idx_mgt.insert(i.second, value, j, table, index_row_in_record);
         }
 #endif
+
         table.record_cnt++;
         std::cout << "query OK, 1 row affected";
     }
@@ -148,6 +175,9 @@ namespace api {
         throw_on_table_not_exist(this->table_name);
 
         auto& table = cat_mgt.GetTable(this->table_name);
+        if (this->attribute_list.empty()) {
+            this->attribute_list = table.attribute_names;
+        }
 
         // validate attribute list, if attribute list is empty, this means SELECT *
         {
@@ -168,11 +198,13 @@ namespace api {
 
         result res;
 
-        if (this->condition_list.size() == 1 && this->condition_list.at(0).op == attribute_operator::EQUAL) {
+        if (this->condition_list.size() == 1 &&
+            this->condition_list.at(0).op == attribute_operator::EQUAL &&
+            !table.index.empty()) {
             uint32_t idx_pos = -1;
             string treename;
             for(auto i = 0; i < table.index.size(); ++i) {
-                if(this->attribute_list.at(0) == table.index.at(i).first) {
+                if(this->condition_list.at(0).attribute_name == table.index.at(i).first) {
                     idx_pos = i;
                     treename = table.index.at(i).second;
                     break;
@@ -183,15 +215,12 @@ namespace api {
                 auto record = rec_mgt.getRecord(table, search_res);
                 res = convert_sql_tuple_to_result(table.attribute_names, this->attribute_list, record);
             }
-        } else {
+        }
+        if (res.row.empty()) {
             res = rec_mgt.selectRecord(table, this->attribute_list, this->condition_list);
         }
 
-        if (this->attribute_list.empty()) {
-            print_select_result(table.attribute_names, res);
-        } else {
-            print_select_result(this->attribute_list, res);
-        }
+        print_select_result(this->attribute_list, res);
 
         if (res.row.empty()) {
             std::cout << "empty set";
@@ -231,7 +260,7 @@ namespace api {
                                     + i.first
                                     + "\' of index \'"
                                     + i.second
-                                    + "cannot be found in table \'"
+                                    + "\' cannot be found in table \'"
                                     + table_name
                                     + "\'");
             }
@@ -267,34 +296,36 @@ namespace api {
         throw_on_table_not_exist(this->table_name);
         auto& table = cat_mgt.GetTable(this->table_name);
 
+        for (const auto &i : table.attribute_names) {
+
+        }
+
+        // i : pair<attr, index>
+        int column = 0;
+        for (; column < table.attribute_names.size(); column++) {
+            if (this->attribute_name == table.attribute_names.at(column)) {
+                break;
+            }
+        }
+        if (column == table.attribute_names.size()) {
+            throw sql_exception(212, "api",
+                                "attribute \'"
+                                + this->attribute_name
+                                + "\' cannot be found in table \'"
+                                + table_name
+                                + "\'");
+        }
+
         cat_mgt.CreateIndex(table, this->attribute_name, this->index_name);
+
 #ifndef DETACH_INDEX_MANAGER
         auto record_row_tuple_pairs = rec_mgt.getRecordPairs(table);
-        for (const auto &i : table.index) {
-            // i : pair<attr, index>
-            int j = 0;
-            for (; j < table.attribute_names.size(); j++) {
-                if (i.first == table.attribute_names.at(j)) {
-                    break;
-                }
-            }
-            if (j == table.attribute_names.size()) {
-                throw sql_exception(211, "api",
-                                    "attribute \'"
-                                    + i.first
-                                    + "\' of index \'"
-                                    + i.second
-                                    + "cannot be found in table \'"
-                                    + table_name
-                                    + "\'");
-            }
 
-            auto record_to_insert = std::vector<std::pair<uint32_t, sql_value>>();
-            for (const auto &iter : record_row_tuple_pairs) {
-                record_to_insert.emplace_back(iter.first, iter.second.element.at(j));
-            }
-            idx_mgt.create(this->index_name, record_to_insert, j, table);
+        auto record_to_insert = std::vector<std::pair<uint32_t, sql_value>>();
+        for (const auto &iter : record_row_tuple_pairs) {
+            record_to_insert.emplace_back(iter.first, iter.second.element.at(column));
         }
+        idx_mgt.create(this->index_name, record_to_insert, column, table);
 #endif
         std::cout << "index \'" << this->index_name << "\' created on \'" << this->table_name << "." << this->attribute_name << "\'";
     }
