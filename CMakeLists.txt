@@ -57,7 +57,7 @@ set(INDEX_MANAGER
 
 find_package(BISON)
 find_package(FLEX)
-
+#[[
 if(BISON_FOUND AND FLEX_FOUND)
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/interpreter)
     BISON_TARGET(MyParser interpreter/parser.y ${CMAKE_CURRENT_BINARY_DIR}/interpreter/parser.tab.cc)
@@ -68,10 +68,10 @@ if(BISON_FOUND AND FLEX_FOUND)
 else()
     message(WARNING "GNU Bison or Flex not found. \
                      This program will use pre-generated files instead... (deprecated)")
-
+]]
     add_executable(MiniSQL macro.h main.cpp ${INTERPRETER} ${API} ${EXCEPTION} ${DEPRECATED_INTERPRETER} ${BUFFER_MANAGER} ${RECORD_MANAGER} ${CATALOG_MANAGER} ${INDEX_MANAGER} utils/utils.cpp utils/utils.h)
-endif()
-
+#endif()
+#[[
 find_library(LIB_READLINE "readline")
 if(LIB_READLINE)
     message(STATUS "Found READLINE: ${LIB_READLINE}")
@@ -81,3 +81,4 @@ else()
     message(WARNING "Library \"readline\" not found. \
             This program will use C++ standard library instead... (not recommended)")
 endif()
+]]
