@@ -93,13 +93,16 @@ void CatalogManager::Flush()
             tab_ofs << ((attr.unique) ? 1 : 0) << std::endl;
 
             // Index info
-            std::vector<std::pair<std::string, std::string>>::iterator ind;
-            for(ind = tb.index.begin(); ind != tb.index.end(); ++ind){
+            bool ifind = false;
+            for(auto ind = tb.index.begin(); ind != tb.index.end(); ++ind){
                 if(ind->first == tb.attribute_names[i]){
                     tab_ofs << 1 << std::endl << ind->second << std::endl;
+                    ifind = true;
+                    break;
                 }
             }
-            if (ind == tb.index.end()){
+
+            if (!ifind){
                 tab_ofs << 0 << std::endl << "-" << std::endl;
             }
         }
@@ -158,9 +161,13 @@ void CatalogManager::LoadFromFile()
             type.unique = (ifuniq) ? 1 : 0;
             tb.attribute_type.push_back(type);
 
-            //TODO: Implement real index creation in tb.index if ifind==1
-            if (ifind){
+            if (ifind == 1){
                 CreateIndex(tb, attr_name, index_name);
+            }
+            else{
+                if(ifind != 0 || index_name != "-"){
+                    throw sql_exception(604, "catalog manager", "catalog file crached on index \'" + index_name + "\'");
+                }
             }
 
         }
@@ -168,7 +175,6 @@ void CatalogManager::LoadFromFile()
         tb.record_len = record_len;
         tables.push_back(tb);
 
-        //TODO: Create real index for whole table
 
     }
 }
