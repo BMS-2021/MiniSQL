@@ -7,20 +7,19 @@ IndexManager::~IndexManager() {
 }
 
 void IndexManager::create(const string& treename) {
-  index_manager.insert(
-      make_pair(treename, std::make_shared<BPTree>(TREE_SIZE, TREE_DEGREE)));
+  index_manager.emplace(treename, std::make_unique<BPTree>(TREE_SIZE, TREE_DEGREE));
 }
 
 void IndexManager::create(const string& treename,
                           const vector<std::pair<uint32_t, sql_value>>& indexs,
                           uint32_t idx_pos,
                           const macro::table table) {
-  auto idxtree = std::make_shared<BPTree>(TREE_SIZE, TREE_DEGREE);
+  auto idxtree = std::make_unique<BPTree>(TREE_SIZE, TREE_DEGREE);
 
   for (auto& x : indexs)
 
     idxtree->insert(idx_pos, table, x.first, x.second);
-  index_manager.insert(make_pair(treename, idxtree));
+  index_manager.emplace(treename, std::move(idxtree));
 }
 
 void IndexManager::drop(const string& treename) {
@@ -81,7 +80,7 @@ void IndexManager::load() {
   for (int i = 0; i < map_sz; ++i) {
     string treestr, name;
     std::getline(f, treestr);
-    auto tree = std::make_shared<BPTree>(treestr, TREE_SIZE, name);
-    index_manager.insert(make_pair(name, tree));
+    auto tree = std::make_unique<BPTree>(treestr, TREE_SIZE, name);
+    index_manager.emplace(name, std::move(tree));
   }
 }
