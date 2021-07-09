@@ -1,7 +1,5 @@
 # IndexManager
 
-## Introduction
-
 As what is just mentioned in its name, the module `IndexManager` is a class that works for the management of the index.
 
 The index manager supports the following functions, which are listed as `public` member methods:
