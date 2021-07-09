@@ -6,8 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(INTERPRETER
         interpreter/interpreter.h
         interpreter/interpreter.cpp
-        interpreter/utils.cpp
-        interpreter/utils.h
         interpreter/readline.c)
 
 set(API
