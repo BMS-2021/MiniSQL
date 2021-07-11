@@ -18,13 +18,9 @@ In buffer, I maintain the following two structures:
 
 - File Blocks
 
-  ![img](file:////Users/apple/Library/Group%20Containers/UBF8T346G9.Office/TemporaryItems/msohtmlclip/clip_image002.jpg)
-
   This structure contains blocks store useful data. The FileHandle points to a file linked list, each node represents a file. And each node in file linked list points to a batch of block. When `BufferManager` handle a request, it firstly find in file linked list. If the file is not found, it will create a new node and open the file. Then it search the blocks under the file node. If the block is in buffer, it will be returned directly. If not, the manager will fetch a block in free block linked list and add it to file blocks.
 
 - Free Blocks
-
-  ![image-20210707125542479](/Users/apple/Library/Application Support/typora-user-images/image-20210707125542479.png)
 
   Free block is  a linked list headed by BlockHandle which stores blocks not used. When a file is closed or be replaced, it will reduce a lot of free blocks, these blocks will be added in to free blocks linked list. When we need new blocks, we can fetch blocked in this linked list.
 
