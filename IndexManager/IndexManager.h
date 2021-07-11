@@ -52,5 +52,5 @@ class IndexManager {
   void load();
 
  private:
-  std::unordered_map<string, std::shared_ptr<BPTree>> index_manager;
+  std::unordered_map<string, std::unique_ptr<BPTree>> index_manager;
 };
