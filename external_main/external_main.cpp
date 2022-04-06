@@ -2,10 +2,10 @@ extern "C" {
 #include "external_main.h"
 }
 
-#include "interpreter/interpreter.h"
-#include "RecordManager/RecordManager.h"
-#include "CatalogManager/CatalogManager.h"
-#include "IndexManager/IndexManager.h"
+#include "../interpreter/interpreter.h"
+#include "../RecordManager/RecordManager.h"
+#include "../CatalogManager/CatalogManager.h"
+#include "../IndexManager/IndexManager.h"
 
 RecordManager rec_mgt;
 CatalogManager cat_mgt;

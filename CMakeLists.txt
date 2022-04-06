@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(MiniSQL)
+project(minisql)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -60,8 +60,8 @@ if(BISON_FOUND AND FLEX_FOUND)
     BISON_TARGET(MyParser interpreter/parser.y ${CMAKE_CURRENT_BINARY_DIR}/interpreter/parser.tab.cc)
     FLEX_TARGET(MyScanner interpreter/tokenizer.l ${CMAKE_CURRENT_BINARY_DIR}/interpreter/lex.yy.cc)
     ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
-    include_directories("interpreter")
-    add_library(MiniSQL macro.h external_main.cpp
+    include_directories(${CMAKE_CURRENT_BINARY_DIR}/interpreter)
+    add_library(${PROJECT_NAME} STATIC macro.h external_main/external_main.cpp
             ${INTERPRETER} ${API} ${EXCEPTION}
             ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
             ${BUFFER_MANAGER} ${RECORD_MANAGER} ${CATALOG_MANAGER} ${INDEX_MANAGER}

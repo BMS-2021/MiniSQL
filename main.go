@@ -2,15 +2,11 @@ package main
 
 /*
 #cgo CFLAGS: -I./
-#cgo LDFLAGS: -L${SRCDIR} -lMiniSQL
-#include "external_main.h"
+#cgo LDFLAGS: -L${SRCDIR}/ -lminisql
+int external_main(char * str);
 */
 import "C"
 
-import (
-    "fmt"
-)
-
 func main() {
-    C.external_main(C.CString("exit;"));
+	C.external_main(C.CString("exit;"))
 }
