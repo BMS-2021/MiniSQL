@@ -5,7 +5,6 @@
 #ifndef MINISQL_MAIN_H
 #define MINISQL_MAIN_H
 
-//#include <iostream>
-int external_main(char * str);
+void external_main(char * str);
 
 #endif //MINISQL_MAIN_H

@@ -22,7 +22,7 @@ IndexManager idx_mgt;
 //    interpret_entrance();
 //}
 
-int external_main(char * str) {
+void external_main(char * str) {
     external_execute(str);
 }
 

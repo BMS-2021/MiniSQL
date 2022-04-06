@@ -70,7 +70,12 @@ else()
     message(FATAL_ERROR "GNU Bison(version >= 3.0) or Flex not found.")
 endif()
 
-find_library(LIB_READLINE "readline")
+add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD 
+        COMMAND go build -v
+        COMMENT "Building go source files"
+)
 
 # if(LIB_READLINE)
 #     message(STATUS "Found READLINE: ${LIB_READLINE}")
