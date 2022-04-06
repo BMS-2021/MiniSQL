@@ -16,7 +16,7 @@ using std::make_tuple;
 
 class IndexManager {
  public:
-  IndexManager() = default;
+  IndexManager();
   ~IndexManager();
 
   void create(const string& treename);

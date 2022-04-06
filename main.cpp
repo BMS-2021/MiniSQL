@@ -1,4 +1,7 @@
-#include <iostream>
+extern "C" {
+#include "main.h"
+}
+
 #include "interpreter/interpreter.h"
 #include "RecordManager/RecordManager.h"
 #include "CatalogManager/CatalogManager.h"
@@ -20,8 +23,6 @@ IndexManager idx_mgt;
 //}
 
 int external_main(char * str) {
-    cat_mgt.LoadFromFile();
-    idx_mgt.load();
     external_execute(str);
 }
 

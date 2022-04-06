@@ -22,13 +22,13 @@ std::unique_ptr<api::base> query_object_ptr = nullptr;
 const auto PRECISION = 4;
 
 void external_execute(char* str) {
-    parse(inter.read());
+    parse(str);
 
     auto start = std::chrono::system_clock::now();
 
     if (parse_exception != nullptr) {
         std::cout << *parse_exception;
-        continue;
+        return;
     }
 
     if (query_object_ptr != nullptr) {

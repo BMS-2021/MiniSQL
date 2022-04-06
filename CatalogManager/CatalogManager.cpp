@@ -53,7 +53,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
 CatalogManager::CatalogManager()
         :tables(std::vector<macro::table>())
 {
-
+    this->LoadFromFile();
 }
 
 CatalogManager::~CatalogManager()
