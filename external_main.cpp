@@ -1,5 +1,5 @@
 extern "C" {
-#include "main.h"
+#include "external_main.h"
 }
 
 #include "interpreter/interpreter.h"

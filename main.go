@@ -2,8 +2,8 @@ package main
 
 /*
 #cgo CFLAGS: -I./
-#cgo LDFLAGS: -L${SRCDIR}/CMakeFiles -lMiniSQL
-#include "main.h"
+#cgo LDFLAGS: -L${SRCDIR} -lMiniSQL
+#include "external_main.h"
 */
 import "C"
 

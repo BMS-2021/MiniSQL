@@ -49,7 +49,7 @@ set(INDEX_MANAGER
         IndexManager/BPTree.cpp
         IndexManager/IndexManager.h
         IndexManager/IndexManager.cpp
-        IndexManager/BPTreeNode.cpp main.h)
+        IndexManager/BPTreeNode.cpp)
 
 # add_definitions(-DDETACH_INDEX_MANAGER)
 
@@ -61,7 +61,7 @@ if(BISON_FOUND AND FLEX_FOUND)
     FLEX_TARGET(MyScanner interpreter/tokenizer.l ${CMAKE_CURRENT_BINARY_DIR}/interpreter/lex.yy.cc)
     ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
     include_directories("interpreter")
-    add_library(MiniSQL macro.h main.cpp
+    add_library(MiniSQL macro.h external_main.cpp
             ${INTERPRETER} ${API} ${EXCEPTION}
             ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
             ${BUFFER_MANAGER} ${RECORD_MANAGER} ${CATALOG_MANAGER} ${INDEX_MANAGER}
