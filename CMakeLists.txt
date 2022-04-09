@@ -73,7 +73,8 @@ endif()
 add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD 
-        COMMAND go build -v
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/go-svc
+        COMMAND go build -o ../MiniSQL
         COMMENT "Building go source files"
 )
 
