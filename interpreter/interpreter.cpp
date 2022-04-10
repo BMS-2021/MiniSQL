@@ -21,6 +21,39 @@ std::unique_ptr<api::base> query_object_ptr = nullptr;
 
 const auto PRECISION = 4;
 
+void external_execute(char* str) {
+    parse(str);
+
+    auto start = std::chrono::system_clock::now();
+
+    if (parse_exception != nullptr) {
+        std::cout << *parse_exception;
+        return;
+    }
+
+    if (query_object_ptr != nullptr) {
+        try {
+            query_object_ptr->exec();
+        } catch (sql_exception &e) {
+            std::cout << e;
+        }
+    }
+
+    auto end = std::chrono::system_clock::now();
+
+    std::cout << " ("
+        << std::fixed
+        << std::setprecision(PRECISION)
+        << static_cast<double>(duration_cast<std::chrono::microseconds>(end - start).count())
+            * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den
+        << " sec)"
+        << std::endl;
+
+    std::cout.unsetf(std::ios::fixed);
+    std::cout.precision(6);
+}
+
+
 void interpret_entrance() {
     while (!sig_exit) {
         std::cout << std::endl;

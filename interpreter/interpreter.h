@@ -10,6 +10,7 @@
 const int SQL_QUERY_LENGTH = 200;
 
 void interpret_entrance();
+void external_execute(char *);
 
 extern "C" int yywrap ( void );
 

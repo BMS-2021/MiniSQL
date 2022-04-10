@@ -2,6 +2,10 @@
 
 #include <fstream>
 
+IndexManager::IndexManager() {
+    this->load();
+}
+
 IndexManager::~IndexManager() {
   // TODO: destruct function
 }
