@@ -4,7 +4,7 @@ This is `MiniSQL`, the final project of *Database System Concept* course.
 
 ![MiniSQL.png](https://i.loli.net/2021/07/11/quRsbFZpzL5r7gY.png)  
 
-In this project, we are required to implement a simple DBMS, which contains some basic features, 
+In this project, we are required to implement a toy database, which contains some basic features, 
 like creating, dropping and selecting table, inserting and deleting rows, 
 creating and dropping indexes which is implemented by a B+ tree, and providing persistent storage. 
 There are three data types that must be supported: 
@@ -12,13 +12,19 @@ There are three data types that must be supported:
 The querying condition could be concatenated using `AND`, and common operators in the condition expression must be supported. 
 External `.sql` files are required to be able to execute by `EXECFILE` statement.  
 
-The project contains six modules: *Interpreter*, *API*, *Catalog Manager*, *Record Manager*, *Buffer Manager*, and *Index Manager*.  
+## Infrastructure
+
+![MiniSQL.png](https://raw.githubusercontent.com/RalXYZ/repo-pictures/47c8cad9a82fa1a3ce59af6799a0c03ddffd4954/MiniSQL/minisql.svg)  
+
+The project contains six modules: *Interpreter*, *API*, *Catalog Manager*, *Record Manager*, *Buffer Manager*, and *Index Manager*.
+A golang HTTP server is provided to serve the database, while you can also choose to use the CLI version of this database.
 
 **Cautious: This project is a final project of a course, NOT a project that can be used in production.**
 
 ## Build
 
 Firstly, make sure you've installed *CMake*, *Bison* and *Flex*.  
+Golang should also be installed, which version must be higher than 1.17.
 Then, in the project director, run the following command:  
 
 ```shell
@@ -26,7 +32,9 @@ cmake .
 make
 ```
 
-Then you will get a `MiniSQL` executable.  
+Then, two executables, one called `MiniSQL` and another called `minisql_local` will appear in the project directory.  
+- `MiniSQL` is the executable that can be run on the server, which exposes HTTP API.
+- `minisql_local` is the executable that can be run on the local machine, which has a CLI interface.
 
 If you haven't installed *GNU Readline* library, the program will fallback, using `std::cin` to read input lines, 
 which will affect the using experience.  
