@@ -23,20 +23,23 @@ IndexManager idx_mgt;
 //     interpret_entrance();
 // }
 
-char *external_main(char *str)
-{
+libminisql_resp external_main(char *str) {
+
+    // redirect cout to buffer
     std::stringstream buffer;
     auto old = std::cout.rdbuf();
     std::cout.rdbuf(buffer.rdbuf());
 
     external_execute(str);
 
-    std::string text = buffer.str();
-
+    // redirect cout back
     std::cout.rdbuf(old);
 
-    const char *buf = text.c_str();
-    char *res = (char *)malloc(strlen(buf) + 1);
+    // get buffer content
+    auto buf = buffer.str().c_str();
+    auto res = reinterpret_cast<char*>(malloc(strlen(buf) + 1));
     strcpy(res, buf);
-    return res;
+
+    auto code; // TODO: set status code during execution
+    return libminisql_resp{ code, res };
 }
