@@ -66,12 +66,8 @@ if(BISON_FOUND AND FLEX_FOUND)
             ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
             ${BUFFER_MANAGER} ${RECORD_MANAGER} ${CATALOG_MANAGER} ${INDEX_MANAGER}
             utils/utils.cpp utils/utils.h)
-    add_executable(${PROJECT_NAME}_local macro.h main.cpp 
-        ${INTERPRETER} ${API} ${EXCEPTION}
-        ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
-        ${BUFFER_MANAGER} ${RECORD_MANAGER} ${CATALOG_MANAGER} ${INDEX_MANAGER}
-        utils/utils.cpp utils/utils.h
-    )
+    add_executable(${PROJECT_NAME}_local main.cpp)
+    target_link_libraries(${PROJECT_NAME}_local ${PROJECT_NAME})
 else()
     message(FATAL_ERROR "GNU Bison(version >= 3.0) or Flex not found.")
 endif()
@@ -92,7 +88,7 @@ file(COPY
 
 add_custom_command(
         TARGET ${PROJECT_NAME}
-        POST_BUILD 
+        POST_BUILD
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/go-svc
         COMMAND go build -o ../MiniSQL
         COMMENT "Building go source files"
