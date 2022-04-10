@@ -9,15 +9,23 @@ package main
 import "C"
 import (
 	"fmt"
+	"net/http"
 	"unsafe"
+
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	res := C.external_main(C.CString("select * from foo;"))
+	e := echo.New()
+	e.POST("/", func(c echo.Context) error {
+		command := c.FormValue("command")
+		res := C.external_main(C.CString(command))
 
-	code := C.int(res.code)
-	msg := C.GoString(res.msg)
-	C.free(unsafe.Pointer(res.msg))
+		code := C.int(res.code)
+		msg := C.GoString(res.msg)
+		C.free(unsafe.Pointer(res.msg))
 
-	fmt.Printf("[%v]%v\n", code, msg)
+		return c.String(http.StatusOK, fmt.Sprintf("[%v]%v\n", code, msg))
+	})
+	e.Logger.Fatal(e.Start(":1323"))
 }

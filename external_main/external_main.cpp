@@ -40,6 +40,6 @@ libminisql_resp external_main(char *str) {
     auto res = reinterpret_cast<char*>(malloc(strlen(buf) + 1));
     strcpy(res, buf);
 
-    auto code; // TODO: set status code during execution
+    auto code = 0; // TODO: set status code during execution
     return libminisql_resp{ code, res };
 }
