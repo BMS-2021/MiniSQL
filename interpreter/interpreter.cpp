@@ -161,7 +161,6 @@ const char* interpreter::read() {
         }
         first_loop = false;
     }
-    std::cout << this->str;
     return this->str;
 #endif
 }
