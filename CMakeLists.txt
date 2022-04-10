@@ -60,7 +60,7 @@ if(BISON_FOUND AND FLEX_FOUND)
     BISON_TARGET(MyParser interpreter/parser.y ${CMAKE_CURRENT_BINARY_DIR}/interpreter/parser.tab.cc)
     FLEX_TARGET(MyScanner interpreter/tokenizer.l ${CMAKE_CURRENT_BINARY_DIR}/interpreter/lex.yy.cc)
     ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
-    include_directories(${CMAKE_CURRENT_BINARY_DIR}/interpreter)
+    include_directories(interpreter)
     add_library(${PROJECT_NAME} STATIC macro.h external_main/external_main.cpp
             ${INTERPRETER} ${API} ${EXCEPTION}
             ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
@@ -75,6 +75,20 @@ if(BISON_FOUND AND FLEX_FOUND)
 else()
     message(FATAL_ERROR "GNU Bison(version >= 3.0) or Flex not found.")
 endif()
+
+file(COPY
+        ${CMAKE_CURRENT_SOURCE_DIR}/go-svc/main.go
+        ${CMAKE_CURRENT_SOURCE_DIR}/go-svc/placeholder.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/go.mod
+        ${CMAKE_CURRENT_SOURCE_DIR}/go.sum
+    DESTINATION
+        ${CMAKE_CURRENT_BINARY_DIR}/go-svc
+    )
+file(COPY
+        ${CMAKE_CURRENT_SOURCE_DIR}/external_main/external_main.h
+    DESTINATION
+        ${CMAKE_CURRENT_BINARY_DIR}/external_main
+)
 
 add_custom_command(
         TARGET ${PROJECT_NAME}
