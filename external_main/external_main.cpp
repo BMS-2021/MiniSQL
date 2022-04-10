@@ -36,9 +36,10 @@ libminisql_resp external_main(char *str) {
     std::cout.rdbuf(old);
 
     // get buffer content
-    auto buf = buffer.str().c_str();
-    auto res = reinterpret_cast<char*>(malloc(strlen(buf) + 1));
-    strcpy(res, buf);
+    auto buffer_content = buffer.str();
+    auto buffer_c_str = buffer_content.c_str();
+    auto res = reinterpret_cast<char*>(malloc(strlen(buffer_c_str) + 1));
+    strcpy(res, buffer_c_str);
 
     auto code = 0; // TODO: set status code during execution
     return libminisql_resp{ code, res };
