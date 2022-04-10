@@ -17,7 +17,12 @@ import (
 
 func main() {
 	e := echo.New()
+	channel := make(chan int, 1)
 	e.POST("/", func(c echo.Context) error {
+		// mutex
+		channel <- 1
+		defer func() {<-channel}()
+
 		command := c.FormValue("command")
 		res := C.external_main(C.CString(command))
 
