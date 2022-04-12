@@ -21,36 +21,51 @@ std::unique_ptr<api::base> query_object_ptr = nullptr;
 
 const auto PRECISION = 4;
 
-void external_execute(char* str) {
-    parse(str);
+/*
+code:
+1: exit
+0: success
+-1: error
+ */
+int sql_execution(const char *sql) {
+    parse_exception = nullptr;
+
+    parse(sql);
+
+    auto query_exit_ptr = dynamic_cast<api::exit*>(query_object_ptr.get());
 
     auto start = std::chrono::system_clock::now();
 
     if (parse_exception != nullptr) {
         std::cout << *parse_exception;
-        return;
+        return -1;
     }
-
-    if (query_object_ptr != nullptr) {
+    if(query_object_ptr != nullptr) {
         try {
             query_object_ptr->exec();
-        } catch (sql_exception &e) {
+        } catch (sql_exception& e) {
             std::cout << e;
+            return -1;
         }
     }
 
     auto end = std::chrono::system_clock::now();
 
-    std::cout << " ("
+    std::cout << "("
         << std::fixed
         << std::setprecision(PRECISION)
         << static_cast<double>(duration_cast<std::chrono::microseconds>(end - start).count())
-            * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den
+          * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den
         << " sec)"
         << std::endl;
 
-    std::cout.unsetf(std::ios::fixed);
-    std::cout.precision(6);
+        std::cout.unsetf(std::ios::fixed);
+        std::cout.precision(6);
+
+    if (query_exit_ptr != nullptr) {
+        return 1;
+    }
+    return 0;
 }
 
 
@@ -61,72 +76,21 @@ void interpret_entrance() {
         parse_exception = nullptr;
 
         if (file_to_exec.empty()) {
-            parse(inter.read());
-
-            auto start = std::chrono::system_clock::now();
-
-            if (parse_exception != nullptr) {
-                std::cout << *parse_exception;
-                continue;
+            auto flag = sql_execution(inter.read());
+            if(flag == 1) {
+                std::exit(0);
             }
-
-            if (query_object_ptr != nullptr) {
-                try {
-                    query_object_ptr->exec();
-                } catch (sql_exception &e) {
-                    std::cout << e;
-                }
-            }
-
-            auto end = std::chrono::system_clock::now();
-
-            std::cout << " ("
-                      << std::fixed
-                      << std::setprecision(PRECISION)
-                      << static_cast<double>(duration_cast<std::chrono::microseconds>(end - start).count())
-                            * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den
-                      << " sec)"
-                      << std::endl;
-
-            std::cout.unsetf(std::ios::fixed);
-            std::cout.precision(6);
         } else {  // execfile
             std::ifstream file(file_to_exec);
             if (file.fail()) {
                 std::cout << sql_exception(101, "interpreter", "file \'" + file_to_exec + "\' not found");
             } else {
                 while (!file.eof()) {
-                    parse_exception = nullptr;
-
                     interpreter inter_inner;
-                    parse(inter_inner.read(file));
-
-                    auto start = std::chrono::system_clock::now();
-
-                    if (parse_exception != nullptr) {
-                        std::cout << *parse_exception;
-                        continue;
+                    auto flag = sql_execution(inter_inner.read(file));
+                    if(flag == 1) {
+                        std::exit(0);
                     }
-                    if (query_object_ptr != nullptr) {
-                        try {
-                            query_object_ptr->exec();
-                        } catch (sql_exception &e) {
-                            std::cout << e;
-                        }
-                    }
-
-                    auto end = std::chrono::system_clock::now();
-
-                    std::cout << "("
-                              << std::fixed
-                              << std::setprecision(PRECISION)
-                              << static_cast<double>(duration_cast<std::chrono::microseconds>(end - start).count())
-                                 * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den
-                              << " sec)"
-                              << std::endl;
-
-                    std::cout.unsetf(std::ios::fixed);
-                    std::cout.precision(6);
                 }
             }
             file_to_exec = "";

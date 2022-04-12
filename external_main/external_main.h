@@ -10,6 +10,6 @@ typedef struct {
     char *msg;
 } libminisql_resp;
 
-libminisql_resp external_main(char *str);
+libminisql_resp external_main(const char *str);
 
 #endif // MINISQL_MAIN_H
