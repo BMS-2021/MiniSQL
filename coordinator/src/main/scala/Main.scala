@@ -14,5 +14,19 @@ object Main:
   def main(args: Array[String]): Unit =
     // create a curator client
     CuratorClient.Start()
-    CuratorClient.Close()
 
+    CuratorClient.AddListener("/test")
+
+    CuratorClient.CreateNode("/test/ababa", "ababa")
+
+    Thread.sleep(1000)
+
+    CuratorClient.SetNode("/test/ababa", "acacia")
+
+    Thread.sleep(1000)
+
+    CuratorClient.DeleteNode("/test/ababa")
+
+    Thread.sleep(1000)
+
+    CuratorClient.Close()
