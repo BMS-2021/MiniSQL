@@ -44,3 +44,21 @@ libminisql_resp external_main(const char *str) {
     // auto code = 0; // TODO: set status code during execution
     return libminisql_resp{ code, res };
 }
+
+char* get_table_names() {
+    auto table_names = cat_mgt.get_table_names();
+    auto reduced = std::string();
+    for(auto x: table_names) {
+        if(reduced.size() > 0) {
+            reduced += "," + x;
+        } else {
+            reduced += x;
+        }
+    }
+
+    auto reduced_c_str = reduced.c_str();
+    auto res = reinterpret_cast<char*>(malloc(strlen(reduced_c_str) + 1));
+    strcpy(res, reduced_c_str);
+
+    return res;
+}

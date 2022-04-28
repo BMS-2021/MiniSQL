@@ -52,6 +52,8 @@ public:
 
     bool DropIndex(const std::string &index_name);
 
+    std::vector<std::string> get_table_names();
+
 
 private:
     std::vector<macro::table> tables;

@@ -327,3 +327,12 @@ bool CatalogManager::DropIndex(const std::string &index_name)
     }
     return false;
 }
+
+std::vector<std::string> CatalogManager::get_table_names() {
+    auto vec = std::vector<std::string>();
+    vec.reserve(tables.size());
+    for (auto x : tables) {
+        vec.push_back(x.name);
+    }
+    return vec;
+}
