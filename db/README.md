@@ -41,6 +41,11 @@ which will affect the using experience.
 
 ## Usage
 
+Start the program in http server mode with zk:
+```sh
+./MiniSQL [node_name] [zk_server_addr]
+```
+
 After the executable has been executed, press `TAB`, then you will see all valid keywords. 
 Pressing `TAB` can also auto-complete the keywords.  
 
