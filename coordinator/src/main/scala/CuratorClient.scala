@@ -16,6 +16,9 @@ object CuratorClient:
     val cluster = new TestingCluster(3)
     cluster.start()
 
+    val conn = cluster.getConnectString()
+    println(s"Connect to $conn")
+
     val retryPolicy = new ExponentialBackoffRetry(1000, 3)
 
     println("connect to the testing cluster")
