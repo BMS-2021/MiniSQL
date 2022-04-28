@@ -10,18 +10,37 @@ import "C"
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 	"unsafe"
+
+	"github.com/go-zookeeper/zk"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
+	regionName := os.Args[1]
+	serverAddr := os.Args[2]
+
+	conn, _, err := zk.Connect([]string{serverAddr}, time.Second)
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := conn.Create("/"+regionName, []byte("asfasdf"), zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
+	if err != nil {
+		panic(err)
+	}
+
+	println("create node :", res)
+
 	e := echo.New()
 	channel := make(chan int, 1)
 	e.POST("/", func(c echo.Context) error {
 		// mutex
 		channel <- 1
-		defer func() {<-channel}()
+		defer func() { <-channel }()
 
 		command := c.FormValue("command")
 		res := C.external_main(C.CString(command))
