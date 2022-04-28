@@ -28,7 +28,11 @@ func main() {
 		panic(err)
 	}
 
-	res, err := conn.Create("/"+regionName, []byte("asfasdf"), zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
+	tableNames := C.GoString(C.get_table_names())
+
+	println(tableNames)
+
+	res, err := conn.Create("/"+regionName, []byte(tableNames), zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
 	if err != nil {
 		panic(err)
 	}
