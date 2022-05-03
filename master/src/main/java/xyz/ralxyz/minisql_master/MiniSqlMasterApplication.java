@@ -1,5 +1,6 @@
 package xyz.ralxyz.minisql_master;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -7,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+@Slf4j
 @SpringBootApplication
 public class MiniSqlMasterApplication {
 
@@ -29,12 +31,14 @@ public class MiniSqlMasterApplication {
                         config.regionPort.get(i)
                 );
 
-                System.out.println("zkUrl: " + config.zkUrl.get(i));
-                System.out.println("zkPathName: " + config.zkPathName.get(i));
-                System.out.println("regionPort: " + config.regionPort.get(i));
-                System.out.println("binPath: " + config.binPath.get(i));
+                log.info("zkUrl: " + config.zkUrl.get(i));
+                log.info("zkPathName: " + config.zkPathName.get(i));
+                log.info("regionPort: " + config.regionPort.get(i));
+                log.info("binPath: " + config.binPath.get(i));
 
-                System.out.println("start: " + builder.command().stream().reduce((a, b) -> a + " " + b).get());
+                log.info("start: " + builder.command().stream().reduce((a, b) -> a + " " + b).get());
+
+                builder.start();
 
                 /*
                 var process = builder.start();
