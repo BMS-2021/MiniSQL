@@ -22,13 +22,16 @@ import (
 func main() {
 	regionName := os.Args[1]
 	serverAddr := os.Args[2]
+	apiPort := os.Args[3]
 
 	conn, _, err := zk.Connect([]string{serverAddr}, time.Second)
 	if err != nil {
 		panic(err)
 	}
 
-	tableNames := C.GoString(C.get_table_names())
+	tableNamesC := C.get_table_names()
+	tableNames := C.GoString(tableNamesC)
+	C.free(unsafe.Pointer(tableNamesC))
 
 	println(tableNames)
 
@@ -55,5 +58,5 @@ func main() {
 
 		return c.String(http.StatusOK, fmt.Sprintf("[%v]%v\n", code, msg))
 	})
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(apiPort))
 }
