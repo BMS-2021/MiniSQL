@@ -1,13 +1,16 @@
 {
-  "name": "macrosql-client",
-  "version": "1.0.0",
+  "name": "@enzymii/minisql-client",
+  "version": "0.1.0",
   "description": "HTTP client for distributed MiniSQL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "enzymii <enzymiix@gmail.com>",
-  "license": "MIT",
-  "private": true,
+  "license": "GPL-3.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BMS-2021/MiniSQL"
+  },
   "scripts": {
     "prepublish": "",
     "test": "tsc && node --experimental-specifier-resolution=node dist/test"

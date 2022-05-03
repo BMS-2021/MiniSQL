@@ -1,3 +1,3 @@
-import MacroSQLClient from "./src/client";
+import MiniSQLClient from "./src/client";
 
-export default MacroSQLClient;
+export default MiniSQLClient;

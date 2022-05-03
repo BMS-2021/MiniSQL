@@ -8,13 +8,13 @@ import config from './config';
 import { RegionInfo, Request, SqlResponse } from './types';
 import { deprecate } from 'util';
 
-class MacroSQLClient {
+class MiniSQLClient {
   private cache?: RegionInfo[];
   private masterUrl!: string;
   private http!: AxiosInstance;
 
   public static async create(masterUrl: string) {
-    const client = new MacroSQLClient(masterUrl);
+    const client = new MiniSQLClient(masterUrl);
     await client.loadCache();
     return client;
   }
@@ -133,4 +133,4 @@ class MacroSQLClient {
   }
 }
 
-export default MacroSQLClient;
+export default MiniSQLClient;
