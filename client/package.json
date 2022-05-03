@@ -2,13 +2,15 @@
   "name": "macrosql-client",
   "version": "1.0.0",
   "description": "HTTP client for distributed MiniSQL",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "enzymii <enzymiix@gmail.com>",
   "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "tsc && node index"
+    "prepublish": "",
+    "test": "tsc && node --experimental-specifier-resolution=node dist/test"
   },
   "devDependencies": {
     "@types/node": "^17.0.31",
