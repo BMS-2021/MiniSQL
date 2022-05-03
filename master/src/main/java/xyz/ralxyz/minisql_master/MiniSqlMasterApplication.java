@@ -38,7 +38,7 @@ public class MiniSqlMasterApplication {
 
                 log.info("start: " + builder.command().stream().reduce((a, b) -> a + " " + b).get());
 
-                builder.start();
+                // builder.start();
 
                 /*
                 var process = builder.start();

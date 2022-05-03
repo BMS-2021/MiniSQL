@@ -32,6 +32,7 @@ public class Cluster {
                 .connectString(this.testingCluster.getConnectString())
                 .retryPolicy(new ExponentialBackoffRetry(1000, 3))
                 .build();
+        this.client.start();
 
         this.client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).inBackground(
                 (curatorFramework, curatorEvent) -> {
@@ -45,6 +46,6 @@ public class Cluster {
                     }
                 },
                 threadPool
-        ).forPath("db");
+        ).forPath("/db");
     }
 }
