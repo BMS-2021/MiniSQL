@@ -90,12 +90,12 @@ class MacroSQLClient {
     }
   }
 
-  async queryMaster(sql: string): Promise<SqlResponse> {
+  async queryMaster(tableName: string, sql: string): Promise<SqlResponse> {
     try {
       return await this.request({
         url: this.masterUrl + '/statement',
         method: 'POST',
-        data: { command: sql },
+        data: { tableName, command: sql },
       });
     } catch (e) {
       this.exceptionHandler(e);
