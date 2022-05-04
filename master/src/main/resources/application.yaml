@@ -1,9 +1,9 @@
 minisql:
   zk_url:
-    localhost:3246
+    localhost:3246,localhost:3246,localhost:3246
   zk_path_name:
-    region_1
+    region_1,region_2,region_3
   region_port:
-    1323
+    1323,1324,1325
   shell_path:
-    /home/ralxyz/Projects/MiniSQL/db/run.sh
+    /home/ralxyz/Documents/temp/region1/run_server.sh,/home/ralxyz/Documents/temp/region2/run_server.sh,/home/ralxyz/Documents/temp/region3/run_server.sh

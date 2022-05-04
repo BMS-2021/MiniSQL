@@ -3,10 +3,12 @@ package xyz.ralxyz.minisql_master;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingCluster;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -27,9 +29,10 @@ public class Cluster {
     public ConcurrentHashMap<String, String> zkPathMap = new ConcurrentHashMap<>();
 
     @Autowired
-    private Config config;
+    Config config;
 
-    public Cluster() throws Exception {
+    @Bean
+    private void init() throws Exception {
         this.testingCluster = new TestingCluster(3);
         this.testingCluster.start();
 
@@ -44,19 +47,22 @@ public class Cluster {
     }
 
     private void creteCallback() throws Exception {
-        this.client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).inBackground(
-                (curatorFramework, curatorEvent) -> {
-                    log.info("create node: " + curatorEvent.getPath());
-                    log.info("create type: " + curatorEvent.getType());
-                    log.info("create data: " + Arrays.toString(curatorEvent.getData()));
+        var cache = CuratorCache.build(this.client, "/db");
+        cache.start();
 
-                    switch (curatorEvent.getType()) {
-                        case CREATE, SET_DATA -> zkPathMap.put(curatorEvent.getPath(), Arrays.toString(curatorEvent.getData()));
-                        case DELETE -> zkPathMap.remove(curatorEvent.getPath());
+        cache.listenable().addListener(
+                (eventType, oldData, newData) -> {
+                    log.info("create node: " + newData.getPath());
+                    log.info("create type: " + eventType);
+                    log.info("create data: " + new String(newData.getData()));
+
+                    switch (eventType) {
+                        case NODE_CREATED, NODE_CHANGED -> zkPathMap.put(newData.getPath(), Arrays.toString(newData.getData()));
+                        case NODE_DELETED -> zkPathMap.remove(newData.getPath());
                     }
                 },
                 threadPool
-        ).forPath("/");
+        );
     }
 
     private void startRegions() throws IOException {

@@ -35,7 +35,7 @@ func main() {
 
 	println(tableNames)
 
-	res, err := conn.Create("/"+regionName, []byte(tableNames), zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
+	res, err := conn.Create("/db/"+regionName, []byte(tableNames), zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
 	if err != nil {
 		panic(err)
 	}
@@ -58,5 +58,5 @@ func main() {
 
 		return c.String(http.StatusOK, fmt.Sprintf("[%v]%v\n", code, msg))
 	})
-	e.Logger.Fatal(e.Start(apiPort))
+	e.Logger.Fatal(e.Start(":" + apiPort))
 }
