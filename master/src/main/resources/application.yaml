@@ -6,4 +6,4 @@ minisql:
   region_port:
     1323,1324,1325
   shell_path:
-    /home/ralxyz/Documents/temp/region1/run_server.sh,/home/ralxyz/Documents/temp/region2/run_server.sh,/home/ralxyz/Documents/temp/region3/run_server.sh
+    /home/ralxyz/Documents/temp/region1/MiniSQL,/home/ralxyz/Documents/temp/region2/MiniSQL,/home/ralxyz/Documents/temp/region3/MiniSQL

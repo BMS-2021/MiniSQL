@@ -6,12 +6,12 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingCluster;
-import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -42,11 +42,13 @@ public class Cluster {
                 .build();
         this.client.start();
 
+        this.client.create().creatingParentsIfNeeded().forPath("/db");
+
         creteCallback();
         startRegions();
     }
 
-    private void creteCallback() throws Exception {
+    private void creteCallback() {
         var cache = CuratorCache.build(this.client, "/db");
         cache.start();
 
@@ -65,7 +67,7 @@ public class Cluster {
         );
     }
 
-    private void startRegions() throws IOException {
+    private void startRegions() throws Exception {
         var connectStringList = java.util.Arrays.stream(this.testingCluster.getConnectString().split(",")).toList();
         for (int i = 0; i < connectStringList.size(); i++) {
             var builder = new ProcessBuilder();
@@ -84,14 +86,6 @@ public class Cluster {
             log.info("start: " + builder.command().stream().reduce((a, b) -> a + " " + b).get());
 
             var process = builder.start();
-
-                /*
-                var process = builder.start();
-                var is = process.getInputStream();
-                process.waitFor();
-                new BufferedReader(new InputStreamReader(is)).lines()
-                        .forEach(System.out::println);
-                 */
         }
     };
 }
