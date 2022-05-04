@@ -16,6 +16,6 @@ public class Config {
     @Value("${minisql.region_port}")
     public List<String> regionPort;
 
-    @Value("${minisql.bin_path}")
-    public List<String> binPath;
+    @Value("${minisql.shell_path}")
+    public List<String> shellPath;
 }

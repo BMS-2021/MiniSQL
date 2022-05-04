@@ -5,5 +5,5 @@ minisql:
     region_1
   region_port:
     1323
-  bin_path:
+  shell_path:
     /home/ralxyz/Projects/MiniSQL/db/run.sh
