@@ -15,7 +15,6 @@ import (
 	"unsafe"
 
 	"github.com/go-zookeeper/zk"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -33,14 +32,14 @@ func main() {
 	tableNames := C.GoString(tableNamesC)
 	C.free(unsafe.Pointer(tableNamesC))
 
-	println(tableNames)
+	fmt.Println(tableNames)
 
 	res, err := conn.Create("/db/"+regionName, []byte(tableNames), zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
 	if err != nil {
 		panic(err)
 	}
 
-	println("create node :", res)
+	fmt.Println("created node:", res)
 
 	e := echo.New()
 	channel := make(chan int, 1)
@@ -49,14 +48,37 @@ func main() {
 		channel <- 1
 		defer func() { <-channel }()
 
+		var request struct {
+			Command string `json:"command" validate:"required"`
+		}
+
+		type Response struct {
+			Code int    `json:"code"`
+			Msg  string `json:"msg"`
+		}
+
+		if err := c.Bind(&request); err != nil {
+			return c.JSON(http.StatusBadRequest, Response{
+				Code: -1,
+				Msg:  err.Error(),
+			})
+		}
+		if err := c.Validate(&request); err != nil {
+			return c.JSON(http.StatusBadRequest, Response{
+				Code: -1,
+				Msg:  err.Error(),
+			})
+		}
+
 		command := c.FormValue("command")
 		res := C.external_main(C.CString(command))
 
-		code := C.int(res.code)
-		msg := C.GoString(res.msg)
+		var response Response
+		response.Code = int(res.code)
+		response.Msg = C.GoString(res.msg)
 		C.free(unsafe.Pointer(res.msg))
 
-		return c.String(http.StatusOK, fmt.Sprintf("[%v]%v\n", code, msg))
+		return c.JSON(http.StatusOK, response)
 	})
 	e.Logger.Fatal(e.Start(":" + apiPort))
 }
