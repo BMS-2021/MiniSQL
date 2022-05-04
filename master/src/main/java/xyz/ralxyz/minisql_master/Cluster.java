@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,7 +27,7 @@ public class Cluster {
 
     public static ExecutorService threadPool = Executors.newFixedThreadPool(2);
 
-    public ConcurrentHashMap<String, String> zkPathMap = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<String, List<String>> zkPathMap = new ConcurrentHashMap<>();
 
     @Autowired
     Config config;
@@ -59,7 +60,12 @@ public class Cluster {
                     log.info("create data: " + new String(newData.getData()));
 
                     switch (eventType) {
-                        case NODE_CREATED, NODE_CHANGED -> zkPathMap.put(newData.getPath(), Arrays.toString(newData.getData()));
+                        case NODE_CREATED, NODE_CHANGED ->
+                            zkPathMap.put(
+                                    Arrays.stream(newData.getPath().split("/")).reduce((a, b) -> b).get(),
+                                    Arrays.stream(Arrays.toString(newData.getData()).split(",")).toList()
+                            );
+
                         case NODE_DELETED -> zkPathMap.remove(newData.getPath());
                     }
                 },
