@@ -6,7 +6,6 @@ import type { AxiosInstance } from 'axios';
 import config from './config';
 
 import { RegionInfo, Request, SqlResponse } from './types';
-import { deprecate } from 'util';
 
 class MiniSQLClient {
   private cache?: RegionInfo[];
@@ -67,12 +66,16 @@ class MiniSQLClient {
     try {
       let resp = undefined;
       if (this.cache) {
-        const targetRegion = this.cache.find(({ tables }) =>
+        const targetRegions = this.cache.filter(({ tables }) =>
           tables.find(
             (table) => table.toLocaleLowerCase === tableName.toLocaleLowerCase
           )
         );
-        if (targetRegion) {
+        if (targetRegions.length > 0) {
+          // load balancing
+          const index = Math.floor(Math.random() * targetRegions.length);
+          const targetRegion = targetRegions[index];
+
           resp = await this.request<SqlResponse>({
             url: targetRegion.regionUrl,
             method: 'POST',
