@@ -18,4 +18,8 @@ public class Config {
 
     @Value("${minisql.shell_path}")
     public List<String> shellPath;
+
+    @Value("${minisql.region_replica}")
+    public int regionReplica;
+
 }

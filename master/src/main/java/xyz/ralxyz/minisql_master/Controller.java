@@ -13,6 +13,7 @@ import xyz.ralxyz.minisql_master.model.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @RestController
@@ -54,7 +55,15 @@ public class Controller {
             if (regionUrlList.size() != 0) {
                 return new SqlResponse(-1, "ERROR 200 from <api>: table '" + statement.tableName() + "' exists");
             } else {
-                //TODO: rand regions, add them to regionUrlList
+                Random rand = new Random();
+                // rand regions, add them to regionUrlList\
+                while (regionUrlList.size() < config.regionReplica) {
+                    final var randIdx = rand.nextInt(cluster.zkPathMap.size());
+                    final var regionUrl = getRegionUrl((String)cluster.zkPathMap.keySet().toArray()[randIdx]);
+                    if (!regionUrlList.contains(regionUrl)) {
+                        regionUrlList.add(regionUrl);
+                    }
+                }
             }
         }
 
