@@ -70,8 +70,7 @@ func main() {
 			})
 		}
 
-		command := c.FormValue("command")
-		res := C.external_main(C.CString(command))
+		res := C.external_main(C.CString(request.Command))
 
 		var response Response
 		response.Code = int(res.code)

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import Axios from 'axios';
+import Axios, { AxiosError } from 'axios';
 import type { AxiosInstance } from 'axios';
 
 // may not remove '.js' because of strange module resolution strategy
@@ -131,7 +131,20 @@ class MiniSQLClient {
   }
 
   private exceptionHandler(e: unknown): never {
-    console.log(e);
+    if (e instanceof AxiosError) {
+      console.log('=== Axios Error ===');
+      if (e.response) {
+        console.log('data: ', e.response.data);
+        console.log('status: ', e.response.data);
+      } else if (e.request) {
+        console.log('request: ', e.request);
+      } else {
+        console.log('err msg: ', e.message);
+      }
+      console.log('===================');
+    } else {
+      console.log('Error: ', e);
+    }
     process.exit(-1);
   }
 }
