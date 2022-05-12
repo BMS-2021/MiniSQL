@@ -94,6 +94,10 @@ public class Controller {
             );
             resp = personResultAsJsonStr;
 
+            if (resp.code() != 0) {
+                break;
+            }
+
             var tableListRaw = new String(this.cluster.client.getData().forPath("/db/" + region));
             if (tableListRaw.length() > 0) {
                 tableListRaw += ",";
