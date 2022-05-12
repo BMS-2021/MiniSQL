@@ -87,7 +87,14 @@ namespace api {
 
     void validate_condition(const macro::table &table, const std::vector<condition> &condition) {
         for (const auto &i : condition) {
-            auto iter = std::find(table.attribute_names.begin(), table.attribute_names.end(), i.attribute_name);
+            // auto iter = std::find(table.attribute_names.begin(), table.attribute_names.end(), i.attribute_name);
+            auto iter = table.attribute_names.begin();
+            for(; iter != table.attribute_names.end(); ++iter) {
+                if (*iter == i.attribute_name) {
+                    break;
+                }
+            }
+
             if (iter == table.attribute_names.end()) {
                 throw sql_exception(204, "api", "attribute \'" + i.attribute_name + "\' not found");
             }
