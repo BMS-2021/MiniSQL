@@ -1,5 +1,5 @@
 import fs from 'fs';
-import Axios, { AxiosError } from 'axios';
+import Axios from 'axios';
 import type { AxiosInstance } from 'axios';
 
 // may not remove '.js' because of strange module resolution strategy
@@ -20,17 +20,19 @@ class MiniSQLClient {
 
   private constructor(masterUrl: string) {
     this.masterUrl = masterUrl;
-    this.http = Axios.create();
+    this.http = Axios.create({ proxy: false });
   }
 
   private async loadCache() {
     try {
+      console.log('Loading Cache...');
       if (fs.existsSync(config.regionCache)) {
         const cache = fs.readFileSync(config.regionCache);
         this.cache = JSON.parse(cache.toString('utf-8'));
       } else {
-        this.flushCache();
+        await this.flushCache();
       }
+      console.log('Load cache ok!');
     } catch (e) {
       this.exceptionHandler(e);
     }
@@ -38,6 +40,7 @@ class MiniSQLClient {
 
   private async flushCache() {
     try {
+      console.log('Flushing Cache...');
       const newCache = await this.request<RegionInfo[]>({
         url: this.masterUrl + '/cache',
       });
@@ -46,12 +49,14 @@ class MiniSQLClient {
         Buffer.from(JSON.stringify(newCache))
       );
       this.cache = newCache;
+      console.log('Flush cache ok with: ', JSON.stringify(newCache));
     } catch (e) {
       this.exceptionHandler(e);
     }
   }
 
   async queryRegion(tableName: string, sql: string): Promise<SqlResponse> {
+    console.log('Querying To Region Server...');
     return this._queryRegion(tableName, sql, 3);
   }
 
@@ -76,6 +81,8 @@ class MiniSQLClient {
           const index = Math.floor(Math.random() * targetRegions.length);
           const targetRegion = targetRegions[index];
 
+          console.log(`Select Region ${targetRegion.regionUrl} as target~`);
+
           resp = await this.request<SqlResponse>({
             url: targetRegion.regionUrl,
             method: 'POST',
@@ -95,6 +102,7 @@ class MiniSQLClient {
 
   async queryMaster(tableName: string, sql: string): Promise<SqlResponse> {
     try {
+      console.log('Sending request to master...');
       return await this.request({
         url: this.masterUrl + '/statement',
         method: 'POST',
@@ -120,6 +128,7 @@ class MiniSQLClient {
         data,
         headers: { 'Content-Type': contentType },
       });
+
       if (res.status.toString().startsWith('2')) {
         const { data } = res;
         return data;
@@ -130,20 +139,20 @@ class MiniSQLClient {
     }
   }
 
-  private exceptionHandler(e: unknown): never {
-    if (e instanceof AxiosError) {
-      console.log('=== Axios Error ===');
-      if (e.response) {
-        console.log('data: ', e.response.data);
-        console.log('status: ', e.response.data);
-      } else if (e.request) {
-        console.log('request: ', e.request);
-      } else {
-        console.log('err msg: ', e.message);
-      }
-      console.log('===================');
+  private exceptionHandler(e: any): never {
+    if (e.response) {
+      console.log('AXIOS RESPONSE ERROR');
+      console.log('data: ', e.response.data);
+      console.log('status: ', e.response.data);
+    } else if (e.request) {
+      console.log('AXIOS REQUEST ERROR');
+      console.log('request: ', e.request);
+    } else if (e.message) {
+      console.log('AXIOS UNKNOWN ERROR');
+      console.log('err msg: ', e.message);
     } else {
-      console.log('Error: ', e);
+      console.log('OTHER ERROR');
+      console.log(e);
     }
     process.exit(-1);
   }

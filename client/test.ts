@@ -1,3 +1,4 @@
+import axios from 'axios';
 import MiniSQLClient from './src/client';
 
 const main = async () => {
