@@ -34,6 +34,8 @@ public class Controller {
     public List<RegionInfo> getCache() {
         final var regionInfoList = new ArrayList<RegionInfo>();
 
+        log.info(cluster.zkPathMap.toString());
+
         cluster.zkPathMap.forEach((k, v) ->
             regionInfoList.add(
                     new RegionInfo(v, getRegionUrl(k))

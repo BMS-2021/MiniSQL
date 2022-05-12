@@ -60,12 +60,14 @@ public class Cluster {
                     log.info("create data: " + new String(newData.getData()));
 
                     switch (eventType) {
-                        case NODE_CREATED, NODE_CHANGED ->
-                            zkPathMap.put(
-                                    Arrays.stream(newData.getPath().split("/")).reduce((a, b) -> b).get(),
-                                    Arrays.stream(Arrays.toString(newData.getData()).split(",")).toList()
-                            );
-
+                        case NODE_CREATED, NODE_CHANGED -> {
+                            if (!newData.getPath().equals("/db")) {
+                                zkPathMap.put(
+                                        Arrays.stream(newData.getPath().split("/")).reduce((a, b) -> b).get(),
+                                        Arrays.stream(Arrays.toString(newData.getData()).split(",")).toList()
+                                );
+                            }
+                        }
                         case NODE_DELETED -> zkPathMap.remove(newData.getPath());
                     }
                 },
