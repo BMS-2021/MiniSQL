@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,7 +66,7 @@ public class Cluster {
                                 final var tableListRaw = new String(newData.getData());
                                 zkPathMap.put(
                                         Arrays.stream(newData.getPath().split("/")).reduce((a, b) -> b).get(),
-                                        tableListRaw.length() == 0 ? List.of() : Arrays.stream(tableListRaw.split(",")).toList()
+                                        tableListRaw.length() == 0 ? new ArrayList<>() : Arrays.stream(tableListRaw.split(",")).toList()
                                 );
                             }
                         }

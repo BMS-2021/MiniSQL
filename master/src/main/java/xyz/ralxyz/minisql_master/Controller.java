@@ -24,6 +24,8 @@ import java.util.Random;
 @RestController
 public class Controller {
 
+    Random rand = new Random();
+
     @Autowired
     Cluster cluster;
 
@@ -49,26 +51,25 @@ public class Controller {
     }
 
     @PostMapping("/statement")
-    public SqlResponse postStatement(@RequestBody final Statement statement) {
-        final var regionUrlList = new ArrayList<String>();
+    public SqlResponse postStatement(@RequestBody final Statement statement) throws Exception {
+        final var regionList = new ArrayList<String>();
         cluster.zkPathMap.forEach((k, v) -> {
             if (v.contains(statement.tableName())) {
-                regionUrlList.add(getRegionUrl(k));
+                regionList.add(k);
             }
         });
 
         final var commandList = Arrays.stream(statement.command().toLowerCase().split(" +")).toList();
         if (commandList.size() >= 2 && commandList.get(0).equals("create") && commandList.get(1).equals("table")) {
-            if (regionUrlList.size() != 0) {
+            if (regionList.size() != 0) {
                 return new SqlResponse(-1, "ERROR 200 from <api>: table '" + statement.tableName() + "' exists");
             } else {
-                Random rand = new Random();
                 // rand regions, add them to regionUrlList\
-                while (regionUrlList.size() < config.regionReplica) {
+                while (regionList.size() < config.regionReplica) {
                     final var randIdx = rand.nextInt(cluster.zkPathMap.size());
-                    final var regionUrl = getRegionUrl((String)cluster.zkPathMap.keySet().toArray()[randIdx]);
-                    if (!regionUrlList.contains(regionUrl)) {
-                        regionUrlList.add(regionUrl);
+                    final var region = (String)cluster.zkPathMap.keySet().toArray()[randIdx];
+                    if (!regionList.contains(region)) {
+                        regionList.add(region);
                     }
                 }
             }
@@ -76,9 +77,9 @@ public class Controller {
 
         SqlResponse resp = null;
 
-        log.info(regionUrlList.toString());
+        log.info(regionList.toString());
 
-        for (final var url : regionUrlList) {
+        for (final var region : regionList) {
             final var headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             final var cmdJsonObject = new JSONObject();
@@ -87,11 +88,19 @@ public class Controller {
             log.info(cmdJsonObject.toString());
 
             final var personResultAsJsonStr = new RestTemplate().postForObject(
-                    "http://" + url,
+                    "http://" + getRegionUrl(region),
                     new HttpEntity<>(cmdJsonObject.toString(), headers),
                     SqlResponse.class
             );
             resp = personResultAsJsonStr;
+
+            var tableListRaw = new String(this.cluster.client.getData().forPath("/db/" + region));
+            if (tableListRaw.length() > 0) {
+                tableListRaw += ",";
+            }
+            tableListRaw += statement.tableName();
+
+            this.cluster.client.setData().forPath("/db/" + region, tableListRaw.getBytes());
         }
 
         return resp;
