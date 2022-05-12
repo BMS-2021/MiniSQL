@@ -84,7 +84,7 @@ class MiniSQLClient {
           console.log(`Select Region ${targetRegion.regionUrl} as target~`);
 
           resp = await this.request<SqlResponse>({
-            url: targetRegion.regionUrl,
+            url: 'http://' + targetRegion.regionUrl,
             method: 'POST',
             data: { command: sql },
           });
