@@ -62,9 +62,10 @@ public class Cluster {
                     switch (eventType) {
                         case NODE_CREATED, NODE_CHANGED -> {
                             if (!newData.getPath().equals("/db")) {
+                                final var tableListRaw = new String(newData.getData());
                                 zkPathMap.put(
                                         Arrays.stream(newData.getPath().split("/")).reduce((a, b) -> b).get(),
-                                        Arrays.stream(Arrays.toString(newData.getData()).split(",")).toList()
+                                        tableListRaw.length() == 0 ? List.of() : Arrays.stream(tableListRaw.split(",")).toList()
                                 );
                             }
                         }

@@ -18,6 +18,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type Request struct {
+	Command string `json:"command"`
+}
+
+type Response struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+}
+
 func main() {
 	regionName := os.Args[1]
 	serverAddr := os.Args[2]
@@ -48,22 +57,8 @@ func main() {
 		channel <- 1
 		defer func() { <-channel }()
 
-		var request struct {
-			Command string `json:"command" validate:"required"`
-		}
-
-		type Response struct {
-			Code int    `json:"code"`
-			Msg  string `json:"msg"`
-		}
-
+		var request Request
 		if err := c.Bind(&request); err != nil {
-			return c.JSON(http.StatusBadRequest, Response{
-				Code: -1,
-				Msg:  err.Error(),
-			})
-		}
-		if err := c.Validate(&request); err != nil {
 			return c.JSON(http.StatusBadRequest, Response{
 				Code: -1,
 				Msg:  err.Error(),

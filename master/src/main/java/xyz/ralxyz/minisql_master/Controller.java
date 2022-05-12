@@ -76,14 +76,18 @@ public class Controller {
 
         SqlResponse resp = null;
 
+        log.info(regionUrlList.toString());
+
         for (final var url : regionUrlList) {
             final var headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             final var cmdJsonObject = new JSONObject();
-            cmdJsonObject.put("command", statement);
+            cmdJsonObject.put("command", statement.command());
+
+            log.info(cmdJsonObject.toString());
 
             final var personResultAsJsonStr = new RestTemplate().postForObject(
-                    url,
+                    "http://" + url,
                     new HttpEntity<>(cmdJsonObject.toString(), headers),
                     SqlResponse.class
             );
