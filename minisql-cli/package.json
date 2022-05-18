@@ -10,7 +10,7 @@
     "start": "tsc && node --experimental-specifier-resolution=node index"
   },
   "dependencies": {
-    "@enzymii/minisql-client": "../client",
+    "@enzymii/minisql-client": "^1.0.0",
     "chalk": "^5.0.1",
     "inquirer": "^8.2.4"
   },
