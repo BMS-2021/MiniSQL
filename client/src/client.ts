@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, { mkdirSync } from 'fs';
 import Axios from 'axios';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
@@ -16,18 +16,27 @@ class MiniSQLClient {
 
   public static async create(masterUrl?: string) {
     if (!masterUrl) {
-      masterUrl = (
-        await inquirer.prompt<{ masterUrl: string }>([
-          {
-            type: 'input',
-            name: 'masterUrl',
-            message: 'Please input master url:',
-            validate: (input) =>
-              /^[a-z0-9.](:\d+)?$/.test(input) || chalk.red('Invalid URL!'),
-          },
-        ])
-      ).masterUrl;
+      const { masterUrl: inputUrl } = await inquirer.prompt<{
+        masterUrl: string;
+      }>([
+        {
+          type: 'input',
+          name: 'masterUrl',
+          message: 'Please input master url:',
+          default: '[http://]ip:port',
+          validate: (input) =>
+            /^(https?:\/\/)?[a-z0-9.]+(:\d+)?$/.test(input) ||
+            /:?\d+/.test(input) ||
+            chalk.red('Invalid URL'),
+        },
+      ]);
+      masterUrl = inputUrl;
     }
+
+    if (!/^http/.test(masterUrl)) {
+      masterUrl = 'http://' + masterUrl;
+    }
+
     const client = new MiniSQLClient(masterUrl);
     await client.loadCache();
     return client;
@@ -47,7 +56,7 @@ class MiniSQLClient {
       } else {
         await this.flushCache();
       }
-      console.log('Load cache ok!');
+      console.log(chalk.green('Load cache ok!'));
     } catch (e) {
       this.exceptionHandler(e);
     }

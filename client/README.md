@@ -6,6 +6,10 @@ Cache region's address, send read-only request to region server and write statem
 
 _It is used for course assignment only, you may not use it in production environment~_
 
+As there is file operation, it may not use in a browser environment.
+
+When you run it in Node.js, please make sure to set `--experimental-specifier-resolution=node` flag to ensure proper module resolution.
+
 ## Usage
 
 _Note that all functions implemented in the package are asynchronous~_

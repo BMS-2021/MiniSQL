@@ -9,7 +9,7 @@ type Answer = {
 };
 
 (async () => {
-  const client = await MiniSQLClient.create('localhost:8080');
+  const client = await MiniSQLClient.create();
   while (true) {
     const { sql, table, isSelect } = await Inquirer.prompt<Answer>([
       {
@@ -26,6 +26,7 @@ type Answer = {
         type: 'confirm',
         name: 'isSelect',
         message: 'Is this a select statement?',
+        default: false,
       },
     ]);
 
@@ -39,6 +40,10 @@ type Answer = {
       console.log(Chalk.cyanBright(msg));
     } else {
       console.log(Chalk.redBright(msg));
+    }
+
+    if (sql.toLocaleLowerCase() === 'exit;') {
+      break;
     }
   }
 })();
