@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,11 +83,11 @@ public class Cluster {
         for (int i = 0; i < connectStringList.size(); i++) {
             var builder = new ProcessBuilder();
             builder.command(
-                    config.shellPath.get(i),
+                    "./MiniSQL",
                     config.zkPathName.get(i),
                     connectStringList.get(i),
                     config.regionPort.get(i)
-            );
+            ).directory(new File(config.shellPath.get(i)));
 
             log.info("shellPath: " + config.shellPath.get(i));
             log.info("zkPathName: " + config.zkPathName.get(i));

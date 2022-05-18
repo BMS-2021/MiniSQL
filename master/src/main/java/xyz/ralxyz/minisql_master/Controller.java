@@ -94,7 +94,8 @@ public class Controller {
             );
             resp = personResultAsJsonStr;
 
-            if (resp.code() != 0) {
+            // normal response (0) or exit (1)
+            if (resp.code() >= 0) {
                 break;
             }
 
