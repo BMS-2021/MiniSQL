@@ -12,7 +12,7 @@
     "url": "https://github.com/BMS-2021/MiniSQL"
   },
   "scripts": {
-    "prepublish": "tsc",
+    "prepare": "tsc",
     "test": "tsc && node --experimental-specifier-resolution=node dist/test"
   },
   "devDependencies": {
@@ -20,6 +20,9 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "axios": "^0.27.2"
+    "@types/inquirer": "^8.2.1",
+    "axios": "^0.27.2",
+    "chalk": "^5.0.1",
+    "inquirer": "^8.2.4"
   }
 }

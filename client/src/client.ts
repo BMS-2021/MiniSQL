@@ -1,5 +1,7 @@
 import fs from 'fs';
 import Axios from 'axios';
+import chalk from 'chalk';
+import inquirer from 'inquirer';
 import type { AxiosInstance } from 'axios';
 
 // may not remove '.js' because of strange module resolution strategy
@@ -12,7 +14,20 @@ class MiniSQLClient {
   private masterUrl!: string;
   private http!: AxiosInstance;
 
-  public static async create(masterUrl: string) {
+  public static async create(masterUrl?: string) {
+    if (!masterUrl) {
+      masterUrl = (
+        await inquirer.prompt<{ masterUrl: string }>([
+          {
+            type: 'input',
+            name: 'masterUrl',
+            message: 'Please input master url:',
+            validate: (input) =>
+              /^[a-z0-9.](:\d+)?$/.test(input) || chalk.red('Invalid URL!'),
+          },
+        ])
+      ).masterUrl;
+    }
     const client = new MiniSQLClient(masterUrl);
     await client.loadCache();
     return client;
@@ -25,7 +40,7 @@ class MiniSQLClient {
 
   private async loadCache() {
     try {
-      console.log('Loading Cache...');
+      console.log(chalk.cyan('Loading Cache...'));
       if (fs.existsSync(config.regionCache)) {
         const cache = fs.readFileSync(config.regionCache);
         this.cache = JSON.parse(cache.toString('utf-8'));
@@ -40,7 +55,7 @@ class MiniSQLClient {
 
   private async flushCache() {
     try {
-      console.log('Flushing Cache...');
+      console.log(chalk.blueBright('Flushing Cache...'));
       const newCache = await this.request<RegionInfo[]>({
         url: this.masterUrl + '/cache',
       });
@@ -49,14 +64,17 @@ class MiniSQLClient {
         Buffer.from(JSON.stringify(newCache))
       );
       this.cache = newCache;
-      console.log('Flush cache ok with: ', JSON.stringify(newCache));
+      console.log(
+        chalk.green('Flush cache ok with: '),
+        JSON.stringify(newCache)
+      );
     } catch (e) {
       this.exceptionHandler(e);
     }
   }
 
   async queryRegion(tableName: string, sql: string): Promise<SqlResponse> {
-    console.log('Querying To Region Server...');
+    console.log(chalk.magenta('Querying To Region Server...'));
     return this._queryRegion(tableName, sql, 3);
   }
 
@@ -82,7 +100,9 @@ class MiniSQLClient {
           const index = Math.floor(Math.random() * targetRegions.length);
           const targetRegion = targetRegions[index];
 
-          console.log(`Select Region ${targetRegion.regionUrl} as target~`);
+          console.log(
+            chalk.yellow(`Select Region ${targetRegion.regionUrl} as target~`)
+          );
 
           resp = await this.request<SqlResponse>({
             url: 'http://' + targetRegion.regionUrl,
@@ -103,7 +123,7 @@ class MiniSQLClient {
 
   async queryMaster(tableName: string, sql: string): Promise<SqlResponse> {
     try {
-      console.log('Sending request to master...');
+      console.log(chalk.magenta('Sending request to master...'));
       return await this.request({
         url: this.masterUrl + '/statement',
         method: 'POST',
@@ -142,18 +162,18 @@ class MiniSQLClient {
 
   private exceptionHandler(e: any): never {
     if (e.response) {
-      console.log('AXIOS RESPONSE ERROR');
-      console.log('data: ', e.response.data);
-      console.log('status: ', e.response.data);
+      console.log(chalk.redBright.bold('AXIOS RESPONSE ERROR'));
+      console.log(chalk.red('data: '), e.response.data);
+      console.log(chalk.red('status: '), e.response.data);
     } else if (e.request) {
-      console.log('AXIOS REQUEST ERROR');
-      console.log('request: ', e.request);
+      console.log(chalk.redBright.bold('AXIOS REQUEST ERROR'));
+      console.log(chalk.red('request: '), e.request);
     } else if (e.message) {
-      console.log('AXIOS UNKNOWN ERROR');
-      console.log('err msg: ', e.message);
+      console.log(chalk.redBright.bold('AXIOS UNKNOWN ERROR'));
+      console.log(chalk.red('err msg: '), e.message);
     } else {
-      console.log('OTHER ERROR');
-      console.log(e);
+      console.log(chalk.redBright.bold('OTHER ERROR'));
+      console.log(chalk.red(e));
     }
     process.exit(-1);
   }
