@@ -73,7 +73,8 @@ class MiniSQLClient {
       if (this.cache) {
         const targetRegions = this.cache.filter(({ tables }) =>
           tables.find(
-            (table) => table.toLocaleLowerCase === tableName.toLocaleLowerCase
+            (table) =>
+              table.toLocaleLowerCase() === tableName.toLocaleLowerCase()
           )
         );
         if (targetRegions.length > 0) {
