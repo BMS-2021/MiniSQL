@@ -1,6 +1,6 @@
 {
   "name": "@enzymii/minisql-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "HTTP client for distributed MiniSQL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
     "url": "https://github.com/BMS-2021/MiniSQL"
   },
   "scripts": {
-    "prepublish": "",
+    "prepublish": "tsc",
     "test": "tsc && node --experimental-specifier-resolution=node dist/test"
   },
   "devDependencies": {
