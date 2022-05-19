@@ -120,7 +120,7 @@ class MiniSQLClient {
           });
         }
       }
-      if (!resp) {
+      if (!resp || resp.code != 0) {
         await this.flushCache();
         resp = await this._queryRegion(tableName, sql, flushAndRetryTimes - 1);
       }
