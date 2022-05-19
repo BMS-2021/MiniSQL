@@ -53,6 +53,8 @@ public class Controller {
     @PostMapping("/statement")
     public SqlResponse postStatement(@RequestBody final Statement statement) throws Exception {
         final var regionList = new ArrayList<String>();
+        var isCreate = false;
+        var isDrop = false;
         cluster.zkPathMap.forEach((k, v) -> {
             if (v.contains(statement.tableName())) {
                 regionList.add(k);
@@ -61,6 +63,7 @@ public class Controller {
 
         final var commandList = Arrays.stream(statement.command().toLowerCase().split(" +")).toList();
         if (commandList.size() >= 2 && commandList.get(0).equals("create") && commandList.get(1).equals("table")) {
+            isCreate = true;
             if (regionList.size() != 0) {
                 return new SqlResponse(-1, "ERROR 200 from <api>: table '" + statement.tableName() + "' exists");
             } else {
@@ -73,6 +76,8 @@ public class Controller {
                     }
                 }
             }
+        } else if (commandList.size() >= 2 && commandList.get(0).equals("drop") && commandList.get(1).equals("table")) {
+            isDrop = true;
         }
 
         SqlResponse resp = null;
@@ -100,10 +105,17 @@ public class Controller {
             }
 
             var tableListRaw = new String(this.cluster.client.getData().forPath("/db/" + region));
-            if (tableListRaw.length() > 0) {
-                tableListRaw += ",";
+            if (isCreate) {
+                if (tableListRaw.length() > 0) {
+                    tableListRaw += ",";
+                }
+                tableListRaw += statement.tableName();
+            } else if (isDrop) {
+                var tableList = tableListRaw.split(",");
+                // remove tableName from tableList
+                tableList = Arrays.stream(tableList).filter(s -> !s.equals(statement.tableName())).toArray(String[]::new);
+                tableListRaw = String.join(",", tableList);
             }
-            tableListRaw += statement.tableName();
 
             this.cluster.client.setData().forPath("/db/" + region, tableListRaw.getBytes());
         }
