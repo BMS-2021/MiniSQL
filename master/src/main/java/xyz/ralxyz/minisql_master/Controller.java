@@ -15,10 +15,7 @@ import xyz.ralxyz.minisql_master.model.RegionInfo;
 import xyz.ralxyz.minisql_master.model.SqlResponse;
 import xyz.ralxyz.minisql_master.model.Statement;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -55,13 +52,22 @@ public class Controller {
         final var regionList = new ArrayList<String>();
         var isCreate = false;
         var isDrop = false;
+        var isExit = false;
+
+        final var commandList = Arrays.stream(statement.command().toLowerCase().split(" +")).toList();
+
+        if (commandList.size() > 0 && commandList.get(0).startsWith("exit")) {
+            isExit = true;
+        }
+
+        boolean finalIsExit = isExit;
         cluster.zkPathMap.forEach((k, v) -> {
-            if (v.contains(statement.tableName())) {
+            if (finalIsExit || v.contains(statement.tableName())) {
                 regionList.add(k);
             }
         });
 
-        final var commandList = Arrays.stream(statement.command().toLowerCase().split(" +")).toList();
+
         if (commandList.size() >= 2 && commandList.get(0).equals("create") && commandList.get(1).equals("table")) {
             isCreate = true;
             if (regionList.size() != 0) {
@@ -118,6 +124,10 @@ public class Controller {
             }
 
             this.cluster.client.setData().forPath("/db/" + region, tableListRaw.getBytes());
+        }
+
+        if (resp == null) {
+            resp = new SqlResponse(-1, "ERROR: invalid table name");
         }
 
         return resp;

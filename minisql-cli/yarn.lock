@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@enzymii/minisql-client@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@enzymii/minisql-client/-/minisql-client-1.0.0.tgz#272c9b7b34ae78a47a2ccda843c814dd11a01a8f"
-  integrity sha512-BUTB8wFa31OmPVfhUTkXS4zo5m4Tj184tnzdxgAd0n6JVOJnqabAejUOk2tILtPI4d1NyFvl3LkKW4u3PPhgTA==
+"@enzymii/minisql-client@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@enzymii/minisql-client/-/minisql-client-1.0.1.tgz#cdaa91303a2b603bfb31c1bc0c78f532be4b0120"
+  integrity sha512-55tdSJN1tmahCWWHW0+3uHV/H+knzRoXXRlb9mx91Yh53WyPPvOuJZRAtyjNtFFypgEtSYu3d9KsjMd6smsc3g==
   dependencies:
     "@types/inquirer" "^8.2.1"
     axios "^0.27.2"
