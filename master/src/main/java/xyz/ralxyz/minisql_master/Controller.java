@@ -15,6 +15,7 @@ import xyz.ralxyz.minisql_master.model.RegionInfo;
 import xyz.ralxyz.minisql_master.model.SqlResponse;
 import xyz.ralxyz.minisql_master.model.Statement;
 
+import java.net.SocketException;
 import java.util.*;
 
 @Slf4j
@@ -98,12 +99,16 @@ public class Controller {
 
             log.info(cmdJsonObject.toString());
 
-            final var personResultAsJsonStr = new RestTemplate().postForObject(
-                    "http://" + getRegionUrl(region),
-                    new HttpEntity<>(cmdJsonObject.toString(), headers),
-                    SqlResponse.class
-            );
-            resp = personResultAsJsonStr;
+            try {
+                final var personResultAsJsonStr = new RestTemplate().postForObject(
+                        "http://" + getRegionUrl(region),
+                        new HttpEntity<>(cmdJsonObject.toString(), headers),
+                        SqlResponse.class
+                );
+                resp = personResultAsJsonStr;
+            } catch (Exception e) {
+                resp = new SqlResponse(1, "bye!");
+            }
 
             // normal response (0) or exit (1)
             if (resp.code() < 0) {

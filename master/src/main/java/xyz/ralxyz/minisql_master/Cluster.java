@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
+import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingCluster;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +59,23 @@ public class Cluster {
 
         cache.listenable().addListener(
                 (eventType, oldData, newData) -> {
+                    if (eventType == CuratorCacheListener.Type.NODE_DELETED) {
+                        final var name = Arrays.stream(oldData.getPath().split("/")).reduce((a, b) -> b).get();
+                        var connectStringList = java.util.Arrays.stream(this.testingCluster.getConnectString().split(",")).toList();
+                        zkPathMap.remove(name);
+                        final var i = config.zkPathName.indexOf(name);
+                        try {
+                            new ProcessBuilder().command(
+                                    "./MiniSQL",
+                                    config.zkPathName.get(i),
+                                    connectStringList.get(i),
+                                    config.regionPort.get(i)
+                            ).directory(new File(config.shellPath.get(i))).start();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return;
+                    }
                     log.info("create node: " + newData.getPath());
                     log.info("create type: " + eventType);
                     log.info("create data: " + new String(newData.getData()));
@@ -71,7 +90,6 @@ public class Cluster {
                                 );
                             }
                         }
-                        case NODE_DELETED -> zkPathMap.remove(newData.getPath());
                     }
                 },
                 threadPool

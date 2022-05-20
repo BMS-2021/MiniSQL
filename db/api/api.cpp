@@ -348,7 +348,7 @@ namespace api {
         cat_mgt.Flush();
         idx_mgt.save();
         std::cout << "bye!" << std::endl;
-        // std::exit(0);
+        std::exit(0);
     }
 }
 
