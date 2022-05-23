@@ -33,17 +33,17 @@ make
 ```
 
 Then, two executables, one called `MiniSQL` and another called `minisql_local` will appear in the project directory.  
-- `MiniSQL` is the executable that can be run on the server, which exposes HTTP API.
-- `minisql_local` is the executable that can be run on the local machine, which has a CLI interface.
+- `MiniSQL` is expected to be executed on the server, which exposes HTTP API. In the MiniSQL cluster, it is started by master node.  
+- `minisql_local` is expected to be executable on the local machine, which has a CLI interface.
 
 If you haven't installed *GNU Readline* library, the program will fallback, using `std::cin` to read input lines, 
 which will affect the using experience.  
 
 ## Usage
 
-Start the program in http server mode with zk:
+Start MiniSQL local by the following command:  
 ```sh
-./MiniSQL [node_name] [zk_server_addr]
+./minisql_local
 ```
 
 After the executable has been executed, press `TAB`, then you will see all valid keywords. 
