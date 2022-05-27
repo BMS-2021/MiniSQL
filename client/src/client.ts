@@ -184,7 +184,8 @@ class MiniSQLClient {
       console.log(chalk.redBright.bold('OTHER ERROR'));
       console.log(chalk.red(e));
     }
-    process.exit(-1);
+    // process.exit(-1);
+    throw 'MiniSQL Client Exception';
   }
 }
 
