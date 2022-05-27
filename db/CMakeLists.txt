@@ -90,7 +90,7 @@ add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/go-svc
-        COMMAND go build -o ../MiniSQL
+        COMMAND go build -o ../${PROJECT_NAME}_region
         COMMENT "Building go source files"
 )
 

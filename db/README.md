@@ -1,16 +1,17 @@
-# MiniSQL
+# MiniSQL Database Engine
 
-This is `MiniSQL`, the final project of *Database System Concept* course.
+**Disclaimer: This project is the final project of a course, which can only be considered as a toy. It shows some undergraduates' ideas on how to build a proper database. Suggestions are welcomed.**
+
+This is `MiniSQL Database Engine`, the final project of *Database System Concept* course.
+
+Currently, the **HTTP server version** of this project, which is called *Region Server*, is a component of `MiniSQL cluster`, a distributed database cluster. This project also has a **standalone CLI version**, which will be discussed later in this document.  
 
 ![MiniSQL.png](https://i.loli.net/2021/07/11/quRsbFZpzL5r7gY.png)  
 
-In this project, we are required to implement a toy database, which contains some basic features, 
-like creating, dropping and selecting table, inserting and deleting rows, 
-creating and dropping indexes which is implemented by a B+ tree, and providing persistent storage. 
-There are three data types that must be supported: 
-`INT`, `FLOAT` and `CHAR()`. `UNIQUE` and `PRIMARY KEY` needs to be correctly declared in the DDL, and processed properly. 
-The querying condition could be concatenated using `AND`, and common operators in the condition expression must be supported. 
-External `.sql` files are required to be able to execute by `EXECFILE` statement.  
+> This screen shot shows MiniSQL standalone version
+
+In this project, we are required to implement a *toy* database engine, which contains some basic features, like creating, dropping and selecting table, inserting and deleting rows, creating and dropping indexes which is implemented by a B+ tree, and providing persistent storage. There are three data types that must be supported: 
+`INT`, `FLOAT` and `CHAR()`. `UNIQUE` and `PRIMARY KEY` needs to be correctly declared in the DDL, and processed properly. The querying condition could be concatenated using `AND`, and common operators in the condition expression must be supported. External `.sql` files are required to be able to execute by `EXECFILE` statement.  
 
 ## Infrastructure
 
@@ -18,8 +19,6 @@ External `.sql` files are required to be able to execute by `EXECFILE` statement
 
 The project contains six modules: *Interpreter*, *API*, *Catalog Manager*, *Record Manager*, *Buffer Manager*, and *Index Manager*.
 A golang HTTP server is provided to serve the database, while you can also choose to use the CLI version of this database.
-
-**Cautious: This project is a final project of a course, NOT a project that can be used in production.**
 
 ## Build
 
@@ -33,17 +32,17 @@ make
 ```
 
 Then, two executables, one called `MiniSQL` and another called `minisql_local` will appear in the project directory.  
-- `MiniSQL` is the executable that can be run on the server, which exposes HTTP API.
-- `minisql_local` is the executable that can be run on the local machine, which has a CLI interface.
+- `minisql_region` is expected to be executed on the server, which exposes HTTP API. Since it is a component of MiniSQL cluster, it is started by master node.  
+- `minisql_local` is the standalone version, which has a CLI interface.
 
 If you haven't installed *GNU Readline* library, the program will fallback, using `std::cin` to read input lines, 
 which will affect the using experience.  
 
 ## Usage
 
-Start the program in http server mode with zk:
+Start MiniSQL local by the following command:  
 ```sh
-./MiniSQL [node_name] [zk_server_addr]
+./minisql_local
 ```
 
 After the executable has been executed, press `TAB`, then you will see all valid keywords. 
