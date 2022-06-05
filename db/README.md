@@ -1,8 +1,8 @@
-# MiniSQL Database Engine
+# MiniSQL Region
 
 **Disclaimer: This project is the final project of a course, which can only be considered as a toy. It shows some undergraduates' ideas on how to build a proper database. Suggestions are welcomed.**
 
-This is `MiniSQL Database Engine`, the final project of *Database System Concept* course.
+This is `MiniSQL Region`, the final project of *Database System Concept* course.
 
 Currently, the **HTTP server version** of this project, which is called *Region Server*, is a component of `MiniSQL cluster`, a distributed database cluster. This project also has a **standalone CLI version**, which will be discussed later in this document.  
 
